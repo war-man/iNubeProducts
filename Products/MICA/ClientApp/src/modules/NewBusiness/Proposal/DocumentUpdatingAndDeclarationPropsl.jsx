@@ -2,6 +2,7 @@
 import FilterNone from "@material-ui/icons/FilterNone";
 
 // @material-ui/core components
+import Modal from '@material-ui/core/Modal';
 
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
@@ -33,7 +34,10 @@ import CustomCheckbox from "components/Checkbox/CustomCheckbox";
 //import ReactTable from "react-table"; import Modal from '@material-ui/core/Modal';
 import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import { Animated } from "react-animated-css";
-
+import SignaturePad from 'react-signature-canvas';
+import Popup from 'reactjs-popup';
+import styles from './sigCanvas.css';
+import ProposalApp from "./ProposalApp.css";
 
 
 import CloudUpload from "@material-ui/icons/CloudUpload";
@@ -80,6 +84,13 @@ class DocumentUpdating extends React.Component {
         this.state = {
             ProposerPlace: "",
             ProposerCountry: "",
+            openProposerpop: false,
+            openSpousepop: false,
+            openWPpop: false,
+            proposerSignature: [],
+            spouseSignature: [],
+            wpSignature: [],
+            sigPad : {},
             data: dataTable.dataRows.map((prop, key) => {
                 return {
                     id: key,
@@ -108,9 +119,105 @@ class DocumentUpdating extends React.Component {
                 };
             })
         };
-    }
-    render() {
 
+
+    }
+
+
+    clear = () => {
+        this.sigPad.clear()
+    }
+
+    /******************* Save Proposer Signature ******************************/
+
+    saveProposerSignature = () => {
+        debugger;
+       
+        this.state.proposerSignature= this.sigPad.getTrimmedCanvas()
+            .toDataURL('image/png');
+       
+        this.setState({});
+        console.log("proposerSignature", this.state.proposerSignature);
+
+
+    }
+
+     /******************* Save Spouse Signature ******************************/
+
+    saveSpouseSignature = () => {
+        debugger;
+       
+        this.state.spouseSignature= this.sigPad.getTrimmedCanvas()
+            .toDataURL('image/png');
+       
+        this.setState({});
+        console.log("spouseSignature", this.state.spouseSignature, "hgsdyegrweu", this.state.proposerSignature);
+
+
+    }
+
+     /******************* Save Wealth Planner Signature ******************************/
+
+    saveWPSignature = () => {
+        debugger;
+
+        this.state.wpSignature = this.sigPad.getTrimmedCanvas()
+            .toDataURL('image/png');
+
+        this.setState({});
+        console.log("wpSignature", this.state.wpSignature);
+
+
+    }
+
+     /******************* Set Proposer Signature ******************************/
+
+    setProposerSignatureCanvas = () => {
+        debugger;
+
+        this.state.openProposerpop = true;
+
+        this.setState({  });
+    }
+
+    handleProposerClose = () => {
+        debugger;
+
+        this.state.openProposerpop = false;
+
+        this.setState({});
+    }
+
+    /******************* Set Spouse Signature ******************************/
+
+    setSpouseSignatureCanvas = () => {
+        debugger;
+
+        this.state.openSpousepop = true;
+
+        this.setState({});
+    }
+
+    handleSpouseClose = () => {
+        this.setState({ openSpousepop: false });
+    }
+
+    /******************* Set Wealth Planner Signature ******************************/
+
+    setWPSignatureCanvas = () => {
+        debugger;
+
+        this.state.openWPpop = true;
+
+        this.setState({});
+    }
+    handleWelathPlanClose = () => {
+        this.setState({ openWPpop: false });
+    }
+
+   
+    render() {
+        let { trimmedDataURL } = this.state;
         const { classes } = this.props;
 
         return (
@@ -248,17 +355,71 @@ class DocumentUpdating extends React.Component {
                         <CardBody>
                             <h4>Proposer</h4>
                    
-
-                        
                             <GridItem >
-                                <div className="actions-right">
-                                    <Button color="info"
-                                        round className={this.props.classes.marginRight}
-                                        // onClick={this.handleLeadSave}
-                                        id="saveBtn" >
-                                        Add Proposer Signature
+                          
+                                <div className={ProposalApp.App}>
+                                <Popup modal
+                                    open={this.state.openProposerpop}
+                                    trigger={<div className="actions-right">
+                                        <Button color="info"
+                                            round className={this.props.classes.marginRight}
+                                            onClick={this.setProposerSignatureCanvas}
+                                            id="saveBtn" >
+                                            Add Proposer Signature
                                 </Button>
+                                    </div>}
+                                    closeOnDocumentClick={false}
+
+                                    
+                                >
+
+                                    <h4><small >Tap to add Proposer Signature</small></h4>
+                                     <div className={styles.container}>
+                                        <div className={styles.sigContainer}>
+                                            <SignaturePad canvasProps={{ width: 650, height: 300, className: styles.sigPad }}
+                                        ref={(ref) => { this.sigPad = ref }}
+                                    />
+
+                                            <GridContainer justify="center">
+                                                <GridItem xs={3} sm={3} md={3}>
+                                            <Button
+                                                color="info"
+                                                round
+                                                id="save-bnt"
+                                                className={classes.marginRight} onClick={this.clear}>
+                                                Clear
+                                    </Button>
+                                                </GridItem>
+                                                <GridItem xs={3} sm={3} md={3}>
+                                            <Button color="info"
+                                                round
+                                                id="save-bnt"
+                                                className={classes.marginRight} onClick={this.saveProposerSignature}>
+                                                Save
+                                    </Button>
+                                                </GridItem>
+                                                    <GridItem xs={3} sm={3} md={3}>
+                                            <Button color="info"
+                                                round
+                                                id="save-bnt"
+                                                        className={classes.marginRight} onClick={this.handleProposerClose}>
+                                                Close
+                                    </Button>
+                                                </GridItem>
+                                            </GridContainer>
+
+                                             </div>
+                                        {/* {trimmedDataURL
+                                            ? <img
+                                                style={{ width: "05rem" }}
+                                                className={styles.sigImage}
+                                        src={trimmedDataURL} />
+                                    : null}*/}
+                                       </div>
+    
+                                </Popup>
                                 </div>
+                           
                             </GridItem>
                        
 
@@ -306,16 +467,72 @@ class DocumentUpdating extends React.Component {
                        
 
                        
-                            <GridItem >
-                                <div className="actions-right">
-                                    <Button color="info"
-                                        round className={this.props.classes.marginRight}
-                                        // onClick={this.handleLeadSave}
-                                        id="saveBtn" >
-                                        Add Spouse Signature
+                        <GridItem >
+
+                            <div className={ProposalApp.App}>
+                                <Popup modal
+                                    open={this.state.openSpousepop}
+                                    trigger={<div className="actions-right">
+                                        <Button color="info"
+                                            round className={this.props.classes.marginRight}
+                                            onClick={this.setSpouseSignatureCanvas}
+                                            id="saveBtn" >
+                                            Add Spouse Signature
                                 </Button>
-                                </div>
-                            </GridItem>
+                                    </div>}
+                                    closeOnDocumentClick={false}
+
+
+                                >
+
+                                    <h4><small >Tap to add Spouse Signature</small></h4>
+                                    <div className={styles.container}>
+                                        <div className={styles.sigContainer}>
+                                            <SignaturePad canvasProps={{ width: 650, height: 300, className: styles.sigPad }}
+                                                ref={(ref) => { this.sigPad = ref }}
+                                            />
+
+                                            <GridContainer justify="center">
+                                                <GridItem xs={3} sm={3} md={3}>
+                                                    <Button
+                                                        color="info"
+                                                        round
+                                                        id="save-bnt"
+                                                        className={classes.marginRight} onClick={this.clear}>
+                                                        Clear
+                                    </Button>
+                                                </GridItem>
+                                                <GridItem xs={3} sm={3} md={3}>
+                                                    <Button color="info"
+                                                        round
+                                                        id="save-bnt"
+                                                        className={classes.marginRight} onClick={this.saveSpouseSignature}>
+                                                        Save
+                                    </Button>
+                                                </GridItem>
+                                                <GridItem xs={3} sm={3} md={3}>
+                                                    <Button color="info"
+                                                        round
+                                                        id="save-bnt"
+                                                        className={classes.marginRight} onClick={this.handleSpouseClose}>
+                                                        Close
+                                    </Button>
+                                                </GridItem>
+                                            </GridContainer>
+
+                                        </div>
+                                        {/* {trimmedDataURL
+                                            ? <img
+                                                style={{ width: "05rem" }}
+                                                className={styles.sigImage}
+                                        src={trimmedDataURL} />
+                                    : null}*/}
+                                    </div>
+
+                                </Popup>
+                            </div>
+
+                        </GridItem>
                        
 
 
@@ -381,19 +598,70 @@ class DocumentUpdating extends React.Component {
                     
                    
                         <h6>Signature:</h6>
-                  
-                    
-                   
-                           
+
                             <GridItem >
-                                <div className="actions-right">
-                                    <Button color="info"
-                                        round className={this.props.classes.marginRight}
-                                        // onClick={this.handleLeadSave}
-                                        id="saveBtn" >
-                                        WP/FPE Signature
+
+                                <div className={ProposalApp.App}>
+                                    <Popup modal
+                                        open={this.state.openWPpop}
+                                        trigger={<div className="actions-right">
+                                            <Button color="info"
+                                                round className={this.props.classes.marginRight}
+                                                onClick={this.setWPSignatureCanvas}
+                                                id="saveBtn" >
+                                                WP/FPE Signature
                                 </Button>
+                                        </div>}
+                                        closeOnDocumentClick={false}
+                                    >
+
+                                        <h4><small >Tap to add WP/FPE Signature</small></h4>
+                                        <div className={styles.container}>
+                                            <div className={styles.sigContainer}>
+                                                <SignaturePad canvasProps={{ width: 650, height: 300, className: styles.sigPad }}
+                                                    ref={(ref) => { this.sigPad = ref }}
+                                                />
+
+                                                <GridContainer justify="center">
+                                                    <GridItem xs={3} sm={3} md={3}>
+                                                        <Button
+                                                            color="info"
+                                                            round
+                                                            id="save-bnt"
+                                                            className={classes.marginRight} onClick={this.clear}>
+                                                            Clear
+                                    </Button>
+                                                    </GridItem>
+                                                    <GridItem xs={3} sm={3} md={3}>
+                                                        <Button color="info"
+                                                            round
+                                                            id="save-bnt"
+                                                            className={classes.marginRight} onClick={this.saveWPSignature}>
+                                                            Save
+                                    </Button>
+                                                    </GridItem>
+                                                    <GridItem xs={3} sm={3} md={3}>
+                                                        <Button color="info"
+                                                            round
+                                                            id="save-bnt"
+                                                            className={classes.marginRight} onClick={this.handleWelathPlanClose}>
+                                                            Close
+                                    </Button>
+                                                    </GridItem>
+                                                </GridContainer>
+
+                                            </div>
+                                            {/* {trimmedDataURL
+                                            ? <img
+                                                style={{ width: "05rem" }}
+                                                className={styles.sigImage}
+                                        src={trimmedDataURL} />
+                                    : null}*/}
+                                        </div>
+
+                                    </Popup>
                                 </div>
+
                             </GridItem>
 
 
