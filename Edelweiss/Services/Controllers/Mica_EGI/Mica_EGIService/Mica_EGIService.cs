@@ -26,6 +26,7 @@ using OfficeOpenXml;
 using iNube.Utility.Framework.LogPrivider.LogService;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
+using MicaExtension_EGI.Helpers;
 
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
@@ -80,6 +81,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<bool> BalanceAlertScheduler(ApiContext context);
         Task<int> TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate, ApiContext apiContext);
         Task<bool> RetryPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context);
+        Task<GetScheduleResponse> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo, ApiContext context);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -9900,69 +9902,53 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        private async Task<ResponseStatus> ExceptionCheck(dynamic PolicyObject, string PolicyNo,TblSchedule ScheduleData, ApiContext context)
+        private async Task<GetSwitchResponse> ExceptionCheck(dynamic PolicyObject, string PolicyNumber,TblSchedule ScheduleData, ApiContext context)
         {
 
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
-            ResponseStatus response = new ResponseStatus();
+            GetSwitchResponse response = new GetSwitchResponse();
             ErrorInfo errorInfo;
             int FailCount = 0;
-
+      
             try
-            {
-               
-                dynamic PolicyData = null;
+            {   
 
                 if (PolicyObject == null)
                 {
-                    //Call the Policy Service to Get Policy Details.
-                    //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
-                    PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
+                    var GetPolicyData = await GetPolicyDetails(PolicyNumber,context);
 
-                    //Policy Call Failed or data not found.
-                    if (PolicyData == null)
+                    if(GetPolicyData.Status != BusinessStatus.Ok)
                     {
-                        errorInfo = new ErrorInfo();
-
-                        response.ResponseMessage = "Policy data not found";
+                        response.ResponseMessage = GetPolicyData.ResponseMessage;
                         response.Status = BusinessStatus.Error;
-                        errorInfo.ErrorMessage = "Policy Record Not Found";
-                        errorInfo.ErrorCode = "ExpPolicy";
-                        errorInfo.PropertyName = "InternalGetPolicyDetailsByNumber";
-                        response.Errors.Add(errorInfo);
+                        response.Errors = GetPolicyData.Errors;
 
                         return response;
+                    }
+                    else
+                    {
+                        response.PolicyData = GetPolicyData.Data;
                     }
 
                 }
                 else
                 {
-                    PolicyData = PolicyObject;
-                }
-
-                DateTime PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
-
-                if (PolicyStartDate > IndianTime)
-                {
-                    FailCount++;
-                    errorInfo = new ErrorInfo();
-                    errorInfo.ErrorMessage = "Trasactions are not allowed.Policy is not yet Started";
-                    errorInfo.ErrorCode = "Exp001";
-                    errorInfo.PropertyName = "Future Dated Policy";
-                    response.Errors.Add(errorInfo);
-                }
-
-                //Policy Is Cancelled Check is pending
-
+                    response.PolicyData = PolicyObject;
+                }             
 
                 if (ScheduleData.IsActive == false)
                 {
-                    FailCount++;
+                    errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Trasactions are not allowed.Vehicle is Deleted";
+                    response.Status = BusinessStatus.Error;
                     errorInfo = new ErrorInfo();
                     errorInfo.ErrorMessage = "Trasactions are not allowed.Vehicle is Deleted";
                     errorInfo.ErrorCode = "Exp002";
                     errorInfo.PropertyName = "Vehicle Inactive";
                     response.Errors.Add(errorInfo);
+
+                    return response;                    
                 }
 
                 var checkJobRunning = _context.TblScheduleReport.LastOrDefault(x=>x.ScheduleStartDate.Value.Date == IndianTime.Date);
@@ -9982,7 +9968,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 var checkPBSStatus = _context.TblPremiumBookingLog.LastOrDefault(x=>x.TxnDateTime.Value.Date == IndianTime.Date
-                                                                                    && x.PolicyNo == PolicyNo);
+                                                                                    && x.PolicyNo == PolicyNumber);
 
                 if(checkPBSStatus !=null)
                 {
@@ -9997,7 +9983,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     }
                 }
 
-                var CheckBalance = await ADBalanceCheck(PolicyObject,PolicyNo,context);
+                var CheckBalance = await ADBalanceCheck(PolicyObject, PolicyNumber, context);
 
                 if(CheckBalance==false)
                 {
@@ -10036,8 +10022,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 return response;
             }
 
-
-            return new ResponseStatus();
+            return response;
 
         }
 
@@ -10499,7 +10484,279 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             return true;
         }
+        
+        public async Task<GetScheduleResponse> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo, ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
+            GetScheduleResponse response = new GetScheduleResponse();
+
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            var CurrentTimeHour = IndianTime.Hour;
+            var CurrentDay = IndianTime.DayOfWeek.ToString();
+
+
+            if (!String.IsNullOrEmpty(VehicleRegistrationNo) && !String.IsNullOrEmpty(PolicyNo))
+            {
+                var checkdata = _context.TblSchedule.Any(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
+
+                if (checkdata)
+                {
+
+                    var scheduledata = _context.TblSchedule.FirstOrDefault(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
+
+                    response.GetSchedule.PolicyNo = PolicyNo;
+                    response.GetSchedule.VehicleRegistrationNo = VehicleRegistrationNo;
+                    response.GetSchedule.VehicleType = scheduledata.VehicleType;
+                    response.GetSchedule.Mon = scheduledata.Mon;
+                    response.GetSchedule.Tue = scheduledata.Tue;
+                    response.GetSchedule.Wed = scheduledata.Wed;
+                    response.GetSchedule.Thu = scheduledata.Thu;
+                    response.GetSchedule.Fri = scheduledata.Fri;
+                    response.GetSchedule.Sat = scheduledata.Sat;
+                    response.GetSchedule.Sun = scheduledata.Sun;
+
+
+                    var SwitchLogData = _context.TblSwitchLog.Where(x => x.PolicyNo == PolicyNo
+                                                                   && x.VehicleNumber == VehicleRegistrationNo
+                                                                   && x.CreatedDate.Value.Date == IndianTime.Date).ToList();
+
+                    List<TblSwitchLog> ManualData = new List<TblSwitchLog>();
+
+                    if (CurrentTimeHour <  ModuleConstants.SchedulerRunTime)
+                    {
+                        if (SwitchLogData.Count() > 0)
+                        {
+
+                            ManualData = SwitchLogData.OrderByDescending(x => x.CreatedDate)
+                                                      .Where(x => x.SwitchType == "Manual").ToList();
+
+                            if (ManualData.Count() > 0)
+                            {
+                                //Taking First Record Bcz using Order By Descending.
+                                var finalRecord = ManualData.FirstOrDefault();
+
+                                response.GetSchedule.SwitchStatus = finalRecord.SwitchStatus;
+
+                                if (finalRecord.SwitchStatus == true)
+                                {
+                                    response.GetSchedule.SwitchEnabled = false;
+                                }
+                                else
+                                {
+                                    response.GetSchedule.SwitchEnabled = true;
+                                }
+                            }
+                            else
+                            {
+                                bool ScheduleSwitchStatus = CurrentDaySwitchStatus(scheduledata);
+                                response.GetSchedule.SwitchStatus = ScheduleSwitchStatus;
+                                response.GetSchedule.SwitchEnabled = true;
+                            }
+
+                        }
+                        else
+                        {
+                            bool ScheduleSwitchStatus = CurrentDaySwitchStatus(scheduledata);
+                            response.GetSchedule.SwitchStatus = ScheduleSwitchStatus;
+                            response.GetSchedule.SwitchEnabled = true;
+                        }
+
+                    }
+                    else
+                    {
+                        if (SwitchLogData.Count() > 0)
+                        {
+                            var LatestData = SwitchLogData.OrderByDescending(x => x.CreatedDate).FirstOrDefault();
+
+                            response.GetSchedule.SwitchStatus = LatestData.SwitchStatus;
+
+                            if (LatestData.SwitchStatus == true)
+                            {
+                                response.GetSchedule.SwitchEnabled = false;
+                            }
+                            else
+                            {
+                                response.GetSchedule.SwitchEnabled = true;
+                            }
+
+                        }
+                        else
+                        {
+                            //PBS Has Not RAN ITS AN EXCEPTION 
+                            bool ScheduleSwitchStatus = CurrentDaySwitchStatus(scheduledata);
+                            response.GetSchedule.SwitchStatus = ScheduleSwitchStatus;
+                            response.GetSchedule.SwitchEnabled = false;
+                        }
+                    }
+
+                    response.Status = BusinessStatus.Ok;
+
+                    return response;
+
+                }
+                else
+                {
+                    //Return No Records Found 
+                    response.GetSchedule = null;
+                    ErrorInfo errorInfo = new ErrorInfo();
+                    response.ResponseMessage = "No Records Found";
+                    response.Status = BusinessStatus.NotFound;
+                    errorInfo.ErrorMessage = "No records found in the Schedule table for the sent input";
+                    errorInfo.ErrorCode = "GEN001";
+                    errorInfo.PropertyName = "NoRecords";
+                    response.Errors.Add(errorInfo);
+                    return response;
+
+                }
+
+
+            }
+            else
+            {
+                //Return Wrong NUll DATA 
+                response.GetSchedule = null;
+
+                ErrorInfo errorInfo = new ErrorInfo();
+
+                response.ResponseMessage = "Null/Empty Inputs";
+                response.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "Either Policy Number or Vehicle Number is Null";
+                errorInfo.ErrorCode = "GEN002";
+                errorInfo.PropertyName = "MandatoryfieldsMissing";
+                response.Errors.Add(errorInfo);
+                return response;
+
+            }
+
+        }
+
+        private bool CurrentDaySwitchStatus(TblSchedule scheduledata)
+        {
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            var CurrentDay = IndianTime.DayOfWeek.ToString();
+
+            bool CurrentDayStat = false;
+
+            switch (CurrentDay)
+            {
+                case "Monday":
+                    CurrentDayStat = scheduledata.Mon;
+                    break;
+
+                case "Tuesday":
+                    CurrentDayStat = scheduledata.Tue;
+                    break;
+
+
+                case "Wednesday":
+                    CurrentDayStat = scheduledata.Wed;
+                    break;
+
+
+                case "Thursday":
+                    CurrentDayStat = scheduledata.Thu;
+                    break;
+
+
+                case "Friday":
+                    CurrentDayStat = scheduledata.Fri;
+                    break;
+
+
+                case "Saturday":
+                    CurrentDayStat = scheduledata.Sat;
+                    break;
+
+
+
+                case "Sunday":
+                    CurrentDayStat = scheduledata.Sun;
+                    break;
+            }
+
+            return CurrentDayStat;
+
+        }
+
+        private async Task<GenericDTO> GetPolicyDetails(string PolicyNumber,ApiContext context)
+        {
+            GenericDTO response = new GenericDTO();
+            ErrorInfo errorInfo = new ErrorInfo();
+
+            try
+            {
+                //Call the Policy Service to Get Policy Details.
+                var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, context);
+
+                if (PolicyData != BusinessStatus.Ok)
+                {
+                    errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Policy data not found";
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "Policy Record Not Found";
+                    errorInfo.ErrorCode = "ExpPolicy";
+                    errorInfo.PropertyName = "InternalGetPolicyDetailsByNumber";
+                    response.Errors.Add(errorInfo);
+
+                    return response;
+                }
+
+
+                int PolicyStageStatusId = Convert.ToInt32(PolicyData["PolicyStageStatusId"]);
+
+                if (PolicyStageStatusId == ModuleConstants.PolicyStageStatusCancelled)
+                {
+                    errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Policy is Cancelled";
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "Policy Stage Status is Cancelled";
+                    errorInfo.ErrorCode = "ExpPolicy";
+                    errorInfo.PropertyName = "PolicyCancelled";
+                    response.Errors.Add(errorInfo);
+
+                    return response;
+                }
+
+
+                if (PolicyStageStatusId != ModuleConstants.PolicyStageStatusLive)
+                {
+                    errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Policy is not yet live";
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "Policy Stage Status Not Live";
+                    errorInfo.ErrorCode = "ExpPolicy";
+                    errorInfo.PropertyName = "PolicyNotLive";
+                    response.Errors.Add(errorInfo);
+
+                    return response;
+                }
+
+                //Good Policy So Return it with Success
+                response.ResponseMessage = "Policy Data";
+                response.Status = BusinessStatus.Ok;
+                response.Data = PolicyData; 
+
+            }
+            catch
+            {
+                errorInfo = new ErrorInfo();
+
+                response.ResponseMessage = "Some Exception Occured";
+                response.Status = BusinessStatus.Error;
+                errorInfo.ErrorMessage = "Get Policy Details Call Failed due to some exception";
+                errorInfo.ErrorCode = "GetPolicyDetails";
+                errorInfo.PropertyName = "Exception";
+                response.Errors.Add(errorInfo);
+
+                return response;
+            }
+
+            return response;
+        }
 
     }
 }

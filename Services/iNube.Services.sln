@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.705
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.UserManagement", "iNube.Services.UserManagement\iNube.Services.UserManagement.csproj", "{1B2A22E0-3157-4C34-AFF5-DDC88BFB8221}"
 EndProject
@@ -32,6 +32,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.Rating", "iNube.Services.Rating\iNube.Services.Rating.csproj", "{106A631C-DC78-4B2A-964D-5DD5009C631F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.Dispatcher", "iNube.Services.Dispatcher\iNube.Services.Dispatcher.csproj", "{4B9D0BA1-87E9-4F04-8F2C-48627102155C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwsService", "AwsService\AwsService.csproj", "{7B5E64F6-66B3-4049-8DCF-1089A477A37C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +97,10 @@ Global
 		{4B9D0BA1-87E9-4F04-8F2C-48627102155C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B9D0BA1-87E9-4F04-8F2C-48627102155C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B9D0BA1-87E9-4F04-8F2C-48627102155C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B5E64F6-66B3-4049-8DCF-1089A477A37C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B5E64F6-66B3-4049-8DCF-1089A477A37C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B5E64F6-66B3-4049-8DCF-1089A477A37C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B5E64F6-66B3-4049-8DCF-1089A477A37C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

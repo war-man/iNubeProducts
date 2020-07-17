@@ -35,6 +35,8 @@ phases:
         - echo $CODEBUILD_SRC_DIR
         - aws s3 sync ./build/ s3://mica.inubesolutions.com
 
+
+
 artifacts:
   files:
     -  Products/MICA/ClientApp/build/*
