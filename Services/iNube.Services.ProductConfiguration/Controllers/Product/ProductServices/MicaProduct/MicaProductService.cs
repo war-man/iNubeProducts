@@ -1933,6 +1933,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return result;
         }
 
+        //Fetching Entity dropdown data 
         public async Task<IEnumerable<ddDTOs>> GetEntities(int parentid, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
