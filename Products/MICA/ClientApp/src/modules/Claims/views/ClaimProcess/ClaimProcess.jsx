@@ -123,6 +123,7 @@ class ClaimProcess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            responseflag: false,
             ValidIFSCCode: false,
             renderpage: false,
             PerformerFlag: true,
@@ -470,6 +471,7 @@ class ClaimProcess extends React.Component {
     onFormSubmit = () => {
         this.state.ValidationUI = true;
         this.state.validateUI = false;
+        this.state.responseflag = true;
         this.state.approveamtvalidation = false;
         this.IsValidProductDetails();
         this.handleAmountValidation();
@@ -531,6 +533,7 @@ class ClaimProcess extends React.Component {
                             //      if (data.status == 200) {
                             //  this.state.claimId = data.claimId;
                             //  this.setState({ claimnumber: data.claimNumber });
+                            this.setState({ responseflag: false });
                             if (data.status == 3) {
                                 swal({
                                     text: data.responseMessage,
@@ -575,6 +578,7 @@ class ClaimProcess extends React.Component {
                         });
 
                 } else {
+                    this.setState({ responseflag: false });
                     //this.setState({ errormessage: true });
                     if (this.state.fields.claimStatusId == "") {
                         this.setState({ errormessage: true });
@@ -593,9 +597,11 @@ class ClaimProcess extends React.Component {
 
             }
             else {
+                this.setState({ responseflag: false });
                 swal("", "IFSC Code should be in correct format (eg: CNBK1234567)", "error");
             }
         } else {
+            this.setState({ responseflag: false });
             swal("", "Approved amount cannot be greater than balance sum insured", "error");
         }
 

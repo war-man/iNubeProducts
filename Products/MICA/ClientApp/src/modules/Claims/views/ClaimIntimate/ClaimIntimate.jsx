@@ -1311,6 +1311,7 @@ class ClaimIntimate extends React.Component {
     }
 
     renderPage = (ProductClaimData) => {
+    
             if (ProductClaimData.userInputType == "String") {
 
                 return (
@@ -1380,8 +1381,8 @@ class ClaimIntimate extends React.Component {
             .then(response => response.json())
             .then(data => {
                 console.log("getproductclaimsdetailsdata:", data);
-                debugger;
-                if (data=[]) {
+              
+                if (data.length==0) {
                     this.state.vehicleErrRemove = true;
                 } else {
                     this.state.vehicleErrRemove = false;

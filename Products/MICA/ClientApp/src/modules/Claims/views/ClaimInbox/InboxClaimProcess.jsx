@@ -507,7 +507,7 @@ class InboxClaimProcess extends React.Component {
                         body: JSON.stringify(field)
                     }).then(response => response.json())
                         .then(data => {
-                            this.state.responseflag = false;
+                            this.setState({ responseflag: false });
                             //this.setState({ responseflag:false});
                             console.log("response: ", data)
                             //      if (data.status == 200) {
@@ -521,10 +521,10 @@ class InboxClaimProcess extends React.Component {
                                 })
                                     .then((willDelete) => {
                                         if (willDelete) {
-                                            //   this.handlepagereload();
+                                              this.handlepagereload();
                                         }
                                     });
-                                this.handlepagereload();
+                              //  this.handlepagereload();
                             } else if (data.status == 7) {
 
                                 if (data.errors.length > 0) {
@@ -565,7 +565,7 @@ class InboxClaimProcess extends React.Component {
                         });
 
                 } else {
-                    this.state.responseflag = false;
+                    this.setState({ responseflag: false });
                     //this.setState({ responseflag: false });
                     //this.setState({ errormessage: true });
                     if (this.state.fields.claimStatusId == "") {
@@ -575,7 +575,7 @@ class InboxClaimProcess extends React.Component {
                         swal("", "Please select Claim status", "error");
                     }
                     else if (this.state.fields.claimManagerRemarks == "" || this.state.fields.claimManagerRemarks == null) {
-                        this.state.responseflag = false;
+                        this.setState({ responseflag: false });
                         this.setState({ errormessage: true });
                         this.setState({ claimsremarksflag: true });
                         swal("", "Please enter Claim manager remarks", "error");
@@ -584,12 +584,12 @@ class InboxClaimProcess extends React.Component {
                 }
             }
             else {
-                this.state.responseflag = false;
+                this.setState({ responseflag: false });
                 //this.setState({ responseflag: false });
                 swal("", "IFSC Code should be in correct format (eg: CNBK1234567)", "error");
             }
         } else {
-            this.state.responseflag = false;
+            this.setState({ responseflag: false });
             //this.setState({ responseflag: false });
             swal("", "Approved amount cannot be greater than balance sum insured", "error");
         }
