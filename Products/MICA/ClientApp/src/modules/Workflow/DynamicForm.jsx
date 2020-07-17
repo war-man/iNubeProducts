@@ -187,7 +187,7 @@ class DynamicForm extends React.Component {
             fields: {
                 selectedFields: [],
             },
-
+            addcover: false,
             selectedfields: [],
         };
     }
@@ -626,6 +626,13 @@ class DynamicForm extends React.Component {
                 this.setState({})
             }
         }
+        if (name == "AddCover") {
+            this.setState({ addcover: true })
+            //swal({
+            //    text: "This is button event",
+            //    icon: "success"
+            //})
+        }
 
         //let objdata = this.state.dynamicobject
         //for (let i = 0; i < objdata.length; i++) {
@@ -652,41 +659,103 @@ class DynamicForm extends React.Component {
         console.log("Select ", this.state.Dynamicdata);
     }
 
-    dynamicAccordion = (data) => {
+    dynamicAccordion = () => {
         console.log('selected: ', this.state.Accordion)
 
         return (
-            <GridContainer>
-                <GridItem xs={12}>
-                    {this.state.Accordion.map(item => {
-                        return (
-                            <Accordion
-                                collapses={
-                                    [{
-                                        title: "Coverages",
-                                        content: this.ChildDynamicAccordion(item)
-                                    }]
-                                }
-                            />
-                        );
-                    })}
-                </GridItem>
-            </GridContainer>
+            <GridItem md={12}>
+                {this.state.Accordion.map(item => {
+                    return (
+                        <Accordion
+                            collapses={
+                                [{
+                                    title: "Coverages",
+                                    content: this.ChildDynamicAccordion(item)
+                                }]
+                            }
+                        />
+                    );
+                })}
+            </GridItem>
         );
     }
 
+    //ChildDynamicAccordion = (data) => {
+    //    return (
+    //        <CardBody>
+    //            <GridContainer>
+    //                <GridItem md={12}>
+    //                    {data.map((item1, key) => {
+    //                        if (key == 0) {
+    //                            return (
+    //                                <Accordion
+    //                                    collapses={
+    //                                        [{
+    //                                            title: item1.enitityName,
+    //                                            content: <CardBody>
+    //                                                <GridContainer lg={12}>
+    //                                                    {item1.entityAttributes.map(item2 => {
+    //                                                        return (
+    //                                                            <GridItem xs={12} sm={4} >
+    //                                                                {this.handleRenderScreen(item2)}
+    //                                                            </GridItem>
+    //                                                        );
+    //                                                    })}
+    //                                                </GridContainer>
+    //                                            </CardBody>
+    //                                        }]
+    //                                    }
+    //                                />
+    //                            );
+    //                        }
+    //                        if (key == 1) {
+    //                            return (
+    //                                <Accordion
+    //                                    collapses={
+    //                                        [{
+    //                                            title: item1.enitityName,
+    //                                            content: <CardBody>
+    //                                                <GridContainer>
+    //                                                    {item1.entityAttributes.map(item2 => {
+    //                                                        return (
+    //                                                            <GridItem xs={12} sm={4} >
+    //                                                                {this.handleRenderScreen(item2)}
+    //                                                            </GridItem>
+    //                                                        );
+    //                                                    })}
+    //                                                </GridContainer>
+    //                                            </CardBody>
+    //                                        }]
+    //                                    }
+    //                                />
+    //                            );
+    //                        }
+    //                    })}
+    //                </GridItem>
+    //            </GridContainer>
+    //        </CardBody>
+    //    );
+    //}
+
     ChildDynamicAccordion = (data) => {
         return (
-            <GridContainer>
-                <GridItem md={12}>
-                    {data.map((item1, key) => {
-                        if (key == 0) {
-                            return (
-                                <Accordion
-                                    collapses={
-                                        [{
-                                            title: item1.enitityName,
-                                            content: <CardBody>
+            <CardBody>
+                <GridContainer>
+                    <GridItem md={12}>
+                        {data.map((item1, key) => {
+                            if (key == 0) {
+                                return (
+                                    //<Accordion
+                                    //    collapses={
+                                    //        [{
+                                    //            title: item1.enitityName,
+                                    //            content:
+                                    <GridContainer>
+                                        <GridItem>
+                                            <h4> {item1.entityName}</h4>
+                                        </GridItem>
+                                        <GridItem xs={12}>
+                                            <CardBody>
                                                 <GridContainer lg={12}>
                                                     {item1.entityAttributes.map(item2 => {
                                                         return (
@@ -697,19 +766,49 @@ class DynamicForm extends React.Component {
                                                     })}
                                                 </GridContainer>
                                             </CardBody>
-                                        }]
-                                    }
-                                />
-                            );
-                        }
-                        if (key == 1) {
-                            return (
-                                <Accordion
-                                    collapses={
-                                        [{
-                                            title: item1.enitityName,
-                                            content: <CardBody>
-                                                <GridContainer>
+                                        </GridItem>
+                                        {this.state.addcover ?
+                                            <GridItem md={12}>
+                                                <Accordion
+                                                    collapses={
+                                                        [{
+                                                            title: item1.entityName,
+                                                            content: <CardBody>
+                                                                <GridContainer lg={12}>
+                                                                    {item1.entityAttributes.map(item2 => {
+                                                                        return (
+                                                                            <GridItem xs={12} sm={4} >
+                                                                                {this.handleRenderScreen(item2)}
+                                                                            </GridItem>
+                                                                        );
+                                                                    })}
+                                                                </GridContainer>
+                                                            </CardBody>
+                                                        }]
+                                                    }
+                                                />
+                                            </GridItem>
+                                            : null}
+                                    </GridContainer>
+                                    //        }]
+                                    //    }
+                                    ///>
+                                );
+                            }
+                            if (key != 0) {
+                                return (
+                                    //<Accordion
+                                    //    collapses={
+                                    //        [{
+                                    //            title: item1.enitityName,
+                                    //            content:
+                                    <GridContainer>
+                                        <GridItem>
+                                            <h4> {item1.enitityName}</h4>
+                                        </GridItem>
+                                        <GridItem xs={12}>
+                                            <CardBody>
+                                                <GridContainer lg={12}>
                                                     {item1.entityAttributes.map(item2 => {
                                                         return (
                                                             <GridItem xs={12} sm={4} >
@@ -719,14 +818,17 @@ class DynamicForm extends React.Component {
                                                     })}
                                                 </GridContainer>
                                             </CardBody>
-                                        }]
-                                    }
-                                />
-                            );
-                        }
-                    })}
-                </GridItem>
-            </GridContainer>
+                                        </GridItem>
+                                    </GridContainer>
+                                    //        }]
+                                    //    }
+                                    ///>
+                                );
+                            }
+                        })}
+                    </GridItem>
+                </GridContainer>
+            </CardBody>
         );
     }
 
@@ -961,7 +1063,7 @@ class DynamicForm extends React.Component {
                                                     </CardIcon>
                                                     <h4>
                                                         <small>{/* <TranslationContainer translationKey="SearchOrganization" />*/}{this.state.entityname} </small>
-                                                        {/* <small><TranslationContainer translationKey="SearchOrganization" />{item[0].enitityName} </small>*/}
+                                                        {/* <small><TranslationContainer translationKey="SearchOrganization" />{item[0].entityName} </small>*/}
                                                     </h4>
                                                 </CardHeader>
                                                 : null}
@@ -976,10 +1078,22 @@ class DynamicForm extends React.Component {
                                                     })}
                                                 </GridContainer>
                                             </CardBody>
+                                            {(key == 1) ?
+                                                <GridContainer>
+                                                    <GridItem md={12}>
+                                                        {this.state.multipleflag ?
+                                                            <GridContainer>
+                                                                <GridItem xs={12}>
+                                                                    {this.dynamicAccordion()}
+                                                                </GridItem>
+                                                            </GridContainer>
+                                                            : null}
+                                                    </GridItem>
+                                                </GridContainer>
+                                                : null}
                                         </Card>
                                     );
                                 })}
-
                             </div>
                             : null}
 
@@ -987,7 +1101,7 @@ class DynamicForm extends React.Component {
                             <GridContainer>
                                 {this.RenderAccordion()}
                             </GridContainer>
-                            : null}*/}
+                            : null}
 
                         {this.state.multipleflag ?
                             <GridContainer>
@@ -995,7 +1109,7 @@ class DynamicForm extends React.Component {
                                     {this.dynamicAccordion()}
                                 </GridItem>
                             </GridContainer>
-                            : null}
+                            : null}*/}
 
                         {/* {this.state.multipleflag ?
                             <GridContainer>

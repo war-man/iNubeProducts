@@ -91,7 +91,7 @@ class DynamicEntity extends React.Component {
                 }
             ],
             entities: {
-                "enitityName": "",
+                "entityName": "",
                 "entityLevel": "",
                 "parentId": 0,
                 "relationship": "",
@@ -99,7 +99,7 @@ class DynamicEntity extends React.Component {
                 "entityAttributes": []
             },
             resetentities: {
-                "enitityName": "",
+                "entityName": "",
                 "entityLevel": "",
                 "parentId": 0,
                 "relationship": "",
@@ -379,8 +379,8 @@ class DynamicEntity extends React.Component {
                                         //error={this.state.firstNameState == "error"}
                                         //error={this.state.firstNameState}
                                         labelText="Entity Name"
-                                        name="enitityName"
-                                        value={this.state.entities.enitityName}
+                                        name="entityName"
+                                        value={this.state.entities.entityName}
                                         required={true}
                                         onChange={(e) => this.SetValue(e)}
                                         formControlProps={{ fullWidth: true }}

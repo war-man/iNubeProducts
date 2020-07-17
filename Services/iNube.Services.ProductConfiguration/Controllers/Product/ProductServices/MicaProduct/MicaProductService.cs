@@ -1476,7 +1476,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex,"Product", "Lead BulkSMS",null,null, apiContext);
+                    _logger.LogError(ex, "Product", "Lead BulkSMS", null, null, apiContext);
                 }
 
 
@@ -1495,7 +1495,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 catch (Exception ex)
                 {
 
-                    _logger.LogError(ex,"Product", "Lead Email", null,null,apiContext);
+                    _logger.LogError(ex, "Product", "Lead Email", null, null, apiContext);
                 }
 
                 item.Smsstatus = false;
@@ -1940,7 +1940,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             var data = _context.TblEntityDetails.Where(a => a.Relationship == "Single").Select(a => new ddDTOs
             {
                 mID = Convert.ToInt32(a.EntityId),
-                mValue = a.EnitityName,
+                mValue = a.EntityName,
             }).ToList();
 
             return data;
@@ -2004,7 +2004,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 Finalentity.Add(item);
                 //var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, "Multiple", apiContext);
             }
-            
+
             return Finalentity;
         }
 

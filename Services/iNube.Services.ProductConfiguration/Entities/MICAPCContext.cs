@@ -15,6 +15,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         {
         }
 
+        public virtual DbSet<TblAvoproducts> TblAvoproducts { get; set; }
         public virtual DbSet<TblBenifitRangeDetails> TblBenifitRangeDetails { get; set; }
         public virtual DbSet<TblCoverChildRcbdetails> TblCoverChildRcbdetails { get; set; }
         public virtual DbSet<TblCoverRcbdetails> TblCoverRcbdetails { get; set; }
@@ -25,6 +26,8 @@ namespace iNube.Services.ProductConfiguration.Entities
         public virtual DbSet<TblInsurableRcbdetails> TblInsurableRcbdetails { get; set; }
         public virtual DbSet<TblLeadInfo> TblLeadInfo { get; set; }
         public virtual DbSet<TblMasProductPolicyInput> TblMasProductPolicyInput { get; set; }
+        public virtual DbSet<TblProductAllocationRate> TblProductAllocationRate { get; set; }
+        public virtual DbSet<TblProductAssumptionMap> TblProductAssumptionMap { get; set; }
         public virtual DbSet<TblProductBasicConfiguration> TblProductBasicConfiguration { get; set; }
         public virtual DbSet<TblProductBenefits> TblProductBenefits { get; set; }
         public virtual DbSet<TblProductChannels> TblProductChannels { get; set; }
@@ -32,12 +35,26 @@ namespace iNube.Services.ProductConfiguration.Entities
         public virtual DbSet<TblProductCovers> TblProductCovers { get; set; }
         public virtual DbSet<TblProductEntity> TblProductEntity { get; set; }
         public virtual DbSet<TblProductInsurableItems> TblProductInsurableItems { get; set; }
+        public virtual DbSet<TblProductPlan> TblProductPlan { get; set; }
+        public virtual DbSet<TblProductPlanRiderDiscountLoadingMap> TblProductPlanRiderDiscountLoadingMap { get; set; }
+        public virtual DbSet<TblProductPlanRiderOccupationChart> TblProductPlanRiderOccupationChart { get; set; }
+        public virtual DbSet<TblProductPlanRiderParameters> TblProductPlanRiderParameters { get; set; }
+        public virtual DbSet<TblProductPlanRiders> TblProductPlanRiders { get; set; }
+        public virtual DbSet<TblProductPolicyTerm> TblProductPolicyTerm { get; set; }
         public virtual DbSet<TblProductPremium> TblProductPremium { get; set; }
         public virtual DbSet<TblProductRatingMapping> TblProductRatingMapping { get; set; }
         public virtual DbSet<TblProductRcbdetails> TblProductRcbdetails { get; set; }
+        public virtual DbSet<TblProductRiderRateParameters> TblProductRiderRateParameters { get; set; }
+        public virtual DbSet<TblProductRiders> TblProductRiders { get; set; }
+        public virtual DbSet<TblProductSam> TblProductSam { get; set; }
         public virtual DbSet<TblProductSwitchOnDetails> TblProductSwitchOnDetails { get; set; }
         public virtual DbSet<TblProducts> TblProducts { get; set; }
         public virtual DbSet<TblPromo> TblPromo { get; set; }
+        public virtual DbSet<TblRecruitment> TblRecruitment { get; set; }
+        public virtual DbSet<TblRiderRate> TblRiderRate { get; set; }
+        public virtual DbSet<TblRiderRateChart> TblRiderRateChart { get; set; }
+        public virtual DbSet<TblRiders> TblRiders { get; set; }
+        public virtual DbSet<TblTargetDistibution> TblTargetDistibution { get; set; }
         public virtual DbSet<TblmasClausesWarrentiesExclusions> TblmasClausesWarrentiesExclusions { get; set; }
         public virtual DbSet<TblmasDynamic> TblmasDynamic { get; set; }
         public virtual DbSet<TblmasMapping> TblmasMapping { get; set; }
@@ -58,6 +75,53 @@ namespace iNube.Services.ProductConfiguration.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+
+            modelBuilder.Entity<TblAvoproducts>(entity =>
+            {
+                entity.HasKey(e => e.ProductId)
+                    .HasName("pk_tblAVOProducts");
+
+                entity.ToTable("tblAVOProducts", "PC");
+
+                entity.Property(e => e.ProductId).ValueGeneratedNever();
+
+                entity.Property(e => e.EffectiveFrom).HasColumnType("date");
+
+                entity.Property(e => e.EffectiveTo).HasColumnType("date");
+
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MinAnnualPremium).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.MinBasicSumAssured).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.MinHalfYearlyPremium).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.MinMonthlyPremium)
+                    .HasColumnName("MinMOnthlyPremium")
+                    .HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.MinQuarterlyPremium).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.MinSurrenderYear)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MinTopUpYear)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ProductCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ProductName)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
 
             modelBuilder.Entity<TblBenifitRangeDetails>(entity =>
             {
@@ -223,9 +287,9 @@ namespace iNube.Services.ProductConfiguration.Entities
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.EnitityName).HasMaxLength(250);
-
                 entity.Property(e => e.EntityLevel).HasMaxLength(50);
+
+                entity.Property(e => e.EntityName).HasMaxLength(250);
 
                 entity.Property(e => e.ParentId).HasColumnType("numeric(18, 0)");
 
@@ -325,6 +389,32 @@ namespace iNube.Services.ProductConfiguration.Entities
                 entity.Property(e => e.ProductPolicyInputId).ValueGeneratedNever();
 
                 entity.Property(e => e.PolicyInputValue).HasMaxLength(200);
+            });
+
+            modelBuilder.Entity<TblProductAllocationRate>(entity =>
+            {
+                entity.HasKey(e => e.AllocationRateId)
+                    .HasName("pk_tblProductAllocationRate");
+
+                entity.ToTable("tblProductAllocationRate", "PC");
+
+                entity.Property(e => e.Product)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<TblProductAssumptionMap>(entity =>
+            {
+                entity.HasKey(e => e.ProductAssumptionMapId)
+                    .HasName("pk_tblProductAssumptionMap");
+
+                entity.ToTable("tblProductAssumptionMap", "PC");
+
+                entity.Property(e => e.ProductAssumptionMapId).ValueGeneratedNever();
+
+                entity.Property(e => e.Frequency).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Value).HasColumnType("numeric(18, 14)");
             });
 
             modelBuilder.Entity<TblProductBasicConfiguration>(entity =>
@@ -582,6 +672,208 @@ namespace iNube.Services.ProductConfiguration.Entities
                     .HasConstraintName("FK_tblProductInsurableItems_tblProducts");
             });
 
+            modelBuilder.Entity<TblProductPlan>(entity =>
+            {
+                entity.HasKey(e => e.PlanId)
+                    .HasName("pk_tblProductPlan");
+
+                entity.ToTable("tblProductPlan", "PC");
+
+                entity.Property(e => e.PlanId).ValueGeneratedNever();
+
+                entity.Property(e => e.PlanCode)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PlanDescriprion)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RefPlanCode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.TblProductPlan)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("fk_tblProductPlan_tblAVOProducts");
+            });
+
+            modelBuilder.Entity<TblProductPlanRiderDiscountLoadingMap>(entity =>
+            {
+                entity.HasKey(e => e.ProductPlanRiderDiscountLoadingMapId)
+                    .HasName("pk_tblProductPlanRiderRateChartMap");
+
+                entity.ToTable("tblProductPlanRiderDiscountLoadingMap", "PC");
+
+                entity.Property(e => e.ChartCode)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ChartType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RateType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Rider)
+                    .WithMany(p => p.TblProductPlanRiderDiscountLoadingMap)
+                    .HasForeignKey(d => d.RiderId)
+                    .HasConstraintName("fk_tblProductPlanRiderDiscountLoadingMap_tblProductRiders_RiderId");
+            });
+
+            modelBuilder.Entity<TblProductPlanRiderOccupationChart>(entity =>
+            {
+                entity.HasKey(e => e.ProductPlanRiderOccupationChartId)
+                    .HasName("pk_tblProductPlanRiderOccupationChart");
+
+                entity.ToTable("tblProductPlanRiderOccupationChart", "PC");
+
+                entity.Property(e => e.OccupationId).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(40)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Value).HasColumnType("numeric(18, 5)");
+            });
+
+            modelBuilder.Entity<TblProductPlanRiderParameters>(entity =>
+            {
+                entity.HasKey(e => e.PlanRiderParameterId)
+                    .HasName("pk_tblProductPlanRiderParameter");
+
+                entity.ToTable("tblProductPlanRiderParameters", "PC");
+
+                entity.Property(e => e.PlanRiderParameterId).ValueGeneratedNever();
+
+                entity.Property(e => e.ApplyOn)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ApplyOnTo)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ListValue)
+                    .HasMaxLength(2000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MaxRateType).HasMaxLength(10);
+
+                entity.Property(e => e.MaxVal)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MinRateType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MinVal)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.NumericValueFrom).HasColumnType("numeric(18, 3)");
+
+                entity.Property(e => e.NumericValueTo).HasColumnType("numeric(18, 3)");
+
+                entity.Property(e => e.StringValueFrom)
+                    .HasMaxLength(1000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StringValueTo)
+                    .HasMaxLength(1000)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.ProductPlanRider)
+                    .WithMany(p => p.TblProductPlanRiderParameters)
+                    .HasForeignKey(d => d.ProductPlanRiderId)
+                    .HasConstraintName("fk_tblProductPlanRiderParameters_tblProductPlanRider_ProductPlanRiderId");
+            });
+
+            modelBuilder.Entity<TblProductPlanRiders>(entity =>
+            {
+                entity.HasKey(e => e.ProductPlanRiderId)
+                    .HasName("pk_tblProductPlanRider");
+
+                entity.ToTable("tblProductPlanRiders", "PC");
+
+                entity.Property(e => e.ProductPlanRiderId).ValueGeneratedNever();
+
+                entity.Property(e => e.CalType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DisplayName)
+                    .HasMaxLength(150)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EffectiveFrom).HasColumnType("date");
+
+                entity.Property(e => e.EffectiveTo).HasColumnType("date");
+
+                entity.Property(e => e.IllustrationChart)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MaxSumAssured).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.MinSumAssured).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.RateCode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RateType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RefOldRiderCode)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RefRiderCode)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RelationId).HasColumnName("RelationID");
+
+                entity.Property(e => e.ReportDisplayName)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.TblProductPlanRiders)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("fk_tblProductPlanRider_tblProduct_ProductId");
+
+                entity.HasOne(d => d.Rider)
+                    .WithMany(p => p.TblProductPlanRiders)
+                    .HasForeignKey(d => d.RiderId)
+                    .HasConstraintName("fk_tblPrductPlanRiders_tblRider_RiderId");
+            });
+
+            modelBuilder.Entity<TblProductPolicyTerm>(entity =>
+            {
+                entity.HasKey(e => e.PolicyTermId)
+                    .HasName("pk_PolicyTermID");
+
+                entity.ToTable("tblProductPolicyTerm", "PC");
+
+                entity.Property(e => e.PolicyTermId)
+                    .HasColumnName("PolicyTermID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.PlanId).HasColumnName("PlanID");
+
+                entity.HasOne(d => d.Plan)
+                    .WithMany(p => p.TblProductPolicyTerm)
+                    .HasForeignKey(d => d.PlanId)
+                    .HasConstraintName("fk_tblProductPolicyTermtblProductPlan");
+            });
+
             modelBuilder.Entity<TblProductPremium>(entity =>
             {
                 entity.HasKey(e => e.PremiumId);
@@ -696,6 +988,64 @@ namespace iNube.Services.ProductConfiguration.Entities
                     .HasConstraintName("FK_tblProductRCBdetails_tblProducts");
             });
 
+            modelBuilder.Entity<TblProductRiderRateParameters>(entity =>
+            {
+                entity.HasKey(e => e.ProductRiderRateParameterId)
+                    .HasName("pk_tblProductRiderRateParameters");
+
+                entity.ToTable("tblProductRiderRateParameters", "PC");
+
+                entity.Property(e => e.RelationShip)
+                    .HasMaxLength(5)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Samfactor)
+                    .HasColumnName("SAMFactor")
+                    .HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.Value).HasColumnType("numeric(18, 10)");
+            });
+
+            modelBuilder.Entity<TblProductRiders>(entity =>
+            {
+                entity.HasKey(e => e.ProductRiderId)
+                    .HasName("pk_tblProductRiderMap");
+
+                entity.ToTable("tblProductRiders", "PC");
+
+                entity.Property(e => e.ProductRiderId).ValueGeneratedNever();
+
+                entity.Property(e => e.EffectiveFrom).HasColumnType("date");
+
+                entity.Property(e => e.EffectiveTo).HasColumnType("date");
+
+                entity.Property(e => e.RelationId).HasColumnName("RelationID");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.TblProductRiders)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("fk_tblProductRiderMap_tblProduct_ProductId");
+
+                entity.HasOne(d => d.Rider)
+                    .WithMany(p => p.TblProductRiders)
+                    .HasForeignKey(d => d.RiderId)
+                    .HasConstraintName("fk_tblPrductRiderMap_tblRider_RiderId");
+            });
+
+            modelBuilder.Entity<TblProductSam>(entity =>
+            {
+                entity.HasKey(e => e.SamId)
+                    .HasName("pk_SamID");
+
+                entity.ToTable("tblProductSAM", "PC");
+
+                entity.Property(e => e.SamId).HasColumnName("SamID");
+
+                entity.Property(e => e.MinSam).HasColumnName("MinSAM");
+
+                entity.Property(e => e.MixSam).HasColumnName("MixSAM");
+            });
+
             modelBuilder.Entity<TblProductSwitchOnDetails>(entity =>
             {
                 entity.HasKey(e => e.SwitchOnId);
@@ -791,6 +1141,144 @@ namespace iNube.Services.ProductConfiguration.Entities
                     .HasMaxLength(50);
 
                 entity.Property(e => e.PromoCode2).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<TblRecruitment>(entity =>
+            {
+                entity.HasKey(e => e.RecruitmentId);
+
+                entity.ToTable("tblRecruitment", "PC");
+
+                entity.Property(e => e.RecruitmentId)
+                    .HasColumnName("RecruitmentID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Channel)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedBy).HasMaxLength(450);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Designation)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedBy).HasMaxLength(450);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RecruitmentNo).HasMaxLength(50);
+
+                entity.Property(e => e.SubChannel)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<TblRiderRate>(entity =>
+            {
+                entity.HasKey(e => e.RateId)
+                    .HasName("PK_RiderRate");
+
+                entity.ToTable("tblRiderRate", "PC");
+
+                entity.Property(e => e.RateId).HasColumnName("RateID");
+
+                entity.Property(e => e.Factor)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MaxValue).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Rate)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RateType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RiderId).HasColumnName("RiderID");
+            });
+
+            modelBuilder.Entity<TblRiderRateChart>(entity =>
+            {
+                entity.HasKey(e => e.RiderRateChartId)
+                    .HasName("pk_tblRiderRateChart");
+
+                entity.ToTable("tblRiderRateChart", "PC");
+
+                entity.Property(e => e.Gender)
+                    .HasMaxLength(1)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Product)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Rate).HasColumnType("numeric(20, 10)");
+
+                entity.Property(e => e.RelationType)
+                    .HasMaxLength(1)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<TblRiders>(entity =>
+            {
+                entity.HasKey(e => e.RiderId)
+                    .HasName("pk_tblRiders");
+
+                entity.ToTable("tblRiders", "PC");
+
+                entity.Property(e => e.RiderId).ValueGeneratedNever();
+
+                entity.Property(e => e.EffectiveFrom).HasColumnType("date");
+
+                entity.Property(e => e.EffectiveTo).HasColumnType("date");
+
+                entity.Property(e => e.ImagePath).HasMaxLength(1000);
+
+                entity.Property(e => e.RiderCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RiderName)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<TblTargetDistibution>(entity =>
+            {
+                entity.HasKey(e => e.TargetDistributionId);
+
+                entity.ToTable("tblTargetDistibution", "PC");
+
+                entity.Property(e => e.TargetDistributionId)
+                    .HasColumnName("TargetDistributionID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Months).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Year1).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Year2).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Year3).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Year4).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Year5).HasColumnType("numeric(18, 0)");
             });
 
             modelBuilder.Entity<TblmasClausesWarrentiesExclusions>(entity =>

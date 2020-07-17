@@ -1098,7 +1098,7 @@ namespace iNube.Services.ProductConfiguration.Models
         }
 
         public decimal EntityId { get; set; }
-        public string EnitityName { get; set; }
+        public string EntityName { get; set; }
         public string EntityLevel { get; set; }
         public string ParentId { get; set; }
         public string Type { get; set; }
