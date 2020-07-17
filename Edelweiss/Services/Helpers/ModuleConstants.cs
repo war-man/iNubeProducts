@@ -10,5 +10,9 @@ namespace MicaExtension_EGI.Helpers
         public const int PolicyStageStatusLive = 22;
         public const int PolicyStageStatusCancelled = 21;
         public const int SchedulerRunTime = 9;
+        public const string EGIRatingId = "37";
+        public const string EGIWrapperRatingId = "41";
+        public const string EGIEndoRatingId = "50";
+        public const string EGINewRatingId = "87";
     }
 }

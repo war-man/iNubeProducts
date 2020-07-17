@@ -277,9 +277,17 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         public async Task<IActionResult> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo)
         {
 
-            var response = await _quotationService.NewGetSchedule(VehicleRegistrationNo, PolicyNo, Context);
+            var response = await _quotationService.NewGetSchedule(VehicleRegistrationNo, PolicyNo,"Normal",Context);
             return ServiceResponse(response);
 
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> NewSwitchOnOff(SwitchOnOffDTO switchOnOff)
+        {
+            var response = await _quotationService.NewSwitchOnOff(switchOnOff, Context);
+
+            return ServiceResponse(response);
         }
     }
 }

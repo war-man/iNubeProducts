@@ -10,6 +10,7 @@ using iNube.Services.MicaExtension_EGI.Models;
 using Microsoft.Extensions.Configuration;
 using iNube.Utility.Framework.LogPrivider.LogService;
 using System.Reflection;
+using MicaExtension_EGI.Helpers;
 
 namespace iNube.Services.Controllers.EGI.IntegrationServices
 {
@@ -62,6 +63,9 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         //PB Monthly-SI Adjustment Amount
         Task<IEnumerable<CustomerSettingsDTO>> GetCustomerSettings(string Type, ApiContext apiContext);
+
+        //New Rating Calculator
+        Task<dynamic> NewRatingCalculator(SchedulerPremiumDTO dynamicData, ApiContext apiContext);
 
     }
     public class IntegrationService : IIntegrationService
@@ -123,7 +127,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         public async Task<dynamic> EndorsementCalculator(EndorsementCalDTO endorsementCal, ApiContext apiContext)
         {
-            var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/50";
+            var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/" + ModuleConstants.EGIEndoRatingId;
             return await PostApiInvoke<EndorsementCalDTO, dynamic>(uri, apiContext, endorsementCal);
         }
 
@@ -135,13 +139,13 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         }
         public async Task<dynamic> WrapperCalculateRatingPremium(SchedulerPremiumDTO dynamicData,ApiContext context)
         {          
-            var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/41";
+            var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/" + ModuleConstants.EGIWrapperRatingId;
             return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, context, dynamicData);
         }
 
         public async Task<dynamic> RatingPremium(SchedulerPremiumDTO dynamicData,ApiContext apiContext)
         {
-            var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/37";
+            var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/"+ ModuleConstants.EGIRatingId;
             return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, dynamicData);
         }
 
@@ -256,6 +260,12 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
 
             return await ExternalPostApiInvoke<MobileAlertRequestDTO, MobileAlertResponseDTO>(uri, apiContext, alertRequestDTO);
+        }
+
+        public async Task<dynamic> NewRatingCalculator(SchedulerPremiumDTO dynamicData, ApiContext apiContext)
+        {
+            var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/"+ ModuleConstants.EGINewRatingId;
+            return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, dynamicData);
         }
 
         public async Task<IEnumerable<CustomerSettingsDTO>> GetCustomerSettings(string Type, ApiContext apiContext)
