@@ -25,6 +25,8 @@ using iNube.Services.Billing.Helpers;
 using OfficeOpenXml;
 using iNube.Utility.Framework.LogPrivider.LogService;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
+using MicaExtension_EGI.Helpers;
 
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
@@ -78,6 +80,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<bool> RenewalScheduler(ApiContext context);
         Task<bool> BalanceAlertScheduler(ApiContext context);
         Task<int> TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate, ApiContext apiContext);
+        Task<bool> RetryPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context);
+        Task<GetScheduleResponse> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo, ApiContext context);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -88,10 +92,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         private readonly IEmailService _emailService;
         private IIntegrationService _integrationService;
         private IConfiguration _configuration;
+        private ILoggerManager _logger;
 
-
-        public MicaEGIService(IConfiguration configuration, IIntegrationService integrationService, IMapper mapper, MICAQMContext context, IOptions<AppSettings> appSettings, IEmailService emailService)
+        public MicaEGIService(IConfiguration configuration, IIntegrationService integrationService, ILoggerManager logger, IMapper mapper, MICAQMContext context, IOptions<AppSettings> appSettings, IEmailService emailService)
         {
+            _logger = logger;
             _mapper = mapper;
             _appSettings = appSettings.Value;
            // _context = context;
@@ -148,6 +153,20 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     response.GetSchedule.Fri = scheduledata.Fri;
                     response.GetSchedule.Sat = scheduledata.Sat;
                     response.GetSchedule.Sun = scheduledata.Sun;
+
+                    ////This Method will return bool type
+                    ////True - AD Balance exsist to process switch on transaction
+                    ////False - AD Balance is Less than the AD Per Day Value of this Policy
+                    //var BalanceExist = await ADBalanceCheck(null,PolicyNo,context);
+
+                    //if(BalanceExist == false)
+                    //{
+                    //    response.GetSchedule.SwitchStatus = false;
+                    //    response.GetSchedule.SwitchEnabled = false;
+                    //    response.Status = BusinessStatus.Ok;
+                    //    response.ResponseMessage = "AD Balance is not sufficient";
+                    //    return response;
+                    //}
 
                     var checkstatus = _context.TblSwitchLog.LastOrDefault(x => x.PolicyNo == PolicyNo
                                                                   && x.VehicleNumber == VehicleRegistrationNo
@@ -879,10 +898,29 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         SuccessResponse.Status = BusinessStatus.Ok;
                         errorInfo.ErrorMessage = "Trasactions are not allowed.Policy is not yet Started";
                         errorInfo.ErrorCode = "ExtCUS";
-                        errorInfo.PropertyName = "NotFound";
+                        errorInfo.PropertyName = "FutureDatedPolicy";
                         SuccessResponse.Errors.Add(errorInfo);
                         return SuccessResponse;
                     }
+
+
+                    ////This Method will return bool type
+                    ////True - AD Balance exsist to process switch on transaction
+                    ////False - AD Balance is Less than the AD Per Day Value of this Policy
+                    //var BalanceExist = await ADBalanceCheck(PolicyData, PolicyNo, context);
+
+                    //if (BalanceExist == false)
+                    //{
+                    //    ErrorInfo errorInfo = new ErrorInfo();
+
+                    //    SuccessResponse.ResponseMessage = "AD Balance is not sufficient";
+                    //    SuccessResponse.Status = BusinessStatus.Ok;
+                    //    errorInfo.ErrorMessage = "Trasactions are not allowed.AD Balance is not sufficient";
+                    //    errorInfo.ErrorCode = "ExtCUS";
+                    //    errorInfo.PropertyName = "ADBalanceLow";
+                    //    SuccessResponse.Errors.Add(errorInfo);
+                    //    return SuccessResponse;
+                    //}
 
                 }
                 else
@@ -2265,7 +2303,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var PolicyNumberList = _context.TblDailyActiveVehicles.Where(x => x.TxnDate.Value.Date == CurrentDate).Select(x => x.PolicyNumber).Distinct().ToList();
 
-            if(PolicyNumberList.Count < 0)
+            if(PolicyNumberList.Count <= 0)
             {
                 return false;
             }
@@ -2310,8 +2348,62 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
                 var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policy, context);
 
+                //This Method will return bool type
+                ////True - AD Balance exsist to process switch on transaction
+                ////False - AD Balance is Less than the AD Per Day Value of this Policy
+                //var BalanceExist = await ADBalanceCheck(PolicyData, policy, context);
+
+                //if (BalanceExist == false)
+                //{
+                //    //Making Active Vehicle Force Full Off Because No AD Balance
+                //    var SwitchLog = _context.TblSwitchLog.Where(x=>x.PolicyNo == policy && x.SwitchStatus == true &&
+                //                                                x.CreatedDate.Value.Date == CurrentDate).ToList();
+                //    if (SwitchLog.Count > 0)
+                //    {
+                //        foreach (var vehicle in SwitchLog)
+                //        {
+                //            vehicle.SwitchType = "ForcefullSwitchOff";
+                //            vehicle.SwitchStatus = false;                         
+                //        }
+                //        _context.TblSwitchLog.UpdateRange(SwitchLog);
+                //    }
+
+                //    bookingLog = new TblPremiumBookingLog();
+
+                //    bookingLog.PolicyNo = policy;
+                //    bookingLog.TxnAmount = 0;
+                //    bookingLog.BasePremium = 0;
+                //    bookingLog.FromTax = 0;
+                //    bookingLog.ToTax = 0;
+                //    bookingLog.TxnDateTime = IndianTime;
+                //    bookingLog.TxnStatus = true;
+                //    bookingLog.TxnDetails = "Auto - Forcefull SwitchOff for Policy - " + policy;
+
+                //    _context.TblPremiumBookingLog.Add(bookingLog);
+
+                   
+
+                //    var DailyActiveData = _context.TblDailyActiveVehicles.LastOrDefault(x => x.TxnDate.Value.Date == CurrentDate && x.PolicyNumber == policy);
+                    
+                //    if (DailyActiveData == null)
+                //    {
+                //        continue;
+                //    }
+
+                //     DailyActiveData.ActivePc = 0;
+                //     DailyActiveData.ActiveTw = 0;
+                //    _context.TblDailyActiveVehicles.Update(DailyActiveData);
+
+                //    schedulerLog.SchedulerStatus = policy + " - AD Balance Not Sufficient";
+                //    _context.TblSchedulerLog.Update(schedulerLog);
+
+                //    _context.SaveChanges();
+
+                //    continue;
+                //}
 
                 PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
+
                 try
                 {
                     if (PolicyData != null)
@@ -2350,6 +2442,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
 
                     }
+                    else
+                    {
+                        continue;
+                    }
 
                 }
                 catch (Exception ex)
@@ -2375,6 +2471,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 var ActivePCCount = getDailyStat.ActivePc;
                 var ActiveTWCount = getDailyStat.ActiveTw;
+
+
+                //If No Active Vehicles are their for the Policy 
+                //Then We need to Skip this Policy
+                if(ActivePCCount == 0 && ActiveTWCount==0)
+                {
+                    continue;
+                }
 
 
 
@@ -2442,7 +2546,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                         schedulerLog.SchedulerStatus = "Deserialized Failed - Calculate Premium Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2502,7 +2606,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                         schedulerLog.SchedulerStatus = "Deserialized Failed - Endorsement Premium Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2519,7 +2623,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     var Premium = ADPERDAY + ADFROMTAXPERDAY + ADTOTAXPERDAY;
 
                     schedulerLog.SchedulerStatus = "Calculate Premium Success";
-                    schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                    schedulerLog.SchedulerEndDateTime = IndianTime;
                     _context.TblSchedulerLog.Update(schedulerLog);
 
                     _context.SaveChanges();
@@ -2583,7 +2687,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         _context.TblDailyActiveVehicles.Update(getDailyStat);
 
                         schedulerLog.SchedulerStatus = "CD Update Success";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2610,7 +2714,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         _context.TblPremiumBookingLog.Add(bookingLog);
 
                         schedulerLog.SchedulerStatus = "CD Update Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2641,7 +2745,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                     schedulerLog.SchedulerStatus = "Calculate Premium Failed";
-                    schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                    schedulerLog.SchedulerEndDateTime = IndianTime;
                     _context.TblSchedulerLog.Update(schedulerLog);
 
                     var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2660,7 +2764,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var Endreport = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
 
-            Endreport.ScheduleEndDate = System.DateTime.UtcNow.AddMinutes(330);
+            Endreport.ScheduleEndDate = IndianTime;
             Endreport.IsActive = false;
 
             _context.TblScheduleReport.Update(Endreport);
@@ -2818,15 +2922,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
         public async Task<List<ddDTO>> GetVehicleMaster(string lMasterlist, ApiContext context)
-        {
-            LoggerManager logger = new LoggerManager(_configuration);
-            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", "Testing", "1", context);
-
+        {          
             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
-
-            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", "Testing", "4 - After Get Context Call Final", context);
-
-
             List<ddDTO> obj;
 
             obj = _context.TblVehicleDetails.Select(x => new ddDTO { mID = x.VehicleId, mValue = x.VehicleModel, mType = x.VehicleType }).ToList();
@@ -5050,24 +5147,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             }
                         }
 
-                        foreach (var itema in policyRiskData)
+                        if (SourceObject[0]["Data"]["Source"] == "PolicyBazaar")
                         {
-                            var PolVehInspeId = itema["InspectionId"];
-                            foreach (var itemb in VehicleRiskItem)
+
+                            foreach (var itema in policyRiskData)
                             {
-                                var EndorseVehInspecId = itemb["InspectionId"];
-                                if (PolVehInspeId == EndorseVehInspecId)
+                                var PolVehInspeId = itema["InspectionId"];
+                                foreach (var itemb in VehicleRiskItem)
                                 {
-                                    ruleEngine1 = new RuleEngineResponse();
-                                    ruleEngine1.ValidatorName = "Inspection id of vehicle";
-                                    ruleEngine1.Outcome = "Fail";
-                                    ruleEngine1.Message = "Inspection Id is already exist for this policy";
-                                    ruleEngine1.Code = "EXEA008";
-                                    engineResponse2.Add(ruleEngine1);
-                                    failcount++;
+                                    var EndorseVehInspecId = itemb["InspectionId"];
+                                    if (PolVehInspeId == EndorseVehInspecId)
+                                    {
+                                        ruleEngine1 = new RuleEngineResponse();
+                                        ruleEngine1.ValidatorName = "Inspection id of vehicle";
+                                        ruleEngine1.Outcome = "Fail";
+                                        ruleEngine1.Message = "Inspection Id is already exist for this policy";
+                                        ruleEngine1.Code = "EXEA008";
+                                        engineResponse2.Add(ruleEngine1);
+                                        failcount++;
+                                    }
                                 }
                             }
+
                         }
+
                         foreach (var itema in policyRiskData)
                         {
                             var PolVehNum = itema["Vehicle Number"];
@@ -6449,7 +6552,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         public async Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext apicontext)
         {
-            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration, new LoggerManager(_configuration)));
 
 
             _context = (MICAQMContext)(await DbManager.GetContextAsync(apicontext.ProductType, apicontext.ServerType, _configuration));
@@ -6979,7 +7082,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex,"TotalUsage",apiContext);
+                    _logger.LogError(ex, "Mica_EGI", MethodBase.GetCurrentMethod().Name, PolicyNo + ":" + FromDate + ":" + ToDate, null, apiContext);
                     return 0;
                 }
 
@@ -8509,7 +8612,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //To check whether mobile number field is blank-- MobileNo
                 //To check MobileNumber length
-                if (SourceObject["Mobile Number"] == "")
+                if (MobileNo == "")
                 {
                     ruleEngine = new RuleEngineResponse();
                     ruleEngine.ValidatorName = "Mobile Number";
@@ -8600,7 +8703,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
             }
-            catch
+            catch 
             {
                 engineResponse = new List<RuleEngineResponse>();
                 ruleEngine = new RuleEngineResponse();
@@ -8610,6 +8713,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 ruleEngine.Code = "GEP";
                 engineResponse.Add(ruleEngine);
                 return engineResponse;
+
             }
 
             return engineResponse;
@@ -9684,6 +9788,976 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return response;
 
         }
+
+        private async Task<bool> ADBalanceCheck(dynamic PolicyObject,string PolicyNo,ApiContext context)
+        {
+            try
+            {
+                dynamic PolicyData = null;
+
+                if (PolicyObject == null)
+                {
+                    //Call the Policy Service to Get Policy Details.
+                    //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
+                    PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
+
+                    //Policy Call Failed or data not found.
+                    if (PolicyData == null)
+                    {
+                        return false;
+                    }
+
+                }
+                else
+                {
+                    PolicyData = PolicyObject;
+                }
+
+
+
+                decimal ADRatePerDay = 0;                   
+
+                List<MicaCDDTO> PremiumDetails = JsonConvert.DeserializeObject<List<MicaCDDTO>>(PolicyData["PremiumDetails"].ToString());
+
+                var CheckEndorsement = PremiumDetails.Any(x => x.Type == "EndorsementAdd" || x.Type == "EndorsementDel");
+
+
+                string StateCode = PolicyData["stateCode"];
+                string AccountNumber = PolicyData["CDAccountNumber"];
+
+                TaxTypeDTO TaxType = await TaxTypeForStateCode(StateCode, context);
+                                
+                if (CheckEndorsement)
+                {
+                    var CumAdPerDay = PolicyData["PremiumDetails"][0]["CumAdPerDay"];
+                    if (CumAdPerDay != null)
+                        ADRatePerDay = Convert.ToDecimal(CumAdPerDay);
+                    else
+                        ADRatePerDay = 0;
+                }
+                else
+                {
+                    var AdPerDay = PolicyData["PremiumDetails"][0]["AdPerDay"];
+                    if (AdPerDay != null)
+                        ADRatePerDay = Convert.ToDecimal(AdPerDay);
+                    else
+                        ADRatePerDay = 0;
+                }
+
+                EndorsementCalDTO endorsementCalDTO = new EndorsementCalDTO();
+                //Rate
+                endorsementCalDTO.dictionary_rate.FSTTAX_TAXTYPE = TaxType.FSTTAX_TAXTYPE;
+                endorsementCalDTO.dictionary_rate.TSTTAX_TAXTYPE = TaxType.TSTTAX_TAXTYPE;
+
+                //Rule
+                endorsementCalDTO.dictionary_rule.AD = ADRatePerDay.ToString();
+                endorsementCalDTO.dictionary_rule.ADDAYS = "1";
+
+                //FT
+                endorsementCalDTO.dictionary_rule.FT = "0";
+                endorsementCalDTO.dictionary_rule.FTDAYS = "0";
+
+
+
+                var CalculatePremium = await EndorsementCalculator(endorsementCalDTO, context);
+
+                if (CalculatePremium.Count > 0)
+                {
+                    var ADPerDay = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
+
+                    var ADFromTaxAmount = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
+
+                    var ADToTaxAmount = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+
+                    var ADPerDayWithTax = ADPerDay + ADFromTaxAmount + ADToTaxAmount;
+
+                    var AccountData = await _integrationService.GetCDAccountDetails(AccountNumber, "AD", context);
+
+                    if (AccountData.Status != BusinessStatus.Ok)
+                    {
+                        return false;
+                    }
+
+                    if(AccountData.TotalAvailableBalance < ADPerDayWithTax)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+
+                }
+                else
+                {
+                    return false;
+                }
+
+
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
+        private async Task<GetSwitchResponse> ExceptionCheck(dynamic PolicyObject, string PolicyNumber,TblSchedule ScheduleData, ApiContext context)
+        {
+
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            GetSwitchResponse response = new GetSwitchResponse();
+            ErrorInfo errorInfo;
+            int FailCount = 0;
+      
+            try
+            {   
+
+                if (PolicyObject == null)
+                {
+                    var GetPolicyData = await GetPolicyDetails(PolicyNumber,context);
+
+                    if(GetPolicyData.Status != BusinessStatus.Ok)
+                    {
+                        response.ResponseMessage = GetPolicyData.ResponseMessage;
+                        response.Status = BusinessStatus.Error;
+                        response.Errors = GetPolicyData.Errors;
+
+                        return response;
+                    }
+                    else
+                    {
+                        response.PolicyData = GetPolicyData.Data;
+                    }
+
+                }
+                else
+                {
+                    response.PolicyData = PolicyObject;
+                }             
+
+                if (ScheduleData.IsActive == false)
+                {
+                    errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Trasactions are not allowed.Vehicle is Deleted";
+                    response.Status = BusinessStatus.Error;
+                    errorInfo = new ErrorInfo();
+                    errorInfo.ErrorMessage = "Trasactions are not allowed.Vehicle is Deleted";
+                    errorInfo.ErrorCode = "Exp002";
+                    errorInfo.PropertyName = "Vehicle Inactive";
+                    response.Errors.Add(errorInfo);
+
+                    return response;                    
+                }
+
+                var checkJobRunning = _context.TblScheduleReport.LastOrDefault(x=>x.ScheduleStartDate.Value.Date == IndianTime.Date);
+
+                if (checkJobRunning != null)
+                {
+                    if(checkJobRunning.IsActive == true)
+                    {
+                        FailCount++;
+                        //errorInfo = new ErrorInfo();
+                        //errorInfo.ErrorMessage = "Scheduler Job is Running";
+                        //errorInfo.ErrorCode = "Exp003";
+                        //errorInfo.PropertyName = "PBS";
+                        //response.Errors.Add(errorInfo);
+                    }
+                }
+
+
+                var checkPBSStatus = _context.TblPremiumBookingLog.LastOrDefault(x=>x.TxnDateTime.Value.Date == IndianTime.Date
+                                                                                    && x.PolicyNo == PolicyNumber);
+
+                if(checkPBSStatus !=null)
+                {
+                    if(checkPBSStatus.TxnStatus == false)
+                    {
+                        FailCount++;
+                        //errorInfo = new ErrorInfo();
+                        //errorInfo.ErrorMessage = "PBS has failed for this Policy";
+                        //errorInfo.ErrorCode = "Exp004";
+                        //errorInfo.PropertyName = "PBS";
+                        //response.Errors.Add(errorInfo);
+                    }
+                }
+
+                var CheckBalance = await ADBalanceCheck(PolicyObject, PolicyNumber, context);
+
+                if(CheckBalance==false)
+                {
+                    FailCount++;
+                    errorInfo = new ErrorInfo();
+                    errorInfo.ErrorMessage = "AD Balance is not sufficient";
+                    errorInfo.ErrorCode = "Exp004";
+                    errorInfo.PropertyName = "AD Balance";
+                    response.Errors.Add(errorInfo);
+                }
+
+                if (FailCount > 0)
+                {
+                    response.ResponseMessage = "List of Exceptions have Occured";
+                    response.Status = BusinessStatus.Error;
+                    return response;
+                }
+                else
+                {
+                    response.Status = BusinessStatus.Ok;
+                    response.ResponseMessage = "No Exception";
+                }
+
+            }
+            catch(Exception ex)
+            {
+                errorInfo = new ErrorInfo();
+
+                response.ResponseMessage = "Some Exception Occured";
+                response.Status = BusinessStatus.Error;
+                errorInfo.ErrorMessage = ex.ToString();
+                errorInfo.ErrorCode = "ExtException";
+                errorInfo.PropertyName = "Catch";
+                response.Errors.Add(errorInfo);
+
+                return response;
+            }
+
+            return response;
+
+        }
+
+        public async Task<bool> RetryPremiumBookingScheduler(DateTime? dateTime,List<string> PolicyNoList,ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+            DateTime? IndianTime = null;
+            IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            var CurrentDay = IndianTime.Value.DayOfWeek.ToString();
+            var CurrentTimeHour = IndianTime.Value.Hour;
+            var CurrentDate = IndianTime.Value.Date;
+
+
+            if (dateTime != null)
+            {
+                IndianTime = dateTime;
+                CurrentDay = dateTime.Value.DayOfWeek.ToString();
+                CurrentTimeHour = dateTime.Value.Hour;
+                CurrentDate = dateTime.Value.Date;
+            }
+
+
+            string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
+
+            TblSwitchLog switchLog = new TblSwitchLog();
+            TblSchedule ScheduleData = new TblSchedule();
+            TblSchedulerLog schedulerLog = new TblSchedulerLog();
+            TblPremiumBookingLog bookingLog = new TblPremiumBookingLog();
+            TblDailyActiveVehicles dailyActiveVehicles = new TblDailyActiveVehicles();
+            TblScheduleReport scheduleReport = new TblScheduleReport();
+            List<string> PolicyNumberList = new List<string>();
+
+            if (PolicyNoList.Count <=0)
+            {
+                PolicyNumberList = _context.TblDailyActiveVehicles.Where(x => x.TxnDate.Value.Date == CurrentDate && x.TotalPremium ==0).Select(x => x.PolicyNumber).Distinct().ToList();
+
+            }
+            else
+            {
+                PolicyNumberList = PolicyNoList;
+            }
+
+            
+            if (PolicyNumberList.Count <= 0)
+            {
+                return false;
+            }
+
+            scheduleReport.ScheduleStartDate = IndianTime;
+            scheduleReport.SuccessCount = 0;
+            scheduleReport.FailCount = 0;
+            scheduleReport.IsActive = true;
+
+            var tblreport = _context.TblScheduleReport.Add(scheduleReport);
+            _context.SaveChanges();
+
+
+            var ReportID = scheduleReport.ReportId;
+
+
+            foreach (var policy in PolicyNumberList)
+            {
+
+                var checkPolicyCancel = CheckPolicyStatus(policy);
+
+                if (checkPolicyCancel == true)
+                {
+                    continue;
+                }
+
+
+                schedulerLog = new TblSchedulerLog();
+
+                schedulerLog.SchedulerDateTime = IndianTime;
+                schedulerLog.SchedulerStatus = "Running";
+
+                _context.TblSchedulerLog.Add(schedulerLog);
+                _context.SaveChanges();
+
+                var BillingFrequency = "";
+                var AccountNumber = "";
+
+                List<DeletionHandleDTO> VehicleListPolicy = new List<DeletionHandleDTO>();
+
+                //Call the Policy Service to Get Policy Details.
+                //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
+                var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policy, context);
+
+
+                PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
+
+                try
+                {
+                    if (PolicyData != null)
+                    {
+
+                        detailsDTO.SumInsured = PolicyData["si"];
+                        detailsDTO.NoOfPC = PolicyData["noOfPC"];
+                        detailsDTO.NoOfTW = PolicyData["noOfTW"];
+                        detailsDTO.PD_Age = PolicyData["driverAge"];
+                        detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
+                        detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
+                        detailsDTO.StateCode = PolicyData["stateCode"];
+                        BillingFrequency = PolicyData["billingFrequency"];
+                        AccountNumber = PolicyData["CDAccountNumber"];
+
+                        var VehicleRiskItem = PolicyData["InsurableItem"][1]["RiskItems"];
+
+                        foreach (var item in VehicleRiskItem)
+                        {
+                            DeletionHandleDTO deletionHandle = new DeletionHandleDTO();
+
+                            deletionHandle.VehicleNumber = item["Vehicle Number"];
+                            deletionHandle.VehicleType = item["Vehicle Type"];
+
+                            if (!String.IsNullOrEmpty(deletionHandle.VehicleNumber) && !String.IsNullOrEmpty(deletionHandle.VehicleType))
+                            {
+                                VehicleListPolicy.Add(deletionHandle);
+                            }
+                        }
+
+                        var scheduledata = _context.TblSchedule.Where(x => x.PolicyNo == policy).ToList();
+
+                        if (VehicleListPolicy.Count != scheduledata.Count())
+                        {
+                            var makeVehicleInactive = VehicleInactive(VehicleListPolicy, scheduledata);
+                        }
+
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    schedulerLog.SchedulerStatus = policy + " - No Record Found for this Policy Number";
+                    _context.TblSchedulerLog.Update(schedulerLog);
+
+                    var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
+
+                    report.FailCount += 1;
+                    _context.TblScheduleReport.Update(report);
+                    _context.SaveChanges();
+                    continue;
+                }
+
+
+                var getDailyStat = _context.TblDailyActiveVehicles.LastOrDefault(x => x.TxnDate.Value.Date == CurrentDate && x.PolicyNumber == policy);
+
+                if (getDailyStat == null)
+                {
+                    continue;
+                }
+
+                var ActivePCCount = getDailyStat.ActivePc;
+                var ActiveTWCount = getDailyStat.ActiveTw;
+
+
+                //If No Active Vehicles are their for the Policy 
+                //Then We need to Skip this Policy
+                if (ActivePCCount == 0 && ActiveTWCount == 0)
+                {
+                    continue;
+                }
+
+
+
+                //CalculatePremiumObject
+                SchedulerPremiumDTO premiumDTO = new SchedulerPremiumDTO();
+
+                //RuleObject
+                premiumDTO.dictionary_rule.SI = detailsDTO.SumInsured.ToString(); //Verify
+                premiumDTO.dictionary_rule.NOOFPC = detailsDTO.NoOfPC.ToString();
+                premiumDTO.dictionary_rule.NOOFTW = detailsDTO.NoOfTW.ToString();
+
+
+                //RateObject
+
+                premiumDTO.dictionary_rate.DEXPRT_Exp = detailsDTO.PD_DriveExperince.ToString();
+                premiumDTO.dictionary_rate.PDAGERT_PAge = detailsDTO.PD_Age.ToString();
+                premiumDTO.dictionary_rate.ADDRVRT_DRV = detailsDTO.AdditionalDriver.ToString(); //Verify
+                premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = ActivePCCount.ToString();
+                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = ActivePCCount.ToString();
+                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = ActiveTWCount.ToString();
+
+
+                var taxType = await TaxTypeForStateCode(detailsDTO.StateCode, context);
+
+                premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE; //Call TaxType //Verify
+                premiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE; //Call TaxType //Verify
+
+
+                //Call CalculatePremium Policy Module MICA
+                var CalPremiumResponse = await _integrationService.CalculatePremium(premiumDTO, context);
+
+                List<CalculationResult> DeserilizedPremiumData = new List<CalculationResult>();
+                CDDTO CdModel = new CDDTO();
+                ExtCDDTO ExtCdModel = new ExtCDDTO();
+                MicaCDDTO micaCDDTO = new MicaCDDTO();
+                CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
+                CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
+                CDPremiumDTO CdPremiumDTO = new CDPremiumDTO();
+                decimal ADPERDAY = 0;
+                decimal ADFROMTAXPERDAY = 0;
+                decimal ADTOTAXPERDAY = 0;
+
+                if (CalPremiumResponse != null)
+                {
+                    try
+                    {
+                        DeserilizedPremiumData = JsonConvert.DeserializeObject<List<CalculationResult>>(CalPremiumResponse.ToString());
+
+                    }
+                    catch (Exception Ex)
+                    {
+                        DeserilizedPremiumData = null;
+
+                        bookingLog = new TblPremiumBookingLog();
+
+                        bookingLog.PolicyNo = policy;
+                        bookingLog.TxnAmount = 0;
+                        bookingLog.BasePremium = 0;
+                        bookingLog.FromTax = 0;
+                        bookingLog.ToTax = 0;
+                        bookingLog.TxnDateTime = IndianTime;
+                        bookingLog.TxnDetails = "Auto Schedule Transaction Failed while Calculating Premium";
+                        bookingLog.TxnStatus = false;
+                        _context.TblPremiumBookingLog.Add(bookingLog);
+
+
+                        schedulerLog.SchedulerStatus = "Deserialized Failed - Calculate Premium Failed";
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
+                        _context.TblSchedulerLog.Update(schedulerLog);
+
+                        var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
+
+                        report.FailCount += 1;
+
+                        _context.TblScheduleReport.Update(report);
+
+                        _context.SaveChanges();
+
+                        continue;
+                    }
+                }
+
+
+
+                if (DeserilizedPremiumData.Count() > 0)
+                {
+                    //ADPMPD IS THE PER DAY AD RATE CONFIG IN RATING CONFIG MODULE
+                    ADPERDAY = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "ADPMPD").EValue);
+
+
+                    EndorsementCalDTO endorsementCal = new EndorsementCalDTO();
+
+                    //Rule
+                    endorsementCal.dictionary_rule.FT = "0";
+                    endorsementCal.dictionary_rule.FTDAYS = "0";
+                    endorsementCal.dictionary_rule.AD = ADPERDAY.ToString();
+                    endorsementCal.dictionary_rule.ADDAYS = "1";
+                    //Rate
+                    endorsementCal.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
+                    endorsementCal.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
+
+                    //TO GET AD PERDAY - FROM TAX AND TO TAX Because its not coming from rating Module
+                    var callEndoCalculator = await EndorsementCalculator(endorsementCal, context);
+
+                    if (callEndoCalculator.Count > 0)
+                    {
+                        ADFROMTAXPERDAY = Convert.ToDecimal(callEndoCalculator.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
+                        ADTOTAXPERDAY = Convert.ToDecimal(callEndoCalculator.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+                    }
+                    else
+                    {
+                        DeserilizedPremiumData = null;
+
+                        bookingLog = new TblPremiumBookingLog();
+
+                        bookingLog.PolicyNo = policy;
+                        bookingLog.TxnAmount = 0;
+                        bookingLog.BasePremium = 0;
+                        bookingLog.FromTax = 0;
+                        bookingLog.ToTax = 0;
+                        bookingLog.TxnDateTime = IndianTime;
+                        bookingLog.TxnDetails = "Auto Schedule Transaction Failed while Endorsement - Calculating Premium";
+                        bookingLog.TxnStatus = false;
+                        _context.TblPremiumBookingLog.Add(bookingLog);
+
+
+                        schedulerLog.SchedulerStatus = "Deserialized Failed - Endorsement Premium Failed";
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
+                        _context.TblSchedulerLog.Update(schedulerLog);
+
+                        var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
+
+                        report.FailCount += 1;
+
+                        _context.TblScheduleReport.Update(report);
+
+                        _context.SaveChanges();
+
+                        continue;
+                    }
+
+                    var Premium = ADPERDAY + ADFROMTAXPERDAY + ADTOTAXPERDAY;
+
+                    schedulerLog.SchedulerStatus = "Calculate Premium Success";
+                    schedulerLog.SchedulerEndDateTime = IndianTime;
+                    _context.TblSchedulerLog.Update(schedulerLog);
+
+                    _context.SaveChanges();
+
+                    taxAmountDTO.TaxAmount = ADFROMTAXPERDAY + ADTOTAXPERDAY;
+                    taxTypeDTO.Type = taxType.FSTTAX_TAXTYPE;
+                    taxTypeDTO.TaxAmount = ADFROMTAXPERDAY;
+                    taxAmountDTO.Tax.Add(taxTypeDTO);
+
+                    taxTypeDTO = new CDTaxTypeDTO();
+                    taxTypeDTO.Type = taxType.TSTTAX_TAXTYPE;
+                    taxTypeDTO.TaxAmount = ADTOTAXPERDAY;
+                    taxAmountDTO.Tax.Add(taxTypeDTO);
+
+                    CdPremiumDTO.TaxAmount = taxAmountDTO;
+                    CdPremiumDTO.Type = "AD";
+                    CdPremiumDTO.TxnAmount = ADPERDAY;
+                    CdPremiumDTO.TotalAmount = ADPERDAY + taxAmountDTO.TaxAmount;
+
+                    micaCDDTO.PremiumDTO.Add(CdPremiumDTO);
+                    micaCDDTO.TxnType = "Debit";
+                    micaCDDTO.Type = "PremiumBooking";
+                    micaCDDTO.TxnAmount = ADPERDAY;
+                    micaCDDTO.TaxAmount = taxAmountDTO.TaxAmount;
+                    micaCDDTO.TotalAmount = micaCDDTO.TxnAmount + micaCDDTO.TaxAmount;
+
+                    ExtCdModel.micaCDDTO.Add(micaCDDTO);
+                    ExtCdModel.AccountNo = AccountNumber;
+                    ExtCdModel.Description = "Auto Schedule Premium for Policy - " + policy;
+                    ExtCdModel.Frequency = BillingFrequency;
+                    ExtCdModel.UserDateTime = IndianTime;
+
+                    var CallMicaCd = await _integrationService.MasterCDACC(ExtCdModel, context);
+
+
+                    if (CallMicaCd != null)
+                    {
+                        bookingLog = new TblPremiumBookingLog();
+
+                        bookingLog.PolicyNo = policy;
+                        bookingLog.TxnAmount = Premium;
+                        bookingLog.BasePremium = ADPERDAY;
+                        bookingLog.FromTax = ADFROMTAXPERDAY;
+                        bookingLog.ToTax = ADTOTAXPERDAY;
+                        bookingLog.TxnDateTime = IndianTime;
+                        bookingLog.TxnStatus = true;
+                        bookingLog.TxnDetails = "Auto Schedule Premium for Policy - " + policy;
+
+                        _context.TblPremiumBookingLog.Add(bookingLog);
+
+
+                        getDailyStat.TotalPremium = Premium;
+                        getDailyStat.BasePremium = ADPERDAY;
+                        getDailyStat.FromTax = ADFROMTAXPERDAY;
+                        getDailyStat.ToTax = ADTOTAXPERDAY;
+
+                        //var tblDailyActive = _context.TblDailyActiveVehicles.FirstOrDefault(x => x.TxnDate == IndianTime &&
+                        //                                                                    x.PolicyNumber == policy);
+
+                        //  tblDailyActive.Premium = Premium;
+
+                        _context.TblDailyActiveVehicles.Update(getDailyStat);
+
+                        schedulerLog.SchedulerStatus = "CD Update Success";
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
+                        _context.TblSchedulerLog.Update(schedulerLog);
+
+                        var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
+
+                        report.SuccessCount += 1;
+
+                        _context.TblScheduleReport.Update(report);
+                        _context.SaveChanges();
+
+                    }
+                    else
+                    {
+                        bookingLog = new TblPremiumBookingLog();
+
+                        bookingLog.PolicyNo = policy;
+                        bookingLog.TxnAmount = Premium;
+                        bookingLog.BasePremium = ADPERDAY;
+                        bookingLog.FromTax = ADFROMTAXPERDAY;
+                        bookingLog.ToTax = ADTOTAXPERDAY;
+                        bookingLog.TxnDateTime = IndianTime;
+                        bookingLog.TxnStatus = false;
+                        bookingLog.TxnDetails = "Auto Schedule - Transaction Failed while Updating CD Balance MICA";
+
+                        _context.TblPremiumBookingLog.Add(bookingLog);
+
+                        schedulerLog.SchedulerStatus = "CD Update Failed";
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
+                        _context.TblSchedulerLog.Update(schedulerLog);
+
+                        var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
+
+                        report.FailCount += 1;
+
+                        _context.TblScheduleReport.Update(report);
+
+                        _context.SaveChanges();
+                    }
+
+
+                }
+                else
+                {
+                    bookingLog = new TblPremiumBookingLog();
+
+                    bookingLog.PolicyNo = policy;
+                    bookingLog.TxnAmount = 0;
+                    bookingLog.BasePremium = 0;
+                    bookingLog.FromTax = 0;
+                    bookingLog.ToTax = 0;
+                    bookingLog.TxnDateTime = IndianTime;
+                    bookingLog.TxnStatus = false;
+                    bookingLog.TxnDetails = "Auto Schedule Transaction Failed while Calculating Premium";
+
+                    _context.TblPremiumBookingLog.Add(bookingLog);
+
+
+                    schedulerLog.SchedulerStatus = "Calculate Premium Failed";
+                    schedulerLog.SchedulerEndDateTime = IndianTime;
+                    _context.TblSchedulerLog.Update(schedulerLog);
+
+                    var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
+
+                    report.FailCount += 1;
+
+                    _context.TblScheduleReport.Update(report);
+
+                    _context.SaveChanges();
+
+                    continue;
+
+                }
+
+            }
+
+            var Endreport = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
+
+            Endreport.ScheduleEndDate = IndianTime;
+            Endreport.IsActive = false;
+
+            _context.TblScheduleReport.Update(Endreport);
+            _context.SaveChanges();
+
+            return true;
+        }
+        
+        public async Task<GetScheduleResponse> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo, ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+            GetScheduleResponse response = new GetScheduleResponse();
+
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            var CurrentTimeHour = IndianTime.Hour;
+            var CurrentDay = IndianTime.DayOfWeek.ToString();
+
+
+            if (!String.IsNullOrEmpty(VehicleRegistrationNo) && !String.IsNullOrEmpty(PolicyNo))
+            {
+                var checkdata = _context.TblSchedule.Any(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
+
+                if (checkdata)
+                {
+
+                    var scheduledata = _context.TblSchedule.FirstOrDefault(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
+
+                    response.GetSchedule.PolicyNo = PolicyNo;
+                    response.GetSchedule.VehicleRegistrationNo = VehicleRegistrationNo;
+                    response.GetSchedule.VehicleType = scheduledata.VehicleType;
+                    response.GetSchedule.Mon = scheduledata.Mon;
+                    response.GetSchedule.Tue = scheduledata.Tue;
+                    response.GetSchedule.Wed = scheduledata.Wed;
+                    response.GetSchedule.Thu = scheduledata.Thu;
+                    response.GetSchedule.Fri = scheduledata.Fri;
+                    response.GetSchedule.Sat = scheduledata.Sat;
+                    response.GetSchedule.Sun = scheduledata.Sun;
+
+
+                    var SwitchLogData = _context.TblSwitchLog.Where(x => x.PolicyNo == PolicyNo
+                                                                   && x.VehicleNumber == VehicleRegistrationNo
+                                                                   && x.CreatedDate.Value.Date == IndianTime.Date).ToList();
+
+                    List<TblSwitchLog> ManualData = new List<TblSwitchLog>();
+
+                    if (CurrentTimeHour <  ModuleConstants.SchedulerRunTime)
+                    {
+                        if (SwitchLogData.Count() > 0)
+                        {
+
+                            ManualData = SwitchLogData.OrderByDescending(x => x.CreatedDate)
+                                                      .Where(x => x.SwitchType == "Manual").ToList();
+
+                            if (ManualData.Count() > 0)
+                            {
+                                //Taking First Record Bcz using Order By Descending.
+                                var finalRecord = ManualData.FirstOrDefault();
+
+                                response.GetSchedule.SwitchStatus = finalRecord.SwitchStatus;
+
+                                if (finalRecord.SwitchStatus == true)
+                                {
+                                    response.GetSchedule.SwitchEnabled = false;
+                                }
+                                else
+                                {
+                                    response.GetSchedule.SwitchEnabled = true;
+                                }
+                            }
+                            else
+                            {
+                                bool ScheduleSwitchStatus = CurrentDaySwitchStatus(scheduledata);
+                                response.GetSchedule.SwitchStatus = ScheduleSwitchStatus;
+                                response.GetSchedule.SwitchEnabled = true;
+                            }
+
+                        }
+                        else
+                        {
+                            bool ScheduleSwitchStatus = CurrentDaySwitchStatus(scheduledata);
+                            response.GetSchedule.SwitchStatus = ScheduleSwitchStatus;
+                            response.GetSchedule.SwitchEnabled = true;
+                        }
+
+                    }
+                    else
+                    {
+                        if (SwitchLogData.Count() > 0)
+                        {
+                            var LatestData = SwitchLogData.OrderByDescending(x => x.CreatedDate).FirstOrDefault();
+
+                            response.GetSchedule.SwitchStatus = LatestData.SwitchStatus;
+
+                            if (LatestData.SwitchStatus == true)
+                            {
+                                response.GetSchedule.SwitchEnabled = false;
+                            }
+                            else
+                            {
+                                response.GetSchedule.SwitchEnabled = true;
+                            }
+
+                        }
+                        else
+                        {
+                            //PBS Has Not RAN ITS AN EXCEPTION 
+                            bool ScheduleSwitchStatus = CurrentDaySwitchStatus(scheduledata);
+                            response.GetSchedule.SwitchStatus = ScheduleSwitchStatus;
+                            response.GetSchedule.SwitchEnabled = false;
+                        }
+                    }
+
+                    response.Status = BusinessStatus.Ok;
+
+                    return response;
+
+                }
+                else
+                {
+                    //Return No Records Found 
+                    response.GetSchedule = null;
+                    ErrorInfo errorInfo = new ErrorInfo();
+                    response.ResponseMessage = "No Records Found";
+                    response.Status = BusinessStatus.NotFound;
+                    errorInfo.ErrorMessage = "No records found in the Schedule table for the sent input";
+                    errorInfo.ErrorCode = "GEN001";
+                    errorInfo.PropertyName = "NoRecords";
+                    response.Errors.Add(errorInfo);
+                    return response;
+
+                }
+
+
+            }
+            else
+            {
+                //Return Wrong NUll DATA 
+                response.GetSchedule = null;
+
+                ErrorInfo errorInfo = new ErrorInfo();
+
+                response.ResponseMessage = "Null/Empty Inputs";
+                response.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "Either Policy Number or Vehicle Number is Null";
+                errorInfo.ErrorCode = "GEN002";
+                errorInfo.PropertyName = "MandatoryfieldsMissing";
+                response.Errors.Add(errorInfo);
+                return response;
+
+            }
+
+        }
+
+        private bool CurrentDaySwitchStatus(TblSchedule scheduledata)
+        {
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            var CurrentDay = IndianTime.DayOfWeek.ToString();
+
+            bool CurrentDayStat = false;
+
+            switch (CurrentDay)
+            {
+                case "Monday":
+                    CurrentDayStat = scheduledata.Mon;
+                    break;
+
+                case "Tuesday":
+                    CurrentDayStat = scheduledata.Tue;
+                    break;
+
+
+                case "Wednesday":
+                    CurrentDayStat = scheduledata.Wed;
+                    break;
+
+
+                case "Thursday":
+                    CurrentDayStat = scheduledata.Thu;
+                    break;
+
+
+                case "Friday":
+                    CurrentDayStat = scheduledata.Fri;
+                    break;
+
+
+                case "Saturday":
+                    CurrentDayStat = scheduledata.Sat;
+                    break;
+
+
+
+                case "Sunday":
+                    CurrentDayStat = scheduledata.Sun;
+                    break;
+            }
+
+            return CurrentDayStat;
+
+        }
+
+        private async Task<GenericDTO> GetPolicyDetails(string PolicyNumber,ApiContext context)
+        {
+            GenericDTO response = new GenericDTO();
+            ErrorInfo errorInfo = new ErrorInfo();
+
+            try
+            {
+                //Call the Policy Service to Get Policy Details.
+                var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, context);
+
+                if (PolicyData != BusinessStatus.Ok)
+                {
+                    errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Policy data not found";
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "Policy Record Not Found";
+                    errorInfo.ErrorCode = "ExpPolicy";
+                    errorInfo.PropertyName = "InternalGetPolicyDetailsByNumber";
+                    response.Errors.Add(errorInfo);
+
+                    return response;
+                }
+
+
+                int PolicyStageStatusId = Convert.ToInt32(PolicyData["PolicyStageStatusId"]);
+
+                if (PolicyStageStatusId == ModuleConstants.PolicyStageStatusCancelled)
+                {
+                    errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Policy is Cancelled";
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "Policy Stage Status is Cancelled";
+                    errorInfo.ErrorCode = "ExpPolicy";
+                    errorInfo.PropertyName = "PolicyCancelled";
+                    response.Errors.Add(errorInfo);
+
+                    return response;
+                }
+
+
+                if (PolicyStageStatusId != ModuleConstants.PolicyStageStatusLive)
+                {
+                    errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Policy is not yet live";
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "Policy Stage Status Not Live";
+                    errorInfo.ErrorCode = "ExpPolicy";
+                    errorInfo.PropertyName = "PolicyNotLive";
+                    response.Errors.Add(errorInfo);
+
+                    return response;
+                }
+
+                //Good Policy So Return it with Success
+                response.ResponseMessage = "Policy Data";
+                response.Status = BusinessStatus.Ok;
+                response.Data = PolicyData; 
+
+            }
+            catch
+            {
+                errorInfo = new ErrorInfo();
+
+                response.ResponseMessage = "Some Exception Occured";
+                response.Status = BusinessStatus.Error;
+                errorInfo.ErrorMessage = "Get Policy Details Call Failed due to some exception";
+                errorInfo.ErrorCode = "GetPolicyDetails";
+                errorInfo.PropertyName = "Exception";
+                response.Errors.Add(errorInfo);
+
+                return response;
+            }
+
+            return response;
+        }
+
     }
 }
 

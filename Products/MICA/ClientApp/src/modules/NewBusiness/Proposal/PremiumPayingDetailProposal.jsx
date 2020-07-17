@@ -70,6 +70,9 @@ class PremiumPayingDetails extends React.Component {
 
         const { classes } = this.props;
 
+
+        console.log("premiumpaymentmethod", this.props.MasterDataDto);
+
         return (
            
                     <CardBody>
@@ -77,10 +80,11 @@ class PremiumPayingDetails extends React.Component {
                         <GridContainer xl={12}>
                             <GridItem xs={12} sm={4} md={3}>
 
-                                <Dropdown
+                        <MasterDropdown
                                     required={true}
                                     labelText="Premium Payment Method"
-                                    lstObject={[]}
+                                    lstObject={this.props.MasterDataDto}
+                                    filterName='PaymentMethod'
                                     // value={orgData.selectedlevel}
                                     //name='selectedlevel'
                                     //onChange={(e) => orgData.handlelevels(e)}
@@ -90,10 +94,11 @@ class PremiumPayingDetails extends React.Component {
                         
                              <GridItem xs={12} sm={4} md={3}>
 
-                            <Dropdown
+                        <MasterDropdown
                                 required={true}
                                 labelText=" Payment Paid By"
-                                lstObject={[]}
+                                lstObject={this.props.MasterDataDto}
+                                //filterName='PaymentMethod'
                                 // value={orgData.selectedlevel}
                                 //name='selectedlevel'
                                 //onChange={(e) => orgData.handlelevels(e)}

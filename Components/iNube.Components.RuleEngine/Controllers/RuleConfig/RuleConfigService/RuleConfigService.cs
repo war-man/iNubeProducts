@@ -6,9 +6,14 @@ using iNube.Components.RuleEngine.Helpers;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework;
 using iNube.Components.RuleEngine.Models;
+using iNube.Components.RuleEngine.Controllers.RuleEngine.RuleEngineService.IntegrationServices;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService
 {
+    
     public interface IRuleConfigService
     {
         //tblParameters
@@ -42,7 +47,8 @@ namespace iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService
 
         IEnumerable<TblRuleMapping> GetAllRuleMapping(int ruleid, string mastermodel, string action, string modelName);
         //HandleEvent
-        IEnumerable<HandleRuleDTO> HandleRuleState(decimal RuleId);
+        //Task<IEnumerable<HandleRuleDTO>> HandleRuleState(decimal RuleId);
+        Task<HandleParamDTO> HandleRuleState(decimal RuleId);
 
 
     }
@@ -50,10 +56,12 @@ namespace iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService
     public class RuleConfigService : IRuleConfigService
     {
         private RuleEngineContext _context;
+        public IIntegrationService _integrationService;
 
-        public RuleConfigService(RuleEngineContext context)
+        public RuleConfigService(RuleEngineContext context, IIntegrationService integrationService)
         {
             _context = context;
+            _integrationService = integrationService;
         }
         
 
@@ -254,12 +262,115 @@ namespace iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService
         }
 
         // HandleState
-        public IEnumerable<HandleRuleDTO> HandleRuleState(decimal RuleId)
-        {
+        //public async Task<IEnumerable<HandleRuleDTO>> HandleRuleState(decimal RuleId)
+        //{
 
+        //    var rule = from tblRuleCondition in _context.TblRuleConditions
+        //               join tblRules in _context.TblRules on tblRuleCondition.RuleId equals tblRules.RuleId
+        //               join tblParameters in _context.TblParameters on tblRuleCondition.ConditionAttribute equals tblParameters.ParamId
+        //               where(tblRules.RuleId == RuleId)
+        //               select new
+        //               {
+        //                   rule_id = tblRules.RuleId,
+        //                   ruleName = tblRules.RuleName,
+        //                   startDate = tblRules.StartDate,
+        //                   endDate = tblRules.EndDate,
+        //                   conditionAttributes = tblRuleCondition.ConditionAttribute,
+        //                   paramId = tblParameters.ParamId,
+        //                   paramName = tblParameters.ParamName,
+        //                   conditionOperator = tblRuleCondition.ConditionOperator,
+        //                   conditionValue = tblRuleCondition.ConditionValueFrom,
+        //                   conditionValueTo = tblRuleCondition.ConditionValueTo,
+        //                   ruleObj = tblRules.RuleObj,
+        //                   ruleType = tblRules.RuleType,
+        //                   ruleGroup = tblRuleCondition.RuleGroupName,
+        //                   type = tblRuleCondition.Type
+        //               };
+        //    var ruleGropList = from tblRuleCondition in _context.TblRuleConditions
+        //                       join tblRules in _context.TblRules on tblRuleCondition.RuleId equals tblRules.RuleId
+        //                       where tblRules.RuleId == RuleId
+        //                       where tblRules.RuleId == RuleId
+        //                       select new
+        //                       {
+        //                           rule_id = tblRules.RuleId,
+        //                           ruleName = tblRules.RuleName,
+        //                           startDate = tblRules.StartDate,
+        //                           endDate = tblRules.EndDate,
+        //                           conditionAttributes = tblRuleCondition.ConditionAttribute,
+        //                           conditionOperator = tblRuleCondition.ConditionOperator,
+        //                           conditionValue = tblRuleCondition.ConditionValueFrom,
+        //                           ruleObj = tblRules.RuleObj,
+        //                           ruleType = tblRules.RuleType,
+        //                           ruleGroup = tblRuleCondition.RuleGroupName
+        //                       };
+        //    var ruleList = rule;
+        //    List<HandleRuleDTO> ltObj = new List<HandleRuleDTO>();
+        //    foreach (var rl in ruleGropList)
+        //    {
+        //        if (rl.ruleType == "RuleGroup" || rl.ruleObj == "NULL")
+        //        {
+        //            foreach (var rlList in ruleList)
+        //            {
+        //                if (rlList.rule_id == Convert.ToDecimal(rl.ruleGroup))
+        //                {
+        //                    HandleRuleDTO obj = new HandleRuleDTO();
+        //                    obj.ParamName = rlList.paramName;
+        //                    ltObj.Add(obj);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    foreach (var rl in rule)
+        //    {
+        //        if (rl.rule_id == RuleId)
+        //        {
+        //            HandleRuleDTO obj = new HandleRuleDTO();
+        //            obj.ParamName = rl.paramName;
+        //            ltObj.Add(obj);
+        //        }
+        //    }
+        //    var RatingFromId = "";
+        //    var RatingToId = "";
+        //    List<RateDTO> rateListObj = new List<RateDTO>();
+        //    foreach (var rl in rule)
+        //    {
+        //        if(rl.type == "Rate")
+        //        {
+        //            if (RatingFromId != rl.conditionValue || RatingToId != rl.conditionValueTo)
+        //            {
+        //                RatingFromId = rl.conditionValue;
+        //                ApiContext apiContext = new ApiContext();
+        //                apiContext.ProductType = "Mica";
+        //                apiContext.ServerType = "297";
+        //                apiContext.Token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI1Y2M0ZTFjZi04MzYxLTQwY2QtODVjMC1hMjE3YThiZGEwYTYiLCJFbWFpbCI6Im1vaGFuQGludWJlc29sdXRpb25zLmNvbSIsIk9yZ0lkIjoiMTEyIiwiUGFydG5lcklkIjoiMCIsIlJvbGUiOiJpTnViZSBBZG1pbiIsIk5hbWUiOiJJbnViZSIsIlVzZXJOYW1lIjoiZWludWJlYWRtaW4iLCJQcm9kdWN0VHlwZSI6Ik1pY2EiLCJTZXJ2ZXJUeXBlIjoiMjk3IiwiZXhwIjoxNjI1MzA0ODYxLCJpc3MiOiJJbnViZSIsImF1ZCI6IkludWJlTUlDQSJ9.zIEhDBPBDV-c389AUvl_kka4WPK1kHYa-Ew9ScB12pQ";
+        //                apiContext.OrgId = 112;
+        //                var ratValueFrom = await _integrationService.HandleRate(Convert.ToInt32(RatingFromId), apiContext);
+        //                RateDTO rateObj = new RateDTO();
+        //                foreach (var parameter in ratValueFrom.ParameterList)
+        //                {
+        //                    rateObj.RateParameter = parameter;
+        //                }
+        //                rateListObj.Add(rateObj);
+        //                if (rl.conditionValueTo != "")
+        //                {
+        //                    RatingFromId = rl.conditionValueTo;
+        //                    var rateValueTo = await _integrationService.HandleRate(Convert.ToInt32(RatingToId), apiContext);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    //ltObj
+
+        //    return ltObj;
+        //}
+
+        public async Task<HandleParamDTO> HandleRuleState(decimal RuleId)
+        {
+            HandleParamDTO obj = new HandleParamDTO();
             var rule = from tblRuleCondition in _context.TblRuleConditions
                        join tblRules in _context.TblRules on tblRuleCondition.RuleId equals tblRules.RuleId
                        join tblParameters in _context.TblParameters on tblRuleCondition.ConditionAttribute equals tblParameters.ParamId
+                       where (tblRules.RuleId == RuleId)
                        select new
                        {
                            rule_id = tblRules.RuleId,
@@ -271,9 +382,11 @@ namespace iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService
                            paramName = tblParameters.ParamName,
                            conditionOperator = tblRuleCondition.ConditionOperator,
                            conditionValue = tblRuleCondition.ConditionValueFrom,
+                           conditionValueTo = tblRuleCondition.ConditionValueTo,
                            ruleObj = tblRules.RuleObj,
                            ruleType = tblRules.RuleType,
-                           ruleGroup = tblRuleCondition.RuleGroupName
+                           ruleGroup = tblRuleCondition.RuleGroupName,
+                           type = tblRuleCondition.Type
                        };
             var ruleGropList = from tblRuleCondition in _context.TblRuleConditions
                                join tblRules in _context.TblRules on tblRuleCondition.RuleId equals tblRules.RuleId
@@ -293,7 +406,7 @@ namespace iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService
                                    ruleGroup = tblRuleCondition.RuleGroupName
                                };
             var ruleList = rule;
-            List<HandleRuleDTO> ltObj = new List<HandleRuleDTO>();
+            List<ParamDTO> ltObj = new List<ParamDTO>();
             foreach (var rl in ruleGropList)
             {
                 if (rl.ruleType == "RuleGroup" || rl.ruleObj == "NULL")
@@ -302,9 +415,9 @@ namespace iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService
                     {
                         if (rlList.rule_id == Convert.ToDecimal(rl.ruleGroup))
                         {
-                            HandleRuleDTO obj = new HandleRuleDTO();
-                            obj.ParamName = rlList.paramName;
-                            ltObj.Add(obj);
+                            ParamDTO objParam = new ParamDTO();
+                            objParam.RuleParameter = rlList.paramName;
+                            ltObj.Add(objParam);
                         }
                     }
                 }
@@ -313,14 +426,58 @@ namespace iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService
             {
                 if (rl.rule_id == RuleId)
                 {
-                    HandleRuleDTO obj = new HandleRuleDTO();
-                    obj.ParamName = rl.paramName;
-                    ltObj.Add(obj);
+                    ParamDTO objParam = new ParamDTO();
+                    objParam.RuleParameter = rl.paramName;
+                    ltObj.Add(objParam);
                 }
             }
+            var RatingFromId = "";
+            var RatingToId = "";
+            List<RateDTO> rateListObj = new List<RateDTO>();
+            foreach (var rl in rule)
+            {
+                if (rl.type == "Rate")
+                {
+                    if (RatingFromId != rl.conditionValue || RatingToId != rl.conditionValueTo)
+                    {
+                        RatingFromId = rl.conditionValue;
+                        ApiContext apiContext = new ApiContext();
+                        apiContext.ProductType = "Mica";
+                        apiContext.ServerType = "297";
+                        apiContext.Token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI1Y2M0ZTFjZi04MzYxLTQwY2QtODVjMC1hMjE3YThiZGEwYTYiLCJFbWFpbCI6Im1vaGFuQGludWJlc29sdXRpb25zLmNvbSIsIk9yZ0lkIjoiMTEyIiwiUGFydG5lcklkIjoiMCIsIlJvbGUiOiJpTnViZSBBZG1pbiIsIk5hbWUiOiJJbnViZSIsIlVzZXJOYW1lIjoiZWludWJlYWRtaW4iLCJQcm9kdWN0VHlwZSI6Ik1pY2EiLCJTZXJ2ZXJUeXBlIjoiMjk3IiwiZXhwIjoxNjI1MzA0ODYxLCJpc3MiOiJJbnViZSIsImF1ZCI6IkludWJlTUlDQSJ9.zIEhDBPBDV-c389AUvl_kka4WPK1kHYa-Ew9ScB12pQ";
+                        apiContext.OrgId = 112;
+                        var ratValueFrom = await _integrationService.HandleRate(Convert.ToInt32(RatingFromId), apiContext);
+                        RateDTO rateObj = new RateDTO();
+                        if (ratValueFrom.ParameterList.Count() != 0)
+                        {
+                            foreach (var parameter in ratValueFrom.ParameterList)
+                            {
+                                rateObj.RateParameter = parameter;
+                            }
+                            rateListObj.Add(rateObj);
+                        }
+                        if (rl.conditionValueTo != "")
+                        {
+                            RatingFromId = rl.conditionValueTo;
+                            var rateValueTo = await _integrationService.HandleRate(Convert.ToInt32(RatingToId), apiContext);
+                            RateDTO rateObjto = new RateDTO();
+                            if (rateValueTo.ParameterList.Count() != 0)
+                            {
+                                foreach (var parameter in ratValueFrom.ParameterList)
+                                {
+                                    rateObjto.RateParameter = parameter;
+                                }
+                                rateListObj.Add(rateObjto);
+                            }
+                        }
+                    }
+                }
+            }
+            //ltObj
+            obj.ParamObj = ltObj;
+            obj.RateObj = rateListObj;
 
-            return ltObj;
+            return obj;
         }
-
     }
 }

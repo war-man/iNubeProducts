@@ -413,7 +413,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     //string connectionString = _configuration.GetConnectionString("DefaultConnection");
                     //string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
 
-                    DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+                    DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration, new LoggerManager(_configuration)));
                     string connectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
 
                     using (SqlConnection connection = new SqlConnection(connectionString))
@@ -543,7 +543,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                             //string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
                             using (SqlConnection connection = new SqlConnection(connectionString))
                             {
-                                string queryForCol = "DECLARE @columns NVARCHAR(MAX) = '' ,@sql NVARCHAR(MAX) = '';SELECT @columns+=QUOTENAME(RatingParameters) + ',' from (Select t1.RatingID,t1.RateObj,t1.RateName,t4.Rate, t3.ParameterName+(case when t2.ConditionValueFrom is Not Null Then 'From' when t2.ConditionValueTo is Not Null then 'To' End) as  RatingParameters , IsNull(t2.ConditionValueFrom,t2.ConditionValueTo) as Value From [RT].[tblRating] t1  inner join [RT].[tblRatingRules] t4 on t1.RatingID = t4.RatingID inner join [RT].[tblRatingRuleConditions] t2 on t2.RatingRuleID = t4.RatingRuleID join [RT].[tblRatingParameters] t3 on  t3.ParametersID = t2.RatingParameters) as B where B.RatingID = " + RatingRuleId + " group by B.RatingParameters SET @columns = LEFT(@columns, LEN(@columns) - 1); set @sql = 'select Rate from ( select B.RatingID,B.RateObj,B.RateName,B.Rate,B.RatingParameters,B.Value from (Select t1.RatingID,t1.RateObj,t1.RateName,t4.Rate, t3.ParameterName+(case when t2.ConditionValueFrom is Not Null Then ''From'' when t2.ConditionValueTo is Not Null then ''To'' End) as  RatingParameters , IsNull(t2.ConditionValueFrom,t2.ConditionValueTo) as Value From [RT].[tblRating] t1 inner join [RT].[tblRatingRules] t4 on t1.RatingID = t4.RatingID inner join [RT].[tblRatingRuleConditions] t2 on t2.RatingRuleID = t4.RatingRuleID join [RT].[tblRatingParameters] t3 on  t3.ParametersID = t2.RatingParameters) as B ) t PIVOT (max(Value) for RatingParameters in ('+ @columns +')) as pvt where RatingID =''" + RatingRuleId + "'' and " + condition + "' EXECUTE sp_executesql @sql;";
+                                string queryForCol = "DECLARE @columns NVARCHAR(MAX) = '' ,@sql NVARCHAR(MAX) = '';SELECT @columns+=QUOTENAME(RatingParameters) + ',' from (Select t1.RatingID,t1.RateObj,t1.RateName,t4.Rate, t3.ParameterName+(case when t2.ConditionValueFrom is Not Null Then 'From' when t2.ConditionValueTo is Not Null then 'To' End) as  RatingParameters , IsNull(t2.ConditionValueFrom,t2.ConditionValueTo) as Value From [RT].[tblRating] t1  inner join [RT].[tblRatingRules] t4 on t1.RatingID = t4.RatingID inner join [RT].[tblRatingRuleConditions] t2 on t2.RatingRuleID = t4.RatingRuleID join [RT].[tblRatingParameters] t3 on  t3.ParametersID = t2.RatingParameters) as B where B.RatingID = " + RatingRuleId + " group by B.RatingParameters SET @columns = LEFT(@columns, LEN(@columns) - 1); set @sql = 'select Rate from ( select B.RatingID,B.RateObj,B.RateName,B.Rate,B.RatingParameters,B.Value,B.RatingRuleID from (Select t1.RatingID,t1.RateObj,t1.RateName,t4.Rate,t4.RatingRuleID, t3.ParameterName+(case when t2.ConditionValueFrom is Not Null Then ''From'' when t2.ConditionValueTo is Not Null then ''To'' End) as  RatingParameters , IsNull(t2.ConditionValueFrom,t2.ConditionValueTo) as Value From [RT].[tblRating] t1 inner join [RT].[tblRatingRules] t4 on t1.RatingID = t4.RatingID inner join [RT].[tblRatingRuleConditions] t2 on t2.RatingRuleID = t4.RatingRuleID join [RT].[tblRatingParameters] t3 on  t3.ParametersID = t2.RatingParameters) as B ) t PIVOT (max(Value) for RatingParameters in ('+ @columns +')) as pvt where RatingID =''" + RatingRuleId + "'' and " + condition + "' EXECUTE sp_executesql @sql;";
                                 connection.Open();
                                 using (SqlCommand command = new SqlCommand(queryForCol, connection))
                                 {
@@ -577,7 +577,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             List<CalculationResult> calcultion = new List<CalculationResult>();
             try
             {
-                _logger.LogRequest("Rating", "Rating", response.ToString(), "_context---Before", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+                _logger.LogRequest("Rating", "Rating", response.ToString(), "_context---Before",null, new ApiContext() { ProductType = "Mica", ServerType = "297" });
 
 
                 if (_context == null)
@@ -585,7 +585,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
                 }
 
-                _logger.LogRequest("Rating", "Rating", _context.ToString(), "_context---After", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+                _logger.LogRequest("Rating", "Rating", _context.ToString(), "_context---After", null,new ApiContext() { ProductType = "Mica", ServerType = "297" });
 
 
                 var Expression = _context.TblCalculationConfigExpression.Where(item => item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId)).OrderBy(it => it.Steps);
@@ -756,7 +756,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             catch (Exception ex)
             {
                 // _logger.LogError(ex, "RatingConfig", MethodBase.GetCurrentMethod().Name, null, null, apiContext);
-                _logger.LogRequest("Rating", "Rating", ex.ToString(), "CatchBlock-Rating-Final", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+                _logger.LogRequest("Rating", "Rating", ex.ToString(), "CatchBlock-Rating-Final",null, new ApiContext() { ProductType = "Mica", ServerType = "297" });
 
                 errorResponse.ResponseMessage = "Incorrect Input Parameter";
                 return errorResponse;
@@ -1726,6 +1726,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             var paramData = from t1 in _context.TblCalculationConfigParam.Where(x => x.CalculationConfigId == CalculationConfigId)
                             select new CalConfigParam
                             {
+                                CalculationConfigParamId = t1.CalculationConfigParamId,
                                 CalculationConfigParamName = t1.CalculationConfigParamName,
                                 Type = t1.Type,
                                 CreatedDate = t1.CreatedDate,
@@ -1743,8 +1744,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             //_context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             try
             {
+                
                 //checking Configurationi parameter weather exists or not 
-
                 foreach (var item in calConfigDto.CalculationConfigExpression)
                 {
                     item.ExpressionValue = item.ExpressionValue.Replace("(", "{").Replace(")", "}");

@@ -24,7 +24,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
         Task<LeadResponse> SaveSuspectAsync(LeadDTO leadDTO, ApiContext context);
         Task<IEnumerable<LeadDTO>> ContactPoolAsync(String type, ApiContext context);
         Task<IEnumerable<LeadDTO>> SuspectPoolAsync(int incStageId, ApiContext context);
-        List<LeadDTO> LoadSuspectInformation(int ContactID, ApiContext context);
+        List<LeadDTO> LoadSuspectInformation(int ContactID, ApiContext context, string NicNo);
 
         LeadResponse ModifySuspect(LeadDTO leadDTO, ApiContext context);
         IEnumerable<ddDTO> GetLocation(string locationType, int parentID, ApiContext context);
@@ -158,93 +158,71 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             }
             return ddDTOs;
         }
-
-
-        //await is used in rule Engine its commented
         public async Task<LeadResponse> SaveSuspectAsync(LeadDTO leadDTO, ApiContext context)
+
         {
-            //// RuleEngine Validation 
 
-            var ruleMapList = await _integrationService.GetRuleMapAsync(context);
-            // Get Rules with Parameter
-            var ruleListParam = await _integrationService.GetRulesWithParamAsync(context);
-            var expando = new ExpandoObject() as IDictionary<string, Object>;
-            var ruleproperties = GetProperties(leadDTO);
-            foreach (var rm in ruleMapList)
+            try
+
             {
-                //var paraColName = "";
-                try
-                {
-                    if (leadDTO.GetType().GetProperty(rm.Param1) != null)
-                    {
-                        var value = leadDTO.GetType().GetProperty(rm.Param1).GetValue(leadDTO, null);
-                        if (value != null)
-                        {
-                            expando.Add(rm.Param2, value.ToString());
-                        }
-                    }
-                }
-                catch (Exception)
+
+                leadDTO.CreationDate = DateTime.Now;
+
+                var lead = _mapper.Map<TblContacts>(leadDTO);
+
+                lead.ContactType = _context.TblmasLdcommonTypes.First(c => c.CommonTypeId == lead.ContactTypeId).Value;
+
+                if (lead.ContactId == 0)
+
                 {
 
-                }
+                    _context.TblContacts.Add(lead);
 
-            }
-            expando.Add("RuleName", Convert.ToInt32(ruleMapList.First().RuleId));
-            var ruleCheck = await _integrationService.SendRuleValidateDataAsync(expando, context);
+                    TblOpportunity objOppurtunity = new TblOpportunity();
 
+                    TblOpportunityHistory objOpportunityHistory = new TblOpportunityHistory();
 
+                    objOppurtunity.ContactId = lead.ContactId;
 
-            if (ruleCheck.Status == BusinessStatus.Ok)
-            {
-                // RuleEngine Validation 
-                try
-                {
+                    objOppurtunity.StageId = 1; // Suspect
 
-                    leadDTO.CreationDate = DateTime.Now;
-                    var lead = _mapper.Map<TblContacts>(leadDTO);
-                    lead.ContactType = _context.TblmasLdcommonTypes.First(c => c.CommonTypeId == lead.ContactTypeId).Value;
+                    objOppurtunity.Createdby = context.UserId;
 
-                    if (lead.ContactId == 0)
-                    {
-                        _context.TblContacts.Add(lead);
-                        //_context.SaveChanges();
-                        TblOpportunity objOppurtunity = new TblOpportunity();
-                        TblOpportunityHistory objOpportunityHistory = new TblOpportunityHistory();
-                        objOppurtunity.ContactId = lead.ContactId;
-                        objOppurtunity.StageId = 1; // Suspect
-                        objOppurtunity.Createdby = context.UserId;
-                        objOpportunityHistory.StageId = 1;
-                        objOpportunityHistory.OpportunityId = objOppurtunity.OppurtunityId;
-                        objOpportunityHistory.CreatedDate = DateTime.Now;
-                        _context.TblOpportunity.Add(objOppurtunity);
-                        // _context.SaveChanges();
-                        objOpportunityHistory.OpportunityId = objOppurtunity.OppurtunityId;
-                        _context.TblOpportunityHistory.Add(objOpportunityHistory);
-                    }
+                    objOpportunityHistory.StageId = 1;
+
+                    objOpportunityHistory.OpportunityId = objOppurtunity.OppurtunityId;
+
+                    objOpportunityHistory.CreatedDate = DateTime.Now;
+
+                    _context.TblOpportunity.Add(objOppurtunity);
+
+                    objOpportunityHistory.OpportunityId = objOppurtunity.OppurtunityId;
+
+                    _context.TblOpportunityHistory.Add(objOpportunityHistory);
+
                     _context.SaveChanges();
-                    leadDTO = _mapper.Map<LeadDTO>(lead);
-                    //return leadDTO;
-                    return new LeadResponse { Status = BusinessStatus.Created, product = leadDTO, ResponseMessage = $"Lead  Saved successfully ! \n Product ID: {leadDTO.ContactID}" };
 
                 }
 
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
+
+
+                leadDTO = _mapper.Map<LeadDTO>(lead);
+
+                return new LeadResponse { Status = BusinessStatus.Created, product = leadDTO, ResponseMessage = $"Lead  Saved successfully ! \n Product ID: {leadDTO.ContactID}" };
+
             }
-            // RuleEngine Validation 
 
-            else
+            catch (Exception ex)
+
             {
-                return null;
+
+                throw ex;
 
             }
 
         }
-
-        // RuleEngine Validation 
+  
+        
         public async Task<IEnumerable<LeadDTO>> ContactPoolAsync(String type, ApiContext context)
         {
             IEnumerable<LeadDTO> lst;
@@ -356,12 +334,17 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
 
         //}
 
-        public List<LeadDTO> LoadSuspectInformation(int ContactID, ApiContext context)
+        public List<LeadDTO> LoadSuspectInformation(int ContactID, ApiContext context,string NicNo)
         {
-
-            var DATA = _context.TblContacts.Where(p => p.ContactId == ContactID).Include(x => x.Address).ToList();
-
-
+            List<TblContacts> DATA = new List<TblContacts>();
+            if (!string.IsNullOrEmpty(NicNo))
+            {
+                DATA = _context.TblContacts.Where(p => p.Nicno == NicNo).Include(x => x.Address).ToList();
+            }
+            else
+            {
+                DATA = _context.TblContacts.Where(p => p.ContactId == ContactID).Include(x => x.Address).ToList();
+            }
 
             var pooldata = _mapper.Map<List<LeadDTO>>(DATA);
             foreach (var item in pooldata)
@@ -400,7 +383,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             tbl_lead.Place = leadDTO.Place;
             tbl_lead.MobileNo = leadDTO.MobileNo;
             tbl_lead.PassportNo = leadDTO.PassportNo;
-
+            tbl_lead.Salutation = leadDTO.Salutation;
             tbl_lead.Currency = leadDTO.Currency;
             tbl_lead.Gender = leadDTO.Gender;
             tbl_lead.MaritalStatusId = leadDTO.MaritalStatusID;

@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using iNube.Utility.Framework.Model;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,7 +65,33 @@ namespace inube.Services.Notification.Models
         public List<FileUploadDTO> fileUploadDTOs { get; set; }
     }
 
+    //public class UpdateImageDTO: ResponseStatus
+    //{
+    //    public UpdateImageDTO()
+    //    {
+    //        fileUpdateDTOs = new List<FileUpdateDTO>();
+    //    }
 
+
+    //    public List<FileUpdateDTO> fileUpdateDTOs { get; set; }
+    //}
+
+    public class FileUpdateDTO
+    {
+
+        public FileUpdateDTO()
+        {
+            tagdto = new List<TagDto>();
+        }
+        public string DocId { get; set; }
+        public string FileName { get; set; }
+        public string FileExtension { get; set; }
+        public byte[] FileData { get; set; }
+        public string ContentType { get; set; }
+        public string IdentificationNo { get; set; }
+        public List<TagDto> tagdto { get; set; }
+
+    }
     public class FileUploadDTO
     {
 

@@ -60,6 +60,7 @@ class Panels extends React.Component {
             selectedValue: null,
             masterList: [],
             type: "Prospect",
+            ContactData: {},
         }
 
     };
@@ -72,6 +73,9 @@ class Panels extends React.Component {
         //}
     }
 
+    SetContactValue = (value) => {
+        this.setState({ ContactData:value });
+    }
 
     render() {
         const { classes } = this.props;
@@ -99,9 +103,9 @@ class Panels extends React.Component {
                                             title: "Prospect Information",
                                    //content: <CommonModify isShowGrid={false} type={this.state.type}
                                    //   isShowCreateLead={this.state.isShowCreateLead} /> 
-                                            content: <CommonModify QuotationData={this.state.QuotationData}
+                                            content: <CommonModify QuotationData={this.state.ContactData}
                                                 isShowCreateLead={this.state.isShowCreateLead} type={this.state.type}
-                                                isDontShow={true} isDontShowCreateLeadBtn={false} isShowQtnRadioBtn={true} contactId={this.props.contactId}/> 
+                                                isDontShow={true} isDontShowCreateLeadBtn={false} isShowQtnRadioBtn={true} contactId={this.props.contactId} SetContactValue={this.SetContactValue}/> 
 
                     },
                                         {
@@ -111,7 +115,7 @@ class Panels extends React.Component {
                                         },
                                         {
                                             title: "Product Details",
-                                            content: <ProductDetails/>
+                                            content: <ProductDetails ProspectData={this.state.ContactData}/>
                                                
                                          }
                                     ]}

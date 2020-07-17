@@ -19,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
+using iNube.Services.ProductConfiguration.Controllers.Product.IntegrationServices;
 
 namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductServices.AvoProduct
 {
@@ -31,14 +32,15 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         private readonly IEmailService _emailService;
         // public IProductConfigurationIntegrationService _integrationService;
         private readonly IConfiguration _configuration;
+        public IIntegrationService _integrationService;
 
-        public AvoProductService(AVOPRContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService, IConfiguration configuration)
+        public AvoProductService(AVOPRContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService, IConfiguration configuration, IIntegrationService integrationService)
         {
             _mapper = mapper;
             _serviceProvider = serviceProvider;
             _logger = logger;
             _emailService = emailService;
-            // _integrationService = integrationService;
+            _integrationService = integrationService;
             _configuration = configuration;
 
         }
@@ -335,7 +337,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //entity.SaveChanges();
             //#endregion
 
-            var connectionString = _configuration.GetConnectionString("PRConnection");
+             var connectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
 
             System.Data.SqlClient.SqlConnection con = new System.Data.SqlClient.SqlConnection(connectionString);
             con.Open();
@@ -441,14 +443,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             }
 
-            var IllustrationData = GetIllustration(objLifeQuote);
+            var IllustrationData = GetIllustration(objLifeQuote,apiContext);
             objLifeQuote = await IllustrationData;
 
             return objLifeQuote;
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public async Task<MapQuoteDTO> GetIllustration(MapQuoteDTO objLifeQuote)
+        public async Task<MapQuoteDTO> GetIllustration(MapQuoteDTO objLifeQuote,ApiContext apiContext)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             string xmlStr = MapQuotePremiumObject(objLifeQuote);
@@ -466,7 +468,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //#endregion
 
 
-            var connectionString = _configuration.GetConnectionString("PRConnection");
+             var connectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
 
             System.Data.SqlClient.SqlConnection con = new System.Data.SqlClient.SqlConnection(connectionString);
             con.Open();
@@ -610,7 +612,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public async Task<MapQuoteDTO> GetRiderSumAssured(MapQuoteDTO objLifeQuote)
+        public async Task<MapQuoteDTO> GetRiderSumAssured(MapQuoteDTO objLifeQuote,ApiContext apiContext)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             //using (AVOAIALifeEntities entity = new AVOAIALifeEntities())
@@ -629,7 +631,8 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //entity.tbllogxmls.Add(objlogxml);
             //entity.SaveChanges();
             //#endregion
-            var connectionString = _configuration.GetConnectionString("PRConnection");
+           // var connectionString = _configuration.GetConnectionString("PRConnection");
+            var connectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
 
             System.Data.SqlClient.SqlConnection con = new System.Data.SqlClient.SqlConnection(connectionString);
             con.Open();
@@ -1018,7 +1021,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             throw new NotImplementedException();
         }
 
-        public async Task<List<object>> GetAllEntitiesById(int Id, ApiContext apiContext)
+        public async Task<List<object>> GetSingleEntitiesById(int Id, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<object>> GetMultipleEntitiesById(int Id, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

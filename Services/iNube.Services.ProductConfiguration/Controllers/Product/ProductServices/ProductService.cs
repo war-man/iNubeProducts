@@ -44,7 +44,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<List<MasterListItemDTO>> ListProducts(ApiContext Context);
         Task<IEnumerable<ProductDTO>> GetProductByLob(int id, ApiContext apiContext);
         Task<MapQuoteDTO> CalculateQuotePremium(MapQuoteDTO objLifeQuote, ApiContext apiContext, bool AnnualMode = false);
-        Task<MapQuoteDTO> GetRiderSumAssured(MapQuoteDTO objLifeQuote);
+        Task<MapQuoteDTO> GetRiderSumAssured(MapQuoteDTO objLifeQuote, ApiContext apiContext);
         Task<List<object>> GetRiders(int ProductId, int PlanId, ApiContext apiContext);
         Task<bool> CheckSpouse(int ProductID, int PlanID, ApiContext apiContext);
         Task<IEnumerable<ddDTOs>> GetRiskClaimMaster(string masterType, int typeId, int parentID, ApiContext apiContext);
@@ -71,7 +71,8 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByEntityId(int id, ApiContext apiContext);
         Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext);
         Task<IEnumerable<ddDTOs>> GetEntities(int parentid, ApiContext apiContext);
-        Task<List<object>> GetAllEntitiesById(int Id, ApiContext apiContext);
+        Task<List<object>> GetSingleEntitiesById(int Id, ApiContext apiContext);
+        Task<List<object>> GetMultipleEntitiesById(int Id, ApiContext apiContext);
     }
 
     public class ProductService : IProductService
@@ -105,9 +106,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return await _AvoproductConfigService.GetRiders(ProductId, PlanId, apiContext);
         }
 
-        public async Task<MapQuoteDTO> GetRiderSumAssured(MapQuoteDTO objLifeQuote)
+        public async Task<MapQuoteDTO> GetRiderSumAssured(MapQuoteDTO objLifeQuote,ApiContext apiContext)
         {
-            return await _AvoproductConfigService.GetRiderSumAssured(objLifeQuote);
+            return await _AvoproductConfigService.GetRiderSumAssured(objLifeQuote,apiContext);
         }
 
         public async Task<List<ddDTOs>> ProductMasterAvo(string masterType, int parentID, ApiContext apiContext)
@@ -390,9 +391,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return await _productConfigService(apiContext.ProductType).GetEntities(parentid, apiContext);
         }
 
-        public async Task<List<object>> GetAllEntitiesById(int Id, ApiContext apiContext)
+        public async Task<List<object>> GetSingleEntitiesById(int Id, ApiContext apiContext)
         {
-            return await _productConfigService(apiContext.ProductType).GetAllEntitiesById(Id, apiContext);
+            return await _productConfigService(apiContext.ProductType).GetSingleEntitiesById(Id, apiContext);
+        }
+
+        public async Task<List<object>> GetMultipleEntitiesById(int Id, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).GetMultipleEntitiesById(Id, apiContext);
         }
     }
 }

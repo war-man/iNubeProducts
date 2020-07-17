@@ -30,5 +30,6 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         UserUploadImageResponse Uploadimage(ImageDTO image, ApiContext apiContext);
         UserNameById GetUserNameById(string Id, ApiContext apiContext);
         UnlockResponse UnlockUser(string userid, ApiContext apiContext);
+        DefaultPasswordReset ResetDefaultPassword(Userpasswordreset userpasswordreset, ApiContext apiContext);
     }
 }

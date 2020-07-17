@@ -77,18 +77,12 @@ namespace iNube.Services.Billing.Helpers
         }
 
         public static async Task<DbContext> GetContextAsync(string product, string connectionKey, IConfiguration configuration)
-        {
-            LoggerManager logger = new LoggerManager(configuration);
-            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", "Testing", "2",new ApiContext() { ProductType=product,ServerType=connectionKey});
-
+        {            
             DbContext context = null;
             //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 
-            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration,new LoggerManager(configuration)));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
-
-            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", dbConnectionString, "5 -- dbConnection String", new ApiContext() { ProductType = product, ServerType = connectionKey });
-
 
             switch (product)
             {

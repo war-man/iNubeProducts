@@ -78,7 +78,7 @@ class User extends React.Component {
         this.state = {
             redirectTo: false,
             loader: false,
-            hideexternal: true,
+            hideexternal: false,
             btnload: false,
             btnload1: false,
             radioVal: "",
@@ -484,6 +484,10 @@ class User extends React.Component {
         //if (cust.customerid == 121 && cust.partnerid == 0 || cust.partnerid != 0) {
         //    this.setState({ hideexternal: true });
         //}
+        //let producttype = localStorage.getItem('ProductType');
+        //if (producttype == "Avo") {
+        //    this.setState({ hideexternal: false });
+        //}
 
         fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/GetMasterData?sMasterlist=abc`, {
             method: 'GET',
@@ -862,6 +866,7 @@ class User extends React.Component {
                 this.setState({
                     empFlag: true,
                     partFlag: false,
+                    hideexternal: false,
                     isUser: false,
                     visibility: false,
                     employeeid: "",
@@ -1106,8 +1111,9 @@ class User extends React.Component {
         //this.change(event, name, type);
     }
 
-    partnerChange(type, event) {
-        this.setState({
+    partnerChange = (type, event) => {
+        let that = this;
+        that.setState({
             [event.target.name]: event.target.value,
             partnerid: event.target.value,
         });
@@ -1117,8 +1123,8 @@ class User extends React.Component {
 
         UserData[name] = value;
 
-        this.setState({ UserData });
-        this.change(event, name, type);
+        that.setState({ UserData });
+        that.change(event, name, type);
     };
 
     getRadioButtonVal = event => {

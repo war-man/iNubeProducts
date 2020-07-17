@@ -977,6 +977,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public bool? Smsstatus { get; set; }
         public bool? Emailstatus { get; set; }
         public bool? IsPayment { get; set; }
+        public bool? IsPolicyIssuance { get; set; }
     }
 
     public class SMSRequest
@@ -1097,10 +1098,11 @@ namespace iNube.Services.ProductConfiguration.Models
         }
 
         public decimal EntityId { get; set; }
-        public string EnitityName { get; set; }
+        public string EntityName { get; set; }
         public string EntityLevel { get; set; }
         public string ParentId { get; set; }
         public string Type { get; set; }
+        public string Relationship { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
 
@@ -1123,6 +1125,35 @@ namespace iNube.Services.ProductConfiguration.Models
         public bool? FutureDate { get; set; }
         public string Checked { get; set; }
         public string ParentId { get; set; }
+        public string Parameter { get; set; }
+        public string Relationship { get; set; }
+    }
+
+    public partial class EntityAttributes
+    {
+        public EntityAttributes()
+        {
+            ChildEntityAttributes = new HashSet<EntityAttributes>();
+        }
+
+        public decimal Id { get; set; }
+        public decimal EntityId { get; set; }
+        public decimal? FieldType { get; set; }
+        public string ComponentType { get; set; }
+        public string EntityLevel { get; set; }
+        public string LabelText { get; set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public string FilterName { get; set; }
+        public string ListObject { get; set; }
+        public bool? Required { get; set; }
+        public bool? FutureDate { get; set; }
+        public string Checked { get; set; }
+        public string ParentId { get; set; }
+        public string Parameter { get; set; }
+        public string Relationship { get; set; }
+
+        public virtual ICollection<EntityAttributes> ChildEntityAttributes { get; set; }
     }
 
     public class PolicyResponse : ResponseStatus

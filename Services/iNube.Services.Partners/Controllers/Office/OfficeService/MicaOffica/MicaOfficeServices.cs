@@ -13,6 +13,7 @@ using iNube.Services.UserManagement.Helpers;
 using Microsoft.Extensions.Configuration;
 using iNube.Services.Partners.Helpers;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.Partners.Controllers.Office.OfficeService
 {
@@ -31,7 +32,7 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
             _mapper = mapper;
             _integrationService = integrationService;
             _configuration = configuration;
-            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
+            dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration))); ;
         }
         public async Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO, ApiContext apiContext)
         {

@@ -256,6 +256,7 @@ componentDidMount() {
         this.setState({ open: true });
     };
     handleClose = () => {
+        debugger
         this.setState({ open: false });
         this.onFormSubmit();
     };

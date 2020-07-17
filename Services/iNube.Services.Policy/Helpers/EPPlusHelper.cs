@@ -87,11 +87,53 @@ namespace iNube.Services.Policy.Helpers
         {
             int age = 0;
             age = DateTime.Now.Year - dateOfBirth.Year;
-            if (DateTime.Now.DayOfYear < dateOfBirth.DayOfYear)
-                age = age - 1;
+            var currentDate = DateTime.UtcNow.AddMinutes(330);
+            //Check for leap year
+            var isCurrentLeapYear = DateTime.IsLeapYear(currentDate.Year);
+            var isDobLeapYear = DateTime.IsLeapYear(dateOfBirth.Year);
+            if (isCurrentLeapYear || isDobLeapYear)
+            {
+                if (isCurrentLeapYear && isDobLeapYear)
+                {
+                    if (currentDate.DayOfYear < dateOfBirth.DayOfYear)
+                        age = age - 1;
+                }
+                else if (isCurrentLeapYear)
+                {
+                    if (currentDate.DayOfYear > 59)
+                    {
+                        if (currentDate.DayOfYear - 1 < dateOfBirth.DayOfYear)
+                            age = age - 1;
+                    }
+                    else
+                    {
+                        if (currentDate.DayOfYear < dateOfBirth.DayOfYear)
+                            age = age - 1;
+                    }
+                }
+                else
+                {
+                    if (dateOfBirth.DayOfYear > 59)
+                    {
+                        if (currentDate.DayOfYear < dateOfBirth.DayOfYear - 1)
+                            age = age - 1;
+                    }
+                    else
+                    {
+                        if (currentDate.DayOfYear < dateOfBirth.DayOfYear)
+                            age = age - 1;
+                    }
+                }
+            }
+            else
+            {
+                if (currentDate.DayOfYear < dateOfBirth.DayOfYear)
+                    age = age - 1;
+            }
 
             return age;
         }
+
     }
 
     //public static class DataTableExtension

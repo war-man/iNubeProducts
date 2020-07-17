@@ -5,6 +5,7 @@ using iNube.Services.Policy.Entities;
 using iNube.Services.Policy.Helpers;
 using iNube.Services.Policy.Models;
 using iNube.Services.UserManagement.Helpers;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework.Notification;
 using Microsoft.AspNetCore.Http;
@@ -46,7 +47,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             _integrationService = integrationService;
             _configuration = configuration;
             _emailService = emailService;
-            dbHelper = new DbHelper(new IntegrationService(configuration));
+            dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration)));
            
         }
 
@@ -1887,7 +1888,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             {
                                 PolicyNumber = policyNumber,
                                 RecipientNumber = policyUpdate.MobileNumber,
-                                SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://micav0002.azurewebsites.net/pages/claim/" + policyNumber,
+                                SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://mica.inubesolutions.com/pages/claim/" + policyNumber,
                             };
                             request.TemplateKey = "InsuranceCertificate";
                             request.AttachPDF = true;
@@ -2035,7 +2036,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         {
                             PolicyNumber = policyNumber,
                             RecipientNumber = policyUpdate.MobileNumber,
-                            SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://micav0002.azurewebsites.net/pages/claim/" + policyNumber,
+                            SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://mica.inubesolutions.com/pages/claim/" + policyNumber,
                         };
                         request.TemplateKey = "InsuranceCertificate";
                         request.AttachPDF = true;
@@ -2431,7 +2432,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             if (ps != null && ps.CustAddress.Count > 0)
             {
-                model.insurerAddress = new InsurerAddress() { AddressLine1 = ps.CustAddress.FirstOrDefault().AddressLine1, AddressLine2 = ps.CustAddress.FirstOrDefault().AddressLine2, City = "BANGLORE", State = "KARNATAKA", PinCode = "560012" };
+                var addrs = ps.CustAddress.FirstOrDefault();
+                model.insurerAddress = new InsurerAddress() { AddressLine1 = addrs.AddressLine1, AddressLine2 = addrs.AddressLine2, City = addrs.City, State = addrs.State, PinCode = addrs.PincodeId?.ToString() };
             }
 
             //OFFICE ADDRESS
@@ -2455,7 +2457,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             if (string.IsNullOrEmpty(model.insuredDetails.InsuredContactName))
             {
-                model.insuredDetails.InsuredContactName = policyDTO.CoverNoteNo;
+                model.insuredDetails.InsuredContactName = policyDTO.InsuredName;
             }
             model.insuredDetails.InsuredEmailAddress = policyDTO.Email;
             model.insuredDetails.InsuredPhoneNumber = policyDTO.MobileNumber;
@@ -7460,10 +7462,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             
         }
 
-        public async Task<ResponseStatus> UpdateCardDetails(string PolicyNumber, string MobileNumber, string RefrenceNumber, ApiContext apiContext)
+        public async Task<ResponseStatus> UpdateCardDetails(UpdateCardDetails updateCardDetails, ApiContext apiContext)
         {
             //  _context = (MICAPOContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            if (string.IsNullOrEmpty(RefrenceNumber))
+            if (string.IsNullOrEmpty(updateCardDetails.RefrenceNumber))
             {
                 return new ResponseStatus { Status = BusinessStatus.Error, ResponseMessage = "Reference Number is required to update Card Details." };
             }
@@ -7477,9 +7479,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 SqlCommand command = new SqlCommand("[dbo].[usp_PaymentRefUpdate]", connection);
                 command.CommandType = CommandType.StoredProcedure;
                 //command.Parameters.AddWithValue("@Action", "Update");
-                command.Parameters.AddWithValue("@PolicyNumber", string.IsNullOrEmpty(PolicyNumber) ? "" : PolicyNumber);
-                command.Parameters.AddWithValue("@MobileNumber", string.IsNullOrEmpty(MobileNumber) ? "" : MobileNumber);
-                command.Parameters.AddWithValue("@NewPaymentRefNo", RefrenceNumber);
+                command.Parameters.AddWithValue("@PolicyNumber", string.IsNullOrEmpty(updateCardDetails.PolicyNumber) ? "" : updateCardDetails.PolicyNumber);
+                command.Parameters.AddWithValue("@MobileNumber", string.IsNullOrEmpty(updateCardDetails.MobileNumber) ? "" : updateCardDetails.MobileNumber);
+                command.Parameters.AddWithValue("@NewPaymentRefNo", updateCardDetails.RefrenceNumber);
 
                 command.Parameters.Add("@Result", SqlDbType.Bit);
                 command.Parameters["@Result"].Direction = ParameterDirection.Output;
@@ -7490,7 +7492,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             if (result)
             {
-                return new ResponseStatus { Status = BusinessStatus.Ok, ResponseMessage = "Card Details updated successfully" };
+                return new ResponseStatus { Status = BusinessStatus.Updated, ResponseMessage = "Card Details updated successfully" };
             }
             else
             {

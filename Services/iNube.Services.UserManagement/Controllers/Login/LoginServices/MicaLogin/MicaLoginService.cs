@@ -226,6 +226,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                 var issuer = _config["Jwt:Issuer"];
                 var audience = _config["Jwt:Audience"];
                 var expiry = isTokenExpire ? DateTime.Now.AddMinutes(180) : DateTime.Now.AddYears(3);
+                //var expiry = isTokenExpire ? DateTime.Now.AddYears(1) : DateTime.Now.AddMinutes(180);
                 if (request != null && request.IsRefreshToken && request.RoleId == "990" && request.ClaimType == "Year")
                 {
                     expiry = DateTime.Now.AddYears(3);

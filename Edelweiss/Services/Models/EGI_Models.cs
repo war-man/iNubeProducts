@@ -493,6 +493,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string AccountNo { get; set; }
         public string Description { get; set; }
         public string Frequency { get; set; }
+        public DateTime? UserDateTime { get; set; }
         public List<MicaCDDTO> micaCDDTO { get; set; }
     }
 
@@ -886,5 +887,18 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public DateTime? ModifiedDate { get; set; }
         public decimal? EnvId { get; set; }
     }
+
+    public partial class GenericDTO : ResponseStatus
+    {
+        public dynamic Data { get; set; }        
+    }
+
+    public partial class GetSwitchResponse : ResponseStatus
+    {
+        public dynamic PolicyData { get; set; }
+        public dynamic PartnerData { get; set; }
+        public GetScheduleDTO ScheduleData { get; set; }
+    }
+
 }
 

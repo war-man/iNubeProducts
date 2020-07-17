@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using iNube.Utility.Framework.Model;
 using iNube.Services.UserManagement.Helpers;
 using iNube.Services.UserManagement.Entities.MICACP;
+using iNube.Services.UserManagement.Controllers.CustomerProvisioning.IntegrationService;
 
 namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileService.MicaProfile
 {
@@ -18,14 +19,16 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         private MICAUMContext _context;
         private MICACPContext _cpcontext;
         private IMapper _mapper;
+        private IIntegrationService _integrationService;
         private bool Result;
         public static int otpvalue { get; set; }
         private readonly IEmailService _emailService;
 
-        public MicaProfileService(IMapper mapper, IEmailService emailService)
+        public MicaProfileService(IMapper mapper, IEmailService emailService, IIntegrationService integrationService)
         {
             _mapper = mapper;
             _emailService = emailService;
+            _integrationService = integrationService;
         }
 
         public UserDetailsDTO GetUserByUserId(string Id, ApiContext apiContext)
@@ -67,7 +70,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
             var userDetails = user.UserDetails.First();
             //var userAddress = user.UserAddress.FirstOrDefault();
-            EmailTest emailTest = new EmailTest();
+            EmailRequest emailTest = new EmailRequest();
             if (string.IsNullOrEmpty(userDetails.UserId))
             {
                 var aspNet = _context.AspNetUsers.FirstOrDefault(x => x.UserName == userDetails.Email);
@@ -130,7 +133,9 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         _cpcontext.TblCustomerUsers.Add(customerUsers);
                         _cpcontext.SaveChanges();
                     }
-                    SendEmailAsync(emailTest);
+                    //await SendEmailAsync(emailTest);
+
+                    await SendNotificationAsync(apiContext, userDetails.Email);
                     return new UserResponse { Status = BusinessStatus.Created, users = _usersDTOs, Id = _usersDTOs.Id, ResponseMessage = $"User created successfully! \n for user: {_usersDTOs.Email}" };
                 }
                 else
@@ -431,6 +436,37 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             return true;
         }
 
+        public async Task<bool> SendEmailAsync(EmailRequest emailTest, ApiContext apiContext)
+        {
+            try
+            {
+                EmailRequest email = new EmailRequest();
+                email.mailTo.Add(emailTest.To);
+                email.Subject = emailTest.Subject;
+                email.Message = emailTest.Message;
+                var res = await _integrationService.SendEmailAsync(email, apiContext);
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return true;
+        }
+
+        private async Task SendNotificationAsync(ApiContext apiContext, string userEmail)
+        {
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                EmailRequest emailTest = new EmailRequest()
+                {
+                    Message = $"Your account has been created with Username:" + userEmail + " and password: Mica@123 \n" + "This is a system generated password. Kindly reset the same after log in.",
+                    Subject = $"User profile creation",
+                    To = userEmail
+                };
+                await SendEmailAsync(emailTest, apiContext);
+            }
+        }
+
         public decimal GetCustomerId(decimal envid, string product)
         {
             _cpcontext = (MICACPContext)DbManager.GetCPContext(product);
@@ -548,7 +584,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             {
                 if (user != null)
                 {
-                    EmailTest emailTest = new EmailTest();
+                    EmailRequest emailTest = new EmailRequest();
                     Random random = new Random();
                     int otp = random.Next(100001, 999999);
                     var chkotp = _context.TblSendOtp.Where(a => a.Email == user.Email);
@@ -568,7 +604,9 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                     emailTest.To = user.Email;
                     emailTest.Subject = "Password reset for MICA";
                     emailTest.Message = "Dear User,\n" + "      " + "\n" + "      OTP for re-setting your MICA password is: " + otp + "      " + "\n" + "\nThanks & Regards:\n" + "      " + "MICA Team";
-                    await SendEmailAsync(emailTest);
+                    //await SendEmailAsync(emailTest);
+
+                    await SendOTPNotificationAsync(apiContext, user.Email, emailTest);
                 }
             }
             catch (Exception ex)
@@ -576,6 +614,14 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 throw;
             }
             return new SendOtpResponse { Status = BusinessStatus.Ok, sendOtp = sendOtp, ResponseMessage = $"OTP sent successfully!" };
+        }
+
+        private async Task SendOTPNotificationAsync(ApiContext apiContext, string userEmail, EmailRequest emailTest)
+        {
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                await SendEmailAsync(emailTest, apiContext);
+            }
         }
 
         public async Task<SendOtpResponse> ResetOTP(SendOtp sendOtp, ApiContext apiContext)
@@ -594,10 +640,9 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             {
                 if (user != null)
                 {
-
-                    EmailTest emailTest = new EmailTest();
+                    EmailRequest emailTest = new EmailRequest();
                     Random random = new Random();
-                    int otp = random.Next(1001, 9999);
+                    int otp = random.Next(100001, 999999);
                     var chkotp = _context.TblSendOtp.Where(a => a.Email == sendOtp.Email);
                     if (chkotp != null)
                     {
@@ -615,7 +660,9 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                     emailTest.To = sendOtp.Email;
                     emailTest.Subject = "Password reset for MICA";
                     emailTest.Message = "Dear User,\n" + "      " + "\n" + "      OTP for re-setting your MICA password is: " + otp + "      " + "\n" + "\nThanks & Regards:\n" + "      " + "MICA Team";
-                    await SendEmailAsync(emailTest);
+                    //await SendEmailAsync(emailTest);
+
+                    await SendOTPNotificationAsync(apiContext, sendOtp.Email, emailTest);
                 }
                 else
                 {
@@ -754,6 +801,44 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             user.AccessFailedCount = 0;
             var _user = _mapper.Map<UserDTO>(user);
             return new UnlockResponse { Status = BusinessStatus.Updated, Id = _user.Id, ResponseMessage = $"User unlocked successfully!" };
+        }
+
+        public DefaultPasswordReset ResetDefaultPassword(Userpasswordreset userpasswordreset, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, userpasswordreset.EnvId.ToString());
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
+
+            var data = _context.AspNetUsers.FirstOrDefault(a => a.UserName == userpasswordreset.Username);
+            string DefaultPassword = "Mica@123";
+
+            byte[] passwordHash;
+            byte[] passwordSalt;
+
+            if (data != null)
+            {
+                passwordSalt = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+
+                using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
+                {
+                    passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(DefaultPassword));
+                }
+                data.PasswordHash = passwordHash;
+                data.AccessFailedCount = 0;
+                data.LastPasswordChanged = DateTimeNow;
+                _context.AspNetUsers.Update(data);
+                _context.SaveChanges();
+
+                var dto = _mapper.Map<UserDTO>(data);
+                return new DefaultPasswordReset { Status = BusinessStatus.Updated, ResponseMessage = $"Password set to default password " + DefaultPassword + " successfully!" };
+            }
+            else
+            {
+                return new DefaultPasswordReset { Status = BusinessStatus.NotFound, ResponseMessage = $"Username doesn't exist or Invalid Environment" };
+            }
         }
     }
 }

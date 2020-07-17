@@ -42,7 +42,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _emailService = emailService;
             _integrationService = integrationService;
             _configuration = configuration;
-            dbHelper = new DbHelper(new IntegrationService(configuration));
+            dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration)));
         }
 
         public async Task<ProductResponse> Create(ProductDTO productDTO, ApiContext apiContext)
@@ -436,6 +436,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             DataTable dt = new DataTable();
             bool IsPolicyIssue = false;
             List<LeadInfoDTO> lstLead = new List<LeadInfoDTO>();
+            int PolicyIssuanceCount = 0;
             foreach (var file in files)
             {
                 var filename = file.Name;
@@ -452,6 +453,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 bool email = true;
                 string FirstName = "", MobileNumber = "", EmailID = "";
                 bool IsPayment;
+
                 //dt.Columns.Add("BankFileId", typeof(int));
                 // dt.Columns.Add("Id", typeof(string));
                 dt.Columns.Add("FirstName", typeof(string));
@@ -473,10 +475,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                             ExcelWorksheet worksheet = package.Workbook.Worksheets["User Details"];
                             if (worksheet != null)
                             {
-                                if (worksheet.Cells[2, 6].Value != null)
-                                {
-                                    IsPolicyIssue = (bool)worksheet.Cells[2, 6].Value;
-                                }
+
                                 var rowCount = worksheet.Dimension.Rows;
                                 LeadInfoDTO lead = null;
                                 for (int row = 2; row <= rowCount; row++)
@@ -510,16 +509,26 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                     lead.ProductId = Convert.ToInt32(productId);
                                     dr["PartnerId"] = apiContext.PartnerId;
                                     lead.PartnerId = Convert.ToInt32(apiContext.PartnerId);
-                                    dr["SMSstatus"] = sms;
-                                    lead.Smsstatus = sms;
-                                    dr["Emailstatus"] = email;
-                                    lead.Emailstatus = email;
+
                                     if (worksheet.Cells[row, 5].Value != null)
                                     {
                                         IsPayment = (bool)worksheet.Cells[row, 5].Value;
                                         dr["IsPayment"] = IsPayment;
                                         lead.IsPayment = IsPayment;
                                     }
+                                    if (worksheet.Cells[row, 6].Value != null)
+                                    {
+                                        IsPolicyIssue = (bool)worksheet.Cells[row, 6].Value;
+                                        if (IsPolicyIssue)
+                                        {
+                                            PolicyIssuanceCount++;
+                                        }
+                                        lead.IsPolicyIssuance = IsPolicyIssue;
+                                    }
+                                    dr["SMSstatus"] = !IsPolicyIssue;
+                                    lead.Smsstatus = !IsPolicyIssue;
+                                    dr["Emailstatus"] = !IsPolicyIssue;
+                                    lead.Emailstatus = !IsPolicyIssue;
                                     //if (worksheet.Cells[row, 6].Value != null)
                                     //{
                                     //    dr["IsPolicyIssue"] = (bool)worksheet.Cells[row, 6].Value;
@@ -562,10 +571,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 //return DemoResponse<List<BankFileDTO>>.GetResult(-1, error);
             }
             // Now try for policy booking
-            if (IsPolicyIssue)
+            if (PolicyIssuanceCount > 0)
             {
+
                 int count = 0;
-                foreach (var item in lstLead)
+                foreach (var item in lstLead.Where(p => p.IsPolicyIssuance == true))
                 {
                     ++count;
                     item.Id = count;
@@ -800,7 +810,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     {
                         foreach (var benefitItem in itemCover.ProductBenefits)
                         {
-                            benefitItem.BenefitCriterias = masProductMaster.FirstOrDefault(p => p.Key == benefitItem.BenefitCriteria).Value;
+                            benefitItem.BenefitCriterias = masProductMaster.FirstOrDefault(p => p.Key == benefitItem.BenefitTypeId).Value;
                         }
                     }
                 }
@@ -1455,30 +1465,37 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 SMSDTO.Channel = "2";
                 SMSDTO.RecipientNumber = item.MobileNumber;
 
-                SMSDTO.SMSMessage = "Hello " + item.FirstName + ", For PolicyBooking click on the below Link http://micav0002.azurewebsites.net/pages/policy/" + item.Id;
+                SMSDTO.SMSMessage = "Hello " + item.FirstName + ", For PolicyBooking click on the below Link http://mica.inubesolutions.com/pages/policy/" + item.Id;
+                try
+                {
+                    //SMS API
+                    var SMSAPI = "https://www.smsgatewayhub.com/api/mt/SendSMS?APIKey=6nnnnyhH4ECKDFC5n59Keg&senderid=SMSTST&channel=2&DCS=0&flashsms=0&number=91" + SMSDTO.RecipientNumber + "&text=" + SMSDTO.SMSMessage;
 
-                //SMS API
-                var SMSAPI = "https://www.smsgatewayhub.com/api/mt/SendSMS?APIKey=6nnnnyhH4ECKDFC5n59Keg&senderid=SMSTST&channel=2&DCS=0&flashsms=0&number=91" + SMSDTO.RecipientNumber + "&text=" + SMSDTO.SMSMessage;
+                    var client = new WebClient();
+                    var content = client.DownloadString(SMSAPI);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Product", "Lead BulkSMS", null, null, apiContext);
+                }
 
-                var client = new WebClient();
-                var content = client.DownloadString(SMSAPI);
 
 
                 //Email Service
                 EmailRequest emailDTO = new EmailRequest();
                 emailDTO.To = item.EmailId;
                 emailDTO.Subject = "Policy Booking Link";
-                emailDTO.Message = "Hello " + item.FirstName + ", For PolicyBooking click on the below Link http://micav0002.azurewebsites.net/pages/policy/" + item.Id;
+                emailDTO.Message = "Hello " + item.FirstName + ", For PolicyBooking click on the below Link http://mica.inubesolutions.com/pages/policy/" + item.Id;
 
                 try
                 {
                     await _emailService.SendEmail(emailDTO.To, emailDTO.Subject, emailDTO.Message);
 
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
 
-                    throw;
+                    _logger.LogError(ex, "Product", "Lead Email", null, null, apiContext);
                 }
 
                 item.Smsstatus = false;
@@ -1920,70 +1937,104 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.ParentId == parentid).Select(a => new ddDTOs
+            var data = _context.TblEntityDetails.Where(a => a.Relationship == "Single").Select(a => new ddDTOs
             {
                 mID = Convert.ToInt32(a.EntityId),
-                mValue = a.EnitityName,
+                mValue = a.EntityName,
             }).ToList();
 
             return data;
         }
 
-        public async Task<List<object>> GetAllEntitiesById(int Id, ApiContext apiContext)
+        //Fetching Relationship=Single datas
+        public async Task<List<object>> GetSingleEntitiesById(int Id, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.EntityId == Id)
+            var data = _context.TblEntityDetails.Where(a => a.EntityId == Id && a.Relationship == "Single")
                 .Include(a => a.TblEntityAttributes)
                 .Select(a => a).ToList();
             var componentType = _context.TblmasDynamic.Select(a => a);
+
+            var result = _mapper.Map<List<EntityDetailsDTO>>(data);
             List<object> Finalentity = new List<object>();
 
-            foreach (var item in data)
+            foreach (var item in result)
             {
                 List<object> attributelist = new List<object>();
-                List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
+                //List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
 
-                var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.TblEntityAttributes);
-                foreach (var item1 in attributes)
+                //var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.EntityAttributes);
+                foreach (var item1 in item.EntityAttributes)
                 {
                     item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
+                    item1.Relationship = item.Relationship;
                 }
-                list.AddRange(attributes);
+                //list.AddRange(attributes);
 
-                attributelist.AddRange(list);
-                Finalentity.Add(attributelist);
-                var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, apiContext);
+                //attributelist.AddRange(list);
+                Finalentity.Add(result);
+                var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, "Single", apiContext);
             }
             return Finalentity;
         }
 
-        public async Task<bool> GetChildAttributeListAsync(decimal id, List<object> Finalentity, ApiContext apiContext)
+        //Fetching Relationship=Multiple datas
+        public async Task<List<object>> GetMultipleEntitiesById(int Id, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.ParentId == id)
+            var data = _context.TblEntityDetails.Where(a => a.ParentId == Id && a.Relationship == "Multiple")
+                .Include(a => a.TblEntityAttributes)
+                .Select(a => a).ToList();
+            var componentType = _context.TblmasDynamic.Select(a => a);
+
+            var result = _mapper.Map<List<EntityDetailsDTO>>(data);
+            List<object> Finalentity = new List<object>();
+
+            foreach (var item in result)
+            {
+                List<object> attributelist = new List<object>();
+
+                foreach (var item1 in item.EntityAttributes)
+                {
+                    item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
+                    item1.Relationship = item.Relationship;
+                }
+                Finalentity.Add(item);
+                //var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, "Multiple", apiContext);
+            }
+
+            return Finalentity;
+        }
+
+        public async Task<bool> GetChildAttributeListAsync(decimal id, List<object> Finalentity, string relationship, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var data = _context.TblEntityDetails.Where(a => a.ParentId == id && a.Relationship == relationship)
            .Include(a => a.TblEntityAttributes)
            .Select(a => a).ToList();
-
+            var result = _mapper.Map<List<EntityDetailsDTO>>(data);
             var componentType = _context.TblmasDynamic.Select(a => a);
 
             if (data != null)
             {
-                foreach (var item in data)
+                foreach (var item in result)
                 {
-                    List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
-                    var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.TblEntityAttributes);
+                    //List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
+                    //var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.TblEntityAttributes);
 
-                    foreach (var item1 in attributes)
+                    foreach (var item1 in item.EntityAttributes)
                     {
                         item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
+                        item1.Relationship = item.Relationship;
                     }
 
-                    list.AddRange(attributes);
-                    Finalentity.Add(list);
+                    //list.AddRange(attributes);
+                    Finalentity.Add(result);
 
-                    var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, apiContext);
+                    var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, relationship, apiContext);
                 }
                 return true;
             }

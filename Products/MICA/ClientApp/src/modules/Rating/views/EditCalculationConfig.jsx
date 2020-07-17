@@ -73,7 +73,7 @@ class EditCalculationConfig extends React.Component {
                 Expression: "",
                 ExpressionResult: "",
                 Expression: "",
-
+                ConditionalParam:"",
                 checkedA: true,
                 checkedB: false,
                 simpleSelect: "",
@@ -88,6 +88,8 @@ class EditCalculationConfig extends React.Component {
             RateRules: [],
             flag: false,
             rateflag: false,
+            condnflag: false,
+            ExpressionResultData: "",
             ruleobj: [],
             ExpressionSendingArray: [],
             RateRulesdata: [],
@@ -109,10 +111,12 @@ class EditCalculationConfig extends React.Component {
             expId: "",
             indexId: "",
             parameterCard: false,
-            gridArray:"",
-
+            gridArray: "",
+            ConditionalParameterAr: [],
             typeList: [{ "mID": 1, "mValue": "Rate", "mType": "RateConfig" },
-            { "mID": 2, "mValue": "Parameter", "mType": "RateConfig" }],
+            { "mID": 2, "mValue": "Parameter", "mType": "RateConfig" },
+                { "mID": 3, "mValue": "ConditionalValues", "mType": "RateConfig" }],
+            ExpCalParamConfigTst :""
         };
     }
 
@@ -207,6 +211,7 @@ class EditCalculationConfig extends React.Component {
         this.setState({});
         this.state.fields.Expression = Eval;//to populate expression on field
         this.state.fields.ExpressionResult = Eres;//to populate expression result on field
+        this.state.ExpCalParamConfigTst = Eres; //To add and modify that parameter into calconfig also 
         this.state.expId = Eid;
         this.state.indexId = index;
         this.setState({});
@@ -222,10 +227,17 @@ class EditCalculationConfig extends React.Component {
         if (evt.target.value == 1) {
             this.state.flag = true;
             this.state.rateflag = false;
+            this.state.condnflag = false;
+        }
+        else if (evt.target.value == 3) {
+            this.state.flag = false;
+            this.state.rateflag = false;
+            this.state.condnflag = true;
         }
         else {
             this.state.flag = false;
             this.state.rateflag = true;
+            this.state.condnflag = false;
         }
 
     }
@@ -260,7 +272,17 @@ class EditCalculationConfig extends React.Component {
         //For Sending into Data List
         this.state.gridArray = this.state.gridArray + "(" + parameter + ")";
         this.setState({});
+    }
 
+    onclickConditionalParameter(parameter) {
+        debugger
+        //For Sending Array With {}
+        this.state.sendingExpression = this.state.sendingExpression + parameter;
+        //Previous
+        this.state.fields.Expression = this.state.fields.Expression + parameter;
+        this.state.gridArray = this.state.gridArray + "(" + parameter + ")";
+        console.log(this.state.fields.Expression, 'Expression');
+        this.setState({});
     }
 
     onCLickRates(rates) {
@@ -309,6 +331,91 @@ class EditCalculationConfig extends React.Component {
         console.log(this.state.multiselectArray, 'MultiSelect');
     }
 
+    addCalConfigParam() {
+        this.state.fields.RateConfigName = this.props.RateVal;
+        if (this.state.fields.RateConfigName != "") {
+            //Showing Grid
+            //For Displaying into Grid
+            //this.setState({ displayCalculationParameterGrid: true });
+            debugger
+            //Removing Space
+            this.state.fields.CalConfigParam = this.state.fields.CalConfigParam.split(' ').join('');
+            //Removing Wild Card Character
+            this.state.fields.CalConfigParam = this.state.fields.CalConfigParam.replace(/[^a-zA-Z0-9 ]/g, "");
+
+            var isActive = 1;
+            let pCalParameterArray = this.state.CalParameterArray;
+            this.setState({ CalParameterArray: pCalParameterArray });
+            let Type = "Param";
+            pCalParameterArray.push({
+                'calculationConfigParamName': this.state.fields.CalConfigParam,
+                'createdDate': date(),
+                'isActive': isActive,
+                'type': Type
+            });
+            // State Set After Selecting
+            this.setState({ CalConfigParam: '' });
+            this.state.fields.CalConfigParam = "";
+            console.log(this.state.CalParameterArray, 'CalParamArray');
+            this.setState({ parameterCard: true });
+            this.setState({ flagButon: true });
+
+            if (this.state.CalParameterArray.length > 0) {
+                this.setState({
+                    newParamData: this.state.CalParameterArray.map((prop, key) => {
+
+                        return {
+                            CalConfigParam: prop.calculationConfigParamName
+                        };
+                    })
+                });
+            }
+        }
+        else {
+            swal("", "Some fields are missing", "error");
+            this.setState({ errormessage: true });
+        }
+
+    }
+
+    addConditionalParameter() {
+        this.state.fields.RateConfigName = this.props.RateVal;
+        if (this.state.fields.RateConfigName != "") {
+            debugger
+            //Removing Space
+            this.state.fields.ConditionalParam = this.state.fields.ConditionalParam.split(' ').join('');
+            //Removing Wild Card Character
+            this.state.fields.ConditionalParam = this.state.fields.ConditionalParam.replace(/[^a-zA-Z0-9 ]/g, "");
+
+            let pConditionalParameterAr = this.state.ConditionalParameterAr;
+            this.setState({ ConditionalParameterAr: pConditionalParameterAr });
+            pConditionalParameterAr.push({
+                'calculationConfigParamName': this.state.fields.ConditionalParam
+            });
+            // State Set After Selecting
+            this.setState({ ConditionalParam: '' });
+            this.state.fields.ConditionalParam = "";
+            console.log(this.state.ConditionalParameterAr, 'CalParamArray');
+            this.setState({ parameterCard: true });
+            this.setState({ flagButon: true });
+
+            if (this.state.ConditionalParameterAr.length > 0) {
+                this.setState({
+                    newConditionalParamData: this.state.ConditionalParameterAr.map((prop, key) => {
+                        return {
+                            CalConfigParam: prop.calculationConfigParamName
+                        };
+                    })
+                });
+            }
+        }
+        else {
+            swal("", "Some fields are missing", "error");
+            this.setState({ errormessage: true });
+        }
+
+    }
+
     addExpression() {
         debugger
         let expRes = this.state.fields.ExpressionResult;
@@ -329,6 +436,8 @@ class EditCalculationConfig extends React.Component {
                     'expressionResult': this.state.fields.ExpressionResult,
                     'expressionValue': this.state.gridArray,
                     'steps': parseInt((this.state.RateRulesdata[this.state.RateRulesdata.length - 1]).steps) + 1,
+                    'date': date(),
+                    'isActive': 1
                 });
                 console.log('newExp', this.state.fields.ExpressionResult, this.state.fields.Expression);
                 console.log(this.state.RateRulesdata, 'CHeck');
@@ -372,14 +481,25 @@ class EditCalculationConfig extends React.Component {
                 //        });
                 //    }
                 //}
-                
+                debugger 
+                //this.state.ExpressionResultData
                 pCalParameterArray.push({
                     'calculationConfigParamName': this.state.fields.ExpressionResult,
                     'createdDate': date(),
                     'isActive': isActive,
                     'type': Type
                 });
+                // Adding those parameter into the Grid
+                if (this.state.CalParameterArray.length > 0) {
+                    this.setState({
+                        newParamData: this.state.CalParameterArray.map((prop, key) => {
 
+                            return {
+                                CalConfigParam: prop.calculationConfigParamName
+                            };
+                        })
+                    });
+                }
 
                 // State Set After Selecting
                 this.setState({ ExpressionResult: '', Expression: '' });
@@ -446,7 +566,17 @@ class EditCalculationConfig extends React.Component {
                 this.tabledata();
                 
 
-              //  let filterVal = this.state.RateRulesdata
+                //Adding into 
+                debugger
+                let ConfigIdUpdate = "";
+                var calArraylength = this.state.CalParameterArray.length;
+                for (var z = 0; z < calArraylength; z++) {
+                    if (this.state.CalParameterArray[z].calculationConfigParamName == this.state.ExpCalParamConfigTst) {
+                        ConfigIdUpdate = this.state.CalParameterArray[z].calculationConfigParamId;
+                        this.state.CalParameterArray[z].calculationConfigParamName = expRes;
+                    }
+                }
+                    
 
                 //pExpressionArray[this.state.expId]['expressionResult'] = this.state.fields.ExpressionResult;
                 //pExpressionArray[this.state.expId]['expressionValue'] = this.state.sendingExpression;
@@ -477,6 +607,7 @@ class EditCalculationConfig extends React.Component {
     }
 
     resetFields() {
+        this.state.ExpressionResultData = this.state.fields.ExpressionResult;
         let rate = this.state.fields;
         rate['ExpressionResult'] = "";
         rate['Expression'] = "";
@@ -493,7 +624,34 @@ class EditCalculationConfig extends React.Component {
         //Merging Both Array With Rate Values Also 
         console.log(this.state.CalParameterArray, 'CalParamArray');
         console.log(this.state.CalRateArray, 'CalRate');
+        this.state.CalRateArray = this.state.CalRateArray.concat(this.state.RateArr);
         this.state.CalParameterArray = this.state.CalParameterArray.concat(this.state.CalRateArray);
+
+        
+        //In Remove duplicate value 
+
+        //var length = this.state.RateParam.length;
+        //for (var i = 0; i < length; i++) {
+        //    var index = this.state.CalParameterArray.indexOf(this.state.RateParam[i]);
+        //    delete this.state.CalParameterArray[index];
+        //}
+
+
+        //Check weather that Expresion result is present or not if not removal of 
+        //var calParamLength = this.state.CalParameterArray.length;
+        //var expLength = this.state.RateRulesdata.length;
+        //for (var i = 0; i < calParamLength; i++) {
+        //    for (var j = 0; j < expLength; j++) {
+        //        if (this.state.CalParameterArray[i].type == "") {
+        //            if (this.state.CalParameterArray[i] != this.state.RateRulesdata[j].ExpressionResult) {
+        //                var index = this.state.CalParameterArray.indexOf(this.state.RateParam[i]);
+        //                delete this.state.CalParameterArray[index];
+        //            }
+        //        }
+        //    }
+        //}
+
+        debugger
         console.log(this.state.CalParameterArray, 'CalCUlationConfig');
         //Distinct ConfigParam
         let calData = this.state.CalParameterArray;
@@ -649,7 +807,20 @@ class EditCalculationConfig extends React.Component {
                                     />
                                 </GridItem> : null}
 
-
+                            {this.state.condnflag ?
+                                <GridItem xs={12} sm={12} md={3}>
+                                    <CustomInput
+                                        labelText="Conditional Values"
+                                        id="ConditionalParam"
+                                        required={true}
+                                        value={this.state.fields.ConditionalParam}
+                                        name='ConditionalParam'
+                                        onChange={this.onInputChange}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                </GridItem> : null}
 
                             {this.state.rateflag ?
 
@@ -668,6 +839,17 @@ class EditCalculationConfig extends React.Component {
                                 <GridItem xs={12} sm={12} md={3}>
                                     <Tooltip title="Add">
                                         <IconButton id="top-bnt" onClick={() => this.addRates()}
+
+                                            round
+                                        >
+                                            <AddIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </GridItem> : null}
+                            {this.state.condnflag ?
+                                <GridItem xs={12} sm={12} md={3}>
+                                    <Tooltip title="Add">
+                                        <IconButton id="top-bnt" onClick={() => this.addConditionalParameter()}
 
                                             round
                                         >
@@ -721,16 +903,33 @@ class EditCalculationConfig extends React.Component {
                                                 label="sqrt"
                                                 onClick={() => this.handleEvaluator("sqrt")} />
                                             <Chip size="small"
-                                                label="{"
-                                                onClick={() => this.handleEvaluator("{")} />
-
-                                            <Chip size="small"
-                                                label="}"
-                                                onClick={() => this.handleEvaluator("}")} />
-                                            <Chip size="small"
                                                 label="."
                                                 onClick={() => this.handleEvaluator(".")} />
+                                            <Chip size="small"
+                                                label="IIF"
+                                                onClick={() => this.handleEvaluator("IIF")} />
+                                            <Chip size="small"
+                                                label=">"
+                                                onClick={() => this.handleEvaluator(">")} />
+                                            <Chip size="small"
+                                                label="<"
+                                                onClick={() => this.handleEvaluator("<")} />
+                                            <Chip size="small"
+                                                label="AND"
+                                                onClick={() => this.handleEvaluator("AND")} />
+                                            <Chip size="small"
+                                                label="OR"
+                                                onClick={() => this.handleEvaluator("OR")} />
 
+                                            <Chip size="small"
+                                                label=","
+                                                onClick={() => this.handleEvaluator(",")} />
+                                            <Chip size="small"
+                                                label="'"
+                                                onClick={() => this.handleEvaluator("'")} />
+                                            <Chip size="small"
+                                                label="="
+                                                onClick={() => this.handleEvaluator("=")} />
                                             <Chip size="small"
                                                 label="0"
                                                 onClick={() => this.handleEvaluator("0")} />
@@ -767,8 +966,6 @@ class EditCalculationConfig extends React.Component {
                                             <Chip size="small"
                                                 label="9"
                                                 onClick={() => this.handleEvaluator("9")} />
-
-
                                         </div>
 
                                     </GridItem>
@@ -810,6 +1007,24 @@ class EditCalculationConfig extends React.Component {
                                                         label={item.rateName}
                                                         onClick={() => this.onCLickRates(item.rateName)} />
                                                 ))}
+                                            </div>
+                                        </GridItem>
+
+                                        <GridItem xs={12} sm={4} md={6}>
+                                            <h4>
+                                                <small> Conditional Values </small>
+                                            </h4>
+                                            <div className="rates-parameter-bg">
+                                                {this.state.ConditionalParameterAr.map((item, i) => (
+
+                                                    <Chip size="small"
+                                                        // avatar={<Avatar>M</Avatar>}
+                                                        color="info"
+                                                        label={item.calculationConfigParamName}
+                                                        onClick={() => this.onclickConditionalParameter(item.calculationConfigParamName)} />
+
+                                                ))
+                                                }
                                             </div>
                                         </GridItem>
 

@@ -18,6 +18,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
         Task<IEnumerable<ddDTO>> GetReportNameForPermissionsDetails(string Url, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetGraphNameForPermissionsDetails(string Url, ApiContext apiContext);
         Task<EmployeeRoles> GetEmployeeRoles(string empCode, ApiContext apiContext);
+        Task<ResponseStatus> SendEmailAsync(EmailRequest EmailRequest, ApiContext apiContext);
     }
 
 
@@ -48,6 +49,12 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
         //      readonly string BillingConfigUrl = "https://inubeservicesbilling.azurewebsites.net";
         ////readonly string BillingConfigUrl = "http://mica-inube-billing-service.mica-internal.:9001";
 
+        public async Task<ResponseStatus> SendEmailAsync(EmailRequest EmailRequest, ApiContext apiContext)
+        {
+            var uri = NotificationUrl + "/api/Notifications/SendEmailAsync";
+            //var uri = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com/api/Notifications/SendEmailAsync";
+            return await PostApiInvoke<EmailRequest, ResponseStatus>(uri, apiContext, EmailRequest);
+        }
 
         public async Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext)
         {

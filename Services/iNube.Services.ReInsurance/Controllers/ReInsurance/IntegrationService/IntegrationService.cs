@@ -47,7 +47,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
 
         public async Task<IEnumerable<RatingResponse>> AllocationCalulation(List<Map> request, int from,int To, ApiContext apiContext)
         {
-             var requestUri = RatingUrl + "/api/RatingConfig/CheckIllustrationRI/CheckIllustrationRI/15?From="+ from + "&To="+To+"&ArrayType=true";
+             var requestUri = RatingUrl + "/api/RatingConfig/CheckIllustrationRI/CheckIllustrationRI/16?From="+ from + "&To="+To+"&ArrayType=true";
             //var uri = "https://localhost:44364/api/RatingConfig/CheckIllustrationRI/CheckIllustrationRI/15?From=1&To=3&ArrayType=true";
 
             try

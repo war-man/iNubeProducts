@@ -1224,7 +1224,9 @@ namespace iNube.Services.Policy.Models
         public string AddressLine2 { get; set; }
         public string AddressLine3 { get; set; }
         public int? PincodeId { get; set; }
-
+        public string City { get; set; }
+        public string State { get; set; }
+        public string Country { get; set; }
         //public virtual MasCityDTO City { get; set; }
         //public virtual MasCountryDTO Country { get; set; }
         ////public virtual TblCustomers Customer { get; set; }
@@ -1812,7 +1814,13 @@ namespace iNube.Services.Policy.Models
         public bool? Status { get; set; }
         public decimal? DifferenceAmount { get; set; }
     }
-   
+    public class UpdateCardDetails
+    {
+        public string PolicyNumber { get; set; }
+        public string MobileNumber { get; set; }
+        public string RefrenceNumber { get; set; }
+    }
+
 }
 
 

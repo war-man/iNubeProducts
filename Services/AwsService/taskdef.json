@@ -1,0 +1,32 @@
+{
+  "family": "dev2-mica-awsservice",
+  "taskRoleArn": "",
+  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "dev2-mica-awsservice",
+      "image": "<IMAGE1_NAME>",
+      "cpu": 200,
+      "memory": 512,
+      "portMappings": [
+        {
+          "containerPort": 9022,
+          "hostPort": 9022,
+          "protocol": "tcp"
+        }
+      ]
+
+
+    }
+  ],
+
+
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "cpu": "200",
+  "memory": "512"
+
+
+}

@@ -47,12 +47,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             return Ok(response);
         }
 
+
         [HttpGet]
         public async Task<IActionResult> GetLeadInfo(int LeadID)
         {
             var response = await _productService.GetLeadInfo(LeadID, Context);
             return Ok(response);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetRiders(int ProductId, int PlanId)
@@ -61,18 +63,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             return Ok(response);
         }
 
-        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> GetRiderSumAssured(MapQuoteDTO mapQuoteDTO)
         {
-            var response = await _AvoProductService.GetRiderSumAssured(mapQuoteDTO);
+            var response = await _AvoProductService.GetRiderSumAssured(mapQuoteDTO, Context);
             return Ok(response);
         }
-        [AllowAnonymous]
         [HttpPost]
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<IActionResult> GetAssignProduct(AssignProductList AssignProductList)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             //            var response =await _AvoProductService.GetRiderSumAssured(mapQuoteDTO);
             return Ok();
@@ -546,15 +544,30 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllEntitiesById(int Id)
+        public async Task<IActionResult> GetSingleEntitiesById(int Id)
         {
-            var response = await _productService.GetAllEntitiesById(Id, Context);
+            var response = await _productService.GetSingleEntitiesById(Id, Context);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMultipleEntitiesById(int Id)
+        {
+            var response = await _productService.GetMultipleEntitiesById(Id, Context);
+            return Ok(response);
+        }
+        
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult HC()
+        {
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult HC()
+        public IActionResult HCTemp()
         {
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);

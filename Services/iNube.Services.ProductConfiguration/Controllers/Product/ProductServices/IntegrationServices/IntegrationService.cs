@@ -8,7 +8,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-
+using iNube.Utility.Framework.LogPrivider.LogService;
+using System.Reflection;
 
 namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationServices
 {
@@ -34,11 +35,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
         // //readonly string RatingUrl = "http://localhost:58593";
         // readonly string RatingUrl = "https://inubeservicesrating.azurewebsites.net";
 
-
-
-        public IntegrationService(IConfiguration configuration)
+        private static readonly HttpClient _httpClient = new HttpClient();
+        private ILoggerManager _logger;
+        public IntegrationService(IConfiguration configuration, ILoggerManager logger)
         {
-
+            _logger = logger;
             _configuration = configuration;
             RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
             PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
@@ -64,13 +65,16 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
-            HttpClient client = new HttpClient();
+            try
+            {
+
             if (!string.IsNullOrEmpty(apiContext.Token))
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                    _httpClient.DefaultRequestHeaders.Clear();
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    _httpClient.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
             }
-            using (var response = await client.GetAsync(url))
+            using (var response = await _httpClient.GetAsync(url))
             using (var content = response.Content)
             {
                 if (response.IsSuccessStatusCode)
@@ -82,6 +86,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
                     }
                 }
             }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Product", MethodBase.GetCurrentMethod().Name, url, null, apiContext);
+
+            }
             return new TResponse();
         }
         public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
@@ -89,17 +99,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
             try
             {
 
-
-                HttpClient client = new HttpClient();
-                //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                //client.BaseAddress = new Uri(url);
-                if (!string.IsNullOrEmpty(apiContext.Token))
+               if (!string.IsNullOrEmpty(apiContext.Token))
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                    _httpClient.DefaultRequestHeaders.Clear();
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    _httpClient.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
                 }
-                using (var response = await client.GetAsync(url))
+                using (var response = await _httpClient.GetAsync(url))
                 using (var content = response.Content)
                 {
                     if (response.IsSuccessStatusCode)
@@ -114,8 +120,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
 
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Product", MethodBase.GetCurrentMethod().Name, url, null, apiContext);
 
                 //throw;
             }
@@ -133,22 +140,22 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
         {
             try
             {
-                HttpClient client = new HttpClient();
                 if (!string.IsNullOrEmpty(apiContext.Token))
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                    _httpClient.DefaultRequestHeaders.Clear();
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    _httpClient.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
                 }
 
                 HttpContent contentPost = null;
                 if (request != null)
                 {
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
                 }
-                using (var response = await client.PostAsync(requestUri, contentPost))
+                using (var response = await _httpClient.PostAsync(requestUri, contentPost))
                 {
                     using (var content = response.Content)
                     {
@@ -156,8 +163,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Product", MethodBase.GetCurrentMethod().Name, requestUri + ":" + JsonConvert.SerializeObject(request), null, apiContext);
 
                 return new TResponse();
             }
@@ -168,21 +176,21 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
         {
             try
             {
-                HttpClient client = new HttpClient();
-                HttpContent contentPost = null;
+                 HttpContent contentPost = null;
                 if (!string.IsNullOrEmpty(apiContext.Token))
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                    _httpClient.DefaultRequestHeaders.Clear();
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    _httpClient.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
                 }
                 if (request != null)
                 {
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
                 }
-                using (var response = await client.PostAsync(requestUri, contentPost))
+                using (var response = await _httpClient.PostAsync(requestUri, contentPost))
                 {
                     using (var content = response.Content)
                     {
@@ -190,8 +198,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Policy", MethodBase.GetCurrentMethod().Name, requestUri + ":" + JsonConvert.SerializeObject(request), null, apiContext);
 
                 return new List<TResponse>();
             }

@@ -46,7 +46,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             _configuration = configuration;
             _emailService = emailService;
             _logger = logger;
-            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
+            dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration))); ;
         }
 
         //Accountig Transaction
@@ -893,7 +893,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Claims_SendEmailAsync", apiContext);
+                _logger.LogError(ex, "Claim","Claims_SendEmailAsync",null,null, apiContext);
             }
             return true;
         }

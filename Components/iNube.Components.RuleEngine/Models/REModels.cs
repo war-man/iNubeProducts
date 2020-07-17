@@ -65,6 +65,7 @@ namespace iNube.Components.RuleEngine.Models
         public string SuccessCode { get; set; }
         public string FailureCode { get; set; }
         public string RuleGroupName { get; set; }
+        public string Type { get; set; }
 
         public RulesDto Rule { get; set; }
     }
@@ -134,7 +135,70 @@ namespace iNube.Components.RuleEngine.Models
     }
     public class HandleRuleDTO
     {
+        public List<RateDTO> RateObj { get; set; }
         public string ParamName { get; set; }
     }
+    public class HandleParamDTO
+    {
+        public List<RateDTO> RateObj { get; set; }
+        public List<ParamDTO> ParamObj { get; set; }
+    }
+    //public class HandleRuleDTO
+    //{
+    //    public List<RateDTO> RateObj { get; set; }
+    //    public List<ParamDTO> ParaObj { get; set; }
+    //}
+    public class HandleExecEvent
+    {
+        public HandleExecEvent()
+        {
+            ParameterList = new List<string>();
+        }
+        public List<string> ParameterList { get; set; }
+    }
+    public class RateDTO
+    {
+        public string RateParameter { get; set; }
+    }
+    public class ParamDTO
+    {
+        public string RuleParameter { get; set; }
+    }
+    public class EnvironmentResponse : ResponseStatus
+    {
+        public string Dbconnection { get; set; }
+    }
+    public class DynamicData
+    {
+        public dynamic ruleParameter { get; set; }
+        public dynamic rateParameter { get; set; }
+    }
 
+    public class RuleDetails
+    {
+        public decimal rulecondition_id { get; set; }
+        public decimal rule_id { get; set; }
+        public string rule_name { get; set; }
+        public string condition_attributes { get; set; }
+        public string param_type { get; set; }
+        public string condition_opr { get; set; }
+        public string condition_valuefrom { get; set; }
+        public string condition_valueto { get; set; }
+        public bool? IsListOfValues { get; set; }
+        public string condition_logical { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public bool? IsActive { get; set; }
+        public string masterTableName { get; set; }
+        public string masterColumnName { get; set; }
+        public DateTime? condition_value_fromDate { get; set; }
+        public DateTime? condition_value_toDate { get; set; }
+        public string dobConditions { get; set; }
+        public string validatorName { get; set; }
+        public string successMsg { get; set; }
+        public string failureMsg { get; set; }
+        public string successCode { get; set; }
+        public string failureCode { get; set; }
+        public string type { get; set; }
+        
+    }
 }

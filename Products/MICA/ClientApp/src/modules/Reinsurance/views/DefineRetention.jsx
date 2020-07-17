@@ -51,6 +51,7 @@ class DefineRetentions extends React.Component {
         this.state = {
             editflag: false,
             retcodeflag: false,
+            flagDuplicate: false,
             branchCodemassage:"",
             masterList: [],
             yearmasterlist: [],
@@ -105,6 +106,13 @@ class DefineRetentions extends React.Component {
             .then(data => {
                 if (data.status == 9) {
                     this.setState({ retcodeflag: true, branchCodemassage: data.responseMessage });
+                    if (data.responseMessage != null) {
+                        this.state.flagDuplicate = true;
+                    }
+                    else {
+                        this.state.flagDuplicate = false;
+                    }
+                    console.log(this.state.flagDuplicate, 'onBlur');
                 } else {
                     this.setState({ retcodeflag: false, branchCodemassage: "" });
                 }
@@ -259,7 +267,7 @@ class DefineRetentions extends React.Component {
        
          
         console.log("submit", this.state.Retention);
-        if (this.state.Retention.year != "" && this.state.Retention.businessTypeId != "" && this.state.Retention.retentionGroupName != "" && this.state.Retention.retentionLogicId != "" && this.state.Retention.effectiveFrom != "" && this.state.Retention.effectiveTo != "") {
+        if (this.state.Retention.year != "" && this.state.Retention.businessTypeId != "" && this.state.Retention.retentionGroupName != "" && this.state.Retention.retentionLogicId != "" && this.state.Retention.effectiveFrom != "" && this.state.Retention.effectiveTo != "" && this.state.flagDuplicate != true ) {
             if (this.state.Retention.effectiveTo >= this.state.Retention.effectiveFrom) {
                 fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveRetentionData`, {
                     method: 'POST',
@@ -303,12 +311,22 @@ class DefineRetentions extends React.Component {
                
             }
             else {
+                //if (this.state.flagDuplicate == true) {
+                //    swal("", "Retention Group can't be duplicate", "error");
+                //    this.setState({ errormessage: true });
+                //}
                 swal("", "Date is not correct", "error");
                 this.setState({ errormessage: true });
             }}
         else {
-            swal("", "Some fields are missing", "error");
-            this.setState({ errormessage: true });
+            if (this.state.flagDuplicate == true) {
+                swal("", "Retention Group can't be duplicate", "error");
+                this.setState({ errormessage: true });
+            }
+            else {
+                swal("", "Some fields are missing", "error");
+                this.setState({ errormessage: true });
+            }
         }
 
         this.state.Retention.effectiveTo = effTo;
@@ -449,6 +467,7 @@ class DefineRetentions extends React.Component {
                     icon: "success"
                 });
                 this.setState({ Retention: data });
+                this.reset();
                 console.log(data, 'Mydata')
                 console.log("Accountss data: ", data);
 

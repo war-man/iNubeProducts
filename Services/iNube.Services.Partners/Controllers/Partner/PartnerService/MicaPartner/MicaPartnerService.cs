@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using System.Dynamic;
 using iNube.Services.Partners.Helpers;
 using Microsoft.Extensions.Configuration;
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.Partners.Controllers.Partner.PartnerService
 {
@@ -42,7 +43,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             _integrationService = integrationService;
             _emailService = emailService;
             _configuration = configuration;
-            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
+            dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration))); ;
 
         }
         /// <summary>

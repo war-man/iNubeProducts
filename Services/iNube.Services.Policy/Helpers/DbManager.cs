@@ -10,6 +10,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Concurrent;
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.UserManagement.Helpers
 {
@@ -48,7 +50,7 @@ namespace iNube.Services.UserManagement.Helpers
     public static class DbManager
     {
         public static string DbName;
-
+       // public static Dictionary<string,string> lstDbCon= new Dictionary<string, string>();
         public static string GetDbConnectionString(string dbName)
         {
             var dbConnectionString = "";
@@ -72,16 +74,13 @@ namespace iNube.Services.UserManagement.Helpers
             }
             return dbConnectionString;
         }
-
-        public static async Task<DbContext> GetContextAsync(string product, string connectionKey, IConfiguration configuration)
+         public static async Task<DbContext> GetContextAsync(string product, string connectionKey, IConfiguration configuration)
         {
             DbContext context = null;
-            //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
-
-            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
-         
-            string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
-
+            
+                DbHelper dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration)));
+                string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
+               
             switch (product)
             {
                 case "Mica":

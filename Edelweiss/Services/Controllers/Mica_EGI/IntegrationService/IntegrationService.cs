@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using iNube.Services.MicaExtension_EGI.Models;
 using Microsoft.Extensions.Configuration;
 using iNube.Utility.Framework.LogPrivider.LogService;
+using System.Reflection;
 
 namespace iNube.Services.Controllers.EGI.IntegrationServices
 {
@@ -68,10 +69,11 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         private IConfiguration _configuration;
         readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, RatingUrl, ExtensionUrl;
-        
-        public IntegrationService(IConfiguration configuration)
+        private ILoggerManager _logger;
+        private static readonly HttpClient _httpClient = new HttpClient();
+        public IntegrationService(IConfiguration configuration, ILoggerManager logger)
         {
-           
+            _logger = logger;
             _configuration = configuration;
             PolicyUrl = _configuration["Integration_Url:Policy:PolicyUrl"];
             BillingUrl = _configuration["Integration_Url:Billing:BillingUrl"];
@@ -248,11 +250,9 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
             var uri = MobileAppUrl;
 
-            LoggerManager logger = new LoggerManager(_configuration);
+             var request = JsonConvert.SerializeObject(alertRequestDTO);
 
-            var request = JsonConvert.SerializeObject(alertRequestDTO);
-
-            logger.LogRequest(request, "MobileAppNotifyCall", "Mobile Call", uri, apiContext);
+            _logger.LogRequest(request, "MobileAppNotifyCall", "Mobile Call", uri,null, apiContext);
 
 
             return await ExternalPostApiInvoke<MobileAlertRequestDTO, MobileAlertResponseDTO>(uri, apiContext, alertRequestDTO);
@@ -266,14 +266,15 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
-            HttpClient client = new HttpClient();   
-
-           if (!string.IsNullOrEmpty(apiContext.Token))
-            {               
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Clear();
+                if (!string.IsNullOrEmpty(apiContext.Token))
+            {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
             }
 
-            using (var response = await client.GetAsync(url))
+            using (var response = await _httpClient.GetAsync(url))
             using (var content = response.Content)
             {              
                 if (response.IsSuccessStatusCode)
@@ -284,18 +285,21 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
                     {
                         return serviceResponse;
                     }
-                }                             
+                }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Rating", MethodBase.GetCurrentMethod().Name, url, null, apiContext);
             }
             return new TResponse();
         }
         public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url) where TResponse : new()
         {
-
-            HttpClient client = new HttpClient();
-            //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            //client.BaseAddress = new Uri(url);
-            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-            using (var response = await client.GetAsync(url))
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Clear();
+           using (var response = await _httpClient.GetAsync(url))
             using (var content = response.Content)
             {
                 if (response.IsSuccessStatusCode)
@@ -307,7 +311,11 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
                     }
                 }
             }
-
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Rating", MethodBase.GetCurrentMethod().Name, url, null, new ApiContext());
+            }
             return new List<TResponse>();
         }
 
@@ -315,23 +323,21 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         {
             try
             {
-                HttpClient client = new HttpClient();
-
-
-                HttpContent contentPost = null;
+                 HttpContent contentPost = null;
                 if (request != null)
                 {
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    _httpClient.DefaultRequestHeaders.Clear();
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
                     if (!string.IsNullOrEmpty(apiContext.Token))
                     {
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
                     }
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
                 }
-                using (var response = await client.PostAsync(requestUri, contentPost))
+                using (var response = await _httpClient.PostAsync(requestUri, contentPost))
                 {
                     using (var content = response.Content)
                     {
@@ -341,7 +347,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             }
             catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Mica_EGI", MethodBase.GetCurrentMethod().Name, requestUri + ":" + JsonConvert.SerializeObject(request), null, apiContext);
                 return new TResponse();
             }
 
@@ -351,22 +357,21 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         {
             try
             {
-                HttpClient client = new HttpClient();
                 HttpContent contentPost = null;
                 if (request != null)
                 {
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
                     if (!string.IsNullOrEmpty(apiContext.Token))
                     {
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
                     }
                     string postBody = JsonConvert.SerializeObject(request);
                     //dynamic dynamicObject = JsonConvert.DeserializeObject(postBody);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
                 }
-                using (var response = await client.PostAsync(requestUri, contentPost))
+                using (var response = await _httpClient.PostAsync(requestUri, contentPost))
                 {
                     using (var content = response.Content)
                     {
@@ -377,6 +382,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             catch (Exception ex)
             {
 
+                _logger.LogError(ex, "Mica_EGI", MethodBase.GetCurrentMethod().Name, requestUri + ":" + JsonConvert.SerializeObject(request), null, apiContext);
                 return new List<TResponse>();
             }
 
@@ -385,14 +391,9 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         {
             try
             {
-
-
-                HttpClient client = new HttpClient();
-                //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                //client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                using (var response = await client.GetAsync(url))
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                using (var response = await _httpClient.GetAsync(url))
                 using (var content = response.Content)
                 {
                     if (response.IsSuccessStatusCode)
@@ -420,26 +421,23 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         {
             try
             {
-                HttpClient client = new HttpClient();
-
-
+               
                 HttpContent contentPost = null;
                 if (request != null)
                 {
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token);                    
+                    _httpClient.DefaultRequestHeaders.Clear();
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token);                    
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
                 }
-                using (var response = await client.PostAsync(requestUri, contentPost))
+                using (var response = await _httpClient.PostAsync(requestUri, contentPost))
                 {
-                    LoggerManager logger = new LoggerManager(_configuration);
-
                     var data = JsonConvert.SerializeObject(response);
                     var data2 = JsonConvert.SerializeObject(contentPost);
 
-                    logger.LogRequest(data, data2, "Mobile Call", response.IsSuccessStatusCode.ToString(), apiContext);
+                    _logger.LogRequest(data, data2, "Mobile Call", response.IsSuccessStatusCode.ToString(), null,apiContext);
 
 
                     if (response.IsSuccessStatusCode)
@@ -457,6 +455,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Mica_EGI", MethodBase.GetCurrentMethod().Name, requestUri + ":" + JsonConvert.SerializeObject(request), null, apiContext);
 
                 return new TResponse();
             }

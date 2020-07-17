@@ -58,10 +58,7 @@ namespace iNube.Services.Policy.Controllers.Proposal
 
         }
 
-
-
-
-
+        
         [HttpGet("GetMasterData")]
 
         public IActionResult MastertypeData()
@@ -172,6 +169,17 @@ namespace iNube.Services.Policy.Controllers.Proposal
         {
             var response = await _proposalService.UpdateEmpPolicyData(eMPDistribute, Context);
             return Ok(response);
+        }
+
+        [HttpGet("GePolicyOwnerDetails")]
+        public async Task<IActionResult> PolicyOwnerDetails(int PolicyID)
+        {
+
+            var response = await _proposalService.PolicyOwnerDetails(PolicyID,Context);
+
+
+            return Ok(response);
+
         }
     }
 }

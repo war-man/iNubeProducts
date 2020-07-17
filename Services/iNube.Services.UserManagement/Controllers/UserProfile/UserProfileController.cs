@@ -380,5 +380,12 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile
             var response = _userService.UnlockUser(userid, Context);
             return Ok(response);
         }
+
+        [HttpGet]
+        public IActionResult ResetDefaultPassword(Userpasswordreset userpasswordreset)
+        {
+            var response = _userService.ResetDefaultPassword(userpasswordreset, Context);
+            return Ok(response);
+        }
     }
 }

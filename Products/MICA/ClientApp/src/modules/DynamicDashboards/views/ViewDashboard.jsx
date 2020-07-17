@@ -38,6 +38,7 @@ const paddingCard =
 {
     padding: "10px",
 }
+const colors = ['#6babac', '#e55253'];
 
 class ViewDashboard extends React.Component {
     constructor(props) {
@@ -116,8 +117,9 @@ class ViewDashboard extends React.Component {
                 ['Sleep', 7]
             ],
             ChartName: "",
-            showdd:false,
+            showdd: false,
         };
+        
     }
 
     componentDidMount() {
@@ -404,59 +406,24 @@ class ViewDashboard extends React.Component {
         }).then(response => response.json())
             .then(data => {
                 this.state.graphData = [];
+                this.state.graphData = [];
+                //Dynamic Labels for Y-axes
                 if (this.state.labels.xaxis != null && this.state.labels.yaxis != null) {
-                    let strLength = this.state.labels.xaxis.length;
                     let multilabel = this.state.labels.yaxis.split(",");
-
-                    if (multilabel[1] == undefined) {
-                        if (this.state.labels.xaxis.charAt(strLength - 1) == 's') {
-                            //  this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
-                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0]];
-
-                        } else {
-                            // this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
-                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0]];
-
-                        }
+                    this.state.graphData[0] = [this.state.labels.xaxis];
+                    for (i = 0; i < multilabel.length; i++) {
+                        this.state.graphData[0].push(multilabel[i]);
                     }
-
-                    else {
-                        if (this.state.labels.xaxis.charAt(strLength - 1) == 's') {
-                            //  this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
-                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0], multilabel[1]];
-
-                        } else {
-                            // this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
-                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0], multilabel[1]];
-                        }
-                    }
+                } else {
+                    this.state.graphData[0] = [''];
                 }
-                    else {
-                        if (this.state.labels.yaxis != null && this.state.labels.xaxis != null) {
-                            this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
-                           // this.state.graphData[0] =this.state.labels.xaxis, multilabel[0], multilabel[1], multilabel[2]
-                        } else {
-                            this.state.graphData[0] = [''];
-                        }
-
-                    }
+                console.log("graphData[0]", this.state.graphData);
                 
                 this.setState({ result: data });
                 console.log(this.state.result, 'Result');
-
-              //  this.state.result.map(m => {
+             //
                     let arr = [];
-                    //Date change
-                    //let splitdate = m.column2.toString().split('-');
-                    //if (splitdate.length >= 2) {
-                    //    if (m.column2 != undefined) {
-                    //        m.column2 = new Date(m.column2).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
-                    //    }
-                    //} 
-                   
-                    //arr.push(m.column3);
-                    //arr.push(m.column2);
-
+                  
                 for (var i = 0; i < this.state.result.length; i++) {
                     this.state.graphData.push(this.state.result[i]);
                 }
@@ -523,6 +490,7 @@ class ViewDashboard extends React.Component {
             return dateObj.day + '/' + dateObj.month + '/' + dateObj.year;
         }
     }
+
     render() {
         console.log(this.state.ChartName, "CName");
         return (
@@ -688,6 +656,43 @@ class ViewDashboard extends React.Component {
                                 loader={<div>Loading Chart</div>}
                                 data={this.state.graphData}
 
+                                chartEvents={[
+                                    {
+                                        eventName: 'select',
+                                        callback: ({ chartWrapper }) => {
+                                            const chart = chartWrapper.getChart()
+                                            const selection = chart.getSelection()
+                                            if (selection.length === 1) {
+                                                const [selectedItem] = selection
+                                                const dataTable = chartWrapper.getDataTable()
+                                                const { row, column } = selectedItem
+                                                //alert(
+                                                //    'You selected : ' +
+                                                //    JSON.stringify({
+                                                //        row,
+                                                //        column,
+                                                //        value: dataTable.getValue(row, column),
+                                                //    }),
+                                                //    null,
+                                                //    2,
+                                                //)
+                                                swal({
+                                                    text: 'You selected : ' +
+                                                        JSON.stringify({
+                                                        row,
+                                                        column,
+                                                        value: dataTable.getValue(row, column),
+                                                    }),
+                                                    //null,
+                                                    //2,
+                                                    icon: "info"
+                                                });
+                                            }
+                                            console.log(selection)
+                                        },
+                                    },
+                                ]}
+
                                 formatters={[
                                     {
                                         type: 'ArrowFormat',
@@ -720,7 +725,8 @@ class ViewDashboard extends React.Component {
                                 }}
                                 legendToggle
                                 rootProps={{ 'data-testid': '1' }}
-                            />}
+                                />}
+                          
                         </GridContainer>
                         </CardBody>
                     </Card>

@@ -620,8 +620,15 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                    .Include("TblContract.TblBillingConfig.TblBillingItem.TblBillingItemDetail")
                    .Include("TblContract.TblInvoiceConfig")
                    .SingleOrDefault();
-            var contractdata = _mapper.Map<CustomersDTO>(_customer);
-            return contractdata;
+            var customerData = _mapper.Map<CustomersDTO>(_customer);
+            foreach (var item in customerData.CustAddress)
+            {
+                item.Country = _context.TblMasCountry.FirstOrDefault(c=> c.CountryId== item.CountryId)?.CountryName;
+                item.State = _context.TblMasState.FirstOrDefault(c => c.StateId == item.StateId)?.StateName;
+                item.City = _context.TblMasCity.FirstOrDefault(c => c.CityId == item.CityId)?.CityName;
+
+            }
+            return customerData;
         }
         public async Task<CustomersDTO> ModifyCustomer(CustomersDTO customerDto, ApiContext apiContext)
         {

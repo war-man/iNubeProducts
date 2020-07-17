@@ -124,7 +124,15 @@ class PendingRequirements extends React.Component {
 
     }
     componentDidMount() {
-        fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/FetchPendingRequirements`)
+        
+        fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/FetchPendingRequirements` + ``, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
             .then(response => response.json())
             .then(data => {
                 console.log("PendingRequirementsDto:", data);

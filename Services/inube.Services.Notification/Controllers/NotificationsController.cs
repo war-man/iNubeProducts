@@ -56,7 +56,7 @@ namespace inube.Services.Notification.Controllers
         [HttpPost]
         public async Task<IActionResult> SendNotificationAsync([FromBody]Models.NotificationRequest request)
         {
-            TemplateController templateController = new TemplateController(_iDMSService, _host, _emailService, _configuration, _viewEngine);
+            TemplateController templateController = new TemplateController(_iDMSService, _host,_emailNService, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
             if (request.TemplateKey == "PolicyIssue")
             {
@@ -93,7 +93,7 @@ namespace inube.Services.Notification.Controllers
         [HttpPost]
         public async Task<IActionResult> SendQuestionsNotificationAsync([FromBody]Models.NotificationRequest request)
         {
-            TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
+            TemplateController templateController = new TemplateController(_iDMSService,_host,_emailNService, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
             ResponseStatus response = null;
             if (request.TemplateKey == "AptiQuestions")
@@ -116,7 +116,7 @@ namespace inube.Services.Notification.Controllers
                 templateModel.FileName = "QuestionSet" + templateData.AllQuestions[0].QBText + ".pdf";
 
                 // var result = await templateController.AptiQuestionsTemplate(templateData);
-                response = await templateController.NotificationTemplate(templateData, templateModel);
+                response = await templateController.NotificationTemplate(templateData, templateModel,Context);
             }
             return ServiceResponse(response);
         }
@@ -126,7 +126,7 @@ namespace inube.Services.Notification.Controllers
         [HttpPost]
         public async Task<IActionResult> SendQuotationNotificationAsync([FromBody]Models.NotificationRequest request)
         {
-            TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
+            TemplateController templateController = new TemplateController(_iDMSService,_host,_emailNService, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
             ResponseStatus response = null;
             if (request.TemplateKey == "QuotationPdf")
@@ -149,7 +149,7 @@ namespace inube.Services.Notification.Controllers
                 templateModel.FileName = "Quotation.pdf";
 
                 // var result = await templateController.AptiQuestionsTemplate(templateData);
-                response = await templateController.NotificationTemplate(templateData, templateModel);
+                response = await templateController.NotificationTemplate(templateData, templateModel, Context);
             }
             return ServiceResponse(response);
         }
@@ -160,7 +160,7 @@ namespace inube.Services.Notification.Controllers
         [HttpPost]
         public async Task<IActionResult> SendProductApiKitNotificationAsync([FromBody]Models.NotificationRequest request)
         {
-            TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
+            TemplateController templateController = new TemplateController(_iDMSService,_host,_emailNService, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
             ResponseStatus response = null;
             if (request.TemplateKey == "ProductApi")
@@ -183,7 +183,7 @@ namespace inube.Services.Notification.Controllers
                 templateModel.FileName = templateData.PName +"_ProductApiKit.pdf";
                 templateModel.ActionType = request.TemplateKey;
                 // var result = await templateController.AptiQuestionsTemplate(templateData);
-                response = await templateController.NotificationTemplate(templateData, templateModel);
+                response = await templateController.NotificationTemplate(templateData, templateModel, Context);
                 if (request.SendSms)
                 {
                     SendSMS(request.smsRequest);
@@ -196,7 +196,7 @@ namespace inube.Services.Notification.Controllers
         [HttpPost]
         public async Task<IActionResult> SendMultiCoverNotificationAsync([FromBody]Models.NotificationRequest request)
         {
-            TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
+            TemplateController templateController = new TemplateController(_iDMSService,_host,_emailNService, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
             ResponseStatus response = null;
             if (request.TemplateKey == "InsuranceCertificate")
@@ -229,7 +229,7 @@ namespace inube.Services.Notification.Controllers
                 // var result = await templateController.AptiQuestionsTemplate(templateData);
                 try
                 {
-                    response = await templateController.NotificationTemplate(templateData, templateModel);
+                    response = await templateController.NotificationTemplate(templateData, templateModel, Context);
                     if (request.SendSms)
                     {
                         SendSMS(request.smsRequest);
@@ -259,7 +259,7 @@ namespace inube.Services.Notification.Controllers
         [HttpPost]
         public async Task<IActionResult> SendTemplateNotificationAsync([FromBody]Models.NotificationRequest request)
         {
-            TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
+            TemplateController templateController = new TemplateController(_iDMSService,_host,_emailNService, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
 
             dynamic templateData = await GetNotificationModelAsync(request, templateController);
@@ -267,7 +267,7 @@ namespace inube.Services.Notification.Controllers
             TemplateModel templateModel = GetTemplateModel(request, templateData);
 
             // var result = await templateController.AptiQuestionsTemplate(templateData);
-            ResponseStatus response = await templateController.NotificationTemplate(templateData, templateModel);
+            ResponseStatus response = await templateController.NotificationTemplate(templateData, templateModel, Context);
             if (request.SendSms)
             {
                 SendSMS(request.smsRequest);

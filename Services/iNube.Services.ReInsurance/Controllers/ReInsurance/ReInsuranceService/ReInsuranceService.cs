@@ -1069,6 +1069,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
             TblRiallocationHistory tblRiallocationHistory = new TblRiallocationHistory();
             tblRiallocationHistory.Premium = allocationPremium;
+            tblRiallocationHistory.AllocationId = tblAllocation.AllocationId;
             tblRiallocationHistory.AllocationDetails = allocationHistorydata;
             tblRiallocationHistory.MaapingId = mappingId;
             tblRiallocationHistory.AllocationLevel = allocatioinLevel;
@@ -1114,7 +1115,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             var RIMappingDTO = _mapper.Map<TblRimappingDto>(tblRiMapping);
 
             //step2
-            var RImappingDetails = _context.TblRimappingDetail.Where(a => a.RimappingId == RIMappingDTO.RimappingId).ToList();
+            var RImappingDetails = _context.TblRimappingDetail.Where(a => a.RimappingId == RIMappingDTO.RimappingId).OrderBy(s=>s.SequenceNo).ToList();
             var LstRImappingDetails = _mapper.Map<List<TblRimappingDetailDto>>(RImappingDetails);
 
             //step3
@@ -1158,13 +1159,14 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             map.Premium =Convert.ToInt32(calulationDto.PremiumAmount);
             map.AllocatedRetention = "0";
             map.AllocatedQS = "0";
-            map.TotalAllocation = "0";
-            map.AllocationBasedOn = "";
+          //  map.TotalAllocation = "0";
+            map.AllocatedBasedOn = "";
             map.NoofLines = "0";
             map.HL = "";
+            map.AllocatedSurplus = "0";
 
             //This is Extra only for testing Purpuse
-          //  map.Percentage = "0";
+            //  map.Percentage = "0";
 
             maps.Add(map);
             //doing for mapping
@@ -1244,7 +1246,6 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                          
 
                             map.AllocationBasis = calulationDto.SumInsured.ToString();
-                            // Convert.ToDecimal(arrangementsvalue.Amount);
                             map.Balance = calulationDto.SumInsured.ToString();
                             if (arrangementsvalue.HigherOrLowerId == 24)
                             {
@@ -1257,22 +1258,23 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                           //  map.NoofLines = arrangementsvalue.NoOfLines.ToString();
                             if (arrangementsvalue.AllocationBasisId == 26)
                             {
-                                map.AllocationBasedOn = "Sum Insured";
+                                map.AllocatedBasedOn = "Sum Insured";
 
                             }
                             else if (arrangementsvalue.AllocationBasisId == 27)
                             {
-                                map.AllocationBasedOn = "Retention";
+                                map.AllocatedBasedOn = "Retention";
 
                             }
                             else
                             {
-                                map.AllocationBasedOn = "Retention + QS";
+                                map.AllocatedBasedOn = "Retention + QS";
                             }
 
                             map.AllocatedRetention = "0";
                             map.AllocatedQS = "0";
-                            map.TotalAllocation = "0";
+                            map.AllocatedSurplus = "0";
+                            //  map.TotalAllocation = "0";
 
                             // map.High
                             maps.Add(map);
@@ -1312,17 +1314,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                                 participant.AllocatedPremium = 0;//need to ask the caluation
                                 participants.Add(participant);
                             }
+                            mapDetails.participants = participants;
+                            mapDetails1.Add(mapDetails);
 
                         }
                         if (trtdata.TreatyTypeId == 4)
                         {
                             map = new Map();
                             mapDetails = new MapDetails();
-                            // surPlus.Percent = trtdata.pe;
                             map.Type = "QS";
                             map.Premium = Convert.ToInt32(calulationDto.PremiumAmount);
-                            // map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
-                            // map.Limit= Convert.ToInt32(arrangementsvalue.li)
                             if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 20)
                             {
                                 map.AllocationMethod = "Percentage";
@@ -1371,22 +1372,23 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             //  map.NoofLines = arrangementsvalue.NoOfLines.ToString();
                             if (arrangementsvalue.AllocationBasisId == 26)
                             {
-                                map.AllocationBasedOn = "Sum Insured";
+                                map.AllocatedBasedOn = "Sum Insured";
 
                             }
                             else if (arrangementsvalue.AllocationBasisId == 27)
                             {
-                                map.AllocationBasedOn = "Retention";
+                                map.AllocatedBasedOn = "Retention";
 
                             }
                             else
                             {
-                                map.AllocationBasedOn = "Retention + QS";
+                                map.AllocatedBasedOn = "Retention + QS";
                             }
 
                             map.AllocatedRetention = "0";
                             map.AllocatedQS = "0";
-                            map.TotalAllocation = "0";
+                            map.AllocatedBasedOn = "0";
+                            map.AllocatedSurplus = "0";
 
                             // map.High
                             maps.Add(map);
@@ -1394,7 +1396,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
                             var QuotaType = map.Type;
                             var QuotaPercentage = Convert.ToInt32(map.Percentage);
-                            var QuotaLimit = Convert.ToInt32(map.Limit);
+                            var QuotaLimit = Convert.ToDecimal(map.Limit);
                             var QuotaAllocationBasis = map.AllocationBasis;
                             var QuotaNoOfLines = "0";
                             var QuotaAllocatedAmount = 0;
@@ -1426,23 +1428,17 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
 
                             }
-                          
-                           // mapDetails1.Add(mapDetails);
-                           // mapDetails.participants = participants;
 
+                         mapDetails.participants=participants;
+                mapDetails1.Add(mapDetails);
                         }
             
                     }
                     mapping.maps = maps;
 
                 }
-                mapDetails.participants=participants;
-
-                //  mapDetails.participants = participants;
-
-
-
-                mapDetails1.Add(mapDetails);
+                //mapDetails.participants=participants;
+                //mapDetails1.Add(mapDetails);
             }
 
             var c = mapDetails1;
@@ -1451,93 +1447,104 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
             var test = mapping;
             list = test.maps;
-            //  var MAPList=JsonConvert.DeserializeObject<List<Map>>(list.ToString);
             var from = 1;
             var To = list.Count;
             var data = await _integrationService.AllocationCalulation(list, from, To, apiContext);
-
             var listdata = data.ToList();
-            //var filterData = listdata.Where(s => s.Period == 1).Select(s => s.RetentionAmount).ToList();
-            //var data1 = filterData[0].ToString();
+            //doing for the fac
+            //var facData = listdata.Where(s => s.Period == To).Select(s => s.OBalance).ToList();
+            //var facAllocatedAmunt = Convert.ToDecimal(facData[0].ToString());
+
+
+
+
+
+
+
+
+
 
             var count = 1;
-          foreach(var item in c)
+             foreach(var item in c)
             {
                 if(item.Type=="Retention")
                 {
-                    var filterData = listdata.Where(s => s.Period == count).Select(s => s.RetentionAmount).ToList();
+                    var filterData = listdata.Where(s => s.Period == count).Select(s => s.AllocatedAmount).ToList();
                     var data1 = filterData[0].ToString();
                     item.AllocatedAmount = Convert.ToDecimal(data1);
 
                     //assigning for the premium
 
-                    var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OPremium).ToList();
+                    var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OAllocatedPremium).ToList();
                     var Premiumdata1 = PreimunData[0].ToString();
                     item.AllocatedPremium = Convert.ToDecimal(Premiumdata1);
-
-                    //foreach(var dist in item.participants)
-                    //{
-                    //    dist.AllocatedAmount=((item.AllocatedAmount*dist.Share)/100);
-                    //    dist.AllocatedPremium = ((item.AllocatedPremium * dist.Share) / 100);
-                    //    dist.Commission = ((item.AllocatedAmount * dist.CommissionRate) / 100);
-                    //    dist.Brokerage= ((item.AllocatedAmount * dist.BrokerageRate) / 100);
-                    //}
-
-
-
                 }
                 if (item.Type == "QS")
                 {
-                    var qsdata= listdata.Where(s => s.Period == count).Select(s => s.QSAmount).ToList();
+                    var qsdata= listdata.Where(s => s.Period == count).Select(s => s.AllocatedAmount).ToList();
                     var qsvalue = qsdata[0].ToString();
                     item.AllocatedAmount = Convert.ToDecimal(qsvalue);
-
-
-                    //assigning Preimum
-
-                    var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OPremium).ToList();
+                    var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OAllocatedPremium).ToList();
                     var Premiumdata1 = PreimunData[0].ToString();
                     item.AllocatedPremium = Convert.ToDecimal(Premiumdata1);
-
-
-
                     foreach (var dist in item.participants)
                     {
                         dist.AllocatedAmount = ((item.AllocatedAmount * dist.Share) / 100);
                         dist.AllocatedPremium = ((item.AllocatedPremium * dist.Share) / 100);
-                        dist.Commission = ((item.AllocatedAmount * dist.CommissionRate) / 100);
-                        dist.Brokerage = ((item.AllocatedAmount * dist.BrokerageRate) / 100);
+                        dist.Commission = ((dist.AllocatedPremium * dist.CommissionRate) / 100);
+                        dist.Brokerage = ((dist.AllocatedPremium * dist.BrokerageRate) / 100);
                     }
 
                 }
                 if (item.Type == "Surplus")
                 {
-                    var qsdata = listdata.Where(s => s.Period == count).Select(s => s.SurplusProvAmount).ToList();
+                    var qsdata = listdata.Where(s => s.Period == count).Select(s => s.ProvSurplusAmount).ToList();
                     var qsvalue = qsdata[0].ToString();
                     item.AllocatedAmount = Convert.ToDecimal(qsvalue);
-
-
-
-                    //Premium Allocation
-
-                    var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OPremium).ToList();
+                    var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OAllocatedPremium).ToList();
                     var Premiumdata1 = PreimunData[0].ToString();
                     item.AllocatedPremium = Convert.ToDecimal(Premiumdata1);
-
-
-
                     foreach (var dist in item.participants)
                     {
                         dist.AllocatedAmount = ((item.AllocatedAmount * dist.Share) / 100);
                         dist.AllocatedPremium = ((item.AllocatedPremium * dist.Share) / 100);
-                        dist.Commission = ((item.AllocatedAmount * dist.CommissionRate) / 100);
-                        dist.Brokerage = ((item.AllocatedAmount * dist.BrokerageRate) / 100);
+                        dist.Commission = ((dist.AllocatedPremium * dist.CommissionRate) / 100);
+                        dist.Brokerage = ((dist.AllocatedPremium * dist.BrokerageRate) / 100);
                     }
                 }
                 count++;
             }
 
 
+
+            var facData = listdata.Where(s => s.Period == (count-1)).Select(s => s.OBalance).ToList();
+            var facAllocatedAmunt = Convert.ToDecimal(facData[0].ToString());
+            if (facAllocatedAmunt>0)
+            {
+
+                mapDetails = new MapDetails();
+                mapDetails.Type = "FAC";
+                mapDetails.Percentage = 0;
+                mapDetails.Limit = 0;
+                mapDetails.AllocationBasis = "";
+                mapDetails.NoOfLines = 0;
+                mapDetails.AllocatedAmount = facAllocatedAmunt;
+                mapDetails.AllocatedPremium = 0;
+                c.Add(mapDetails);
+            }
+            else
+            {
+
+                mapDetails = new MapDetails();
+                mapDetails.Type = "FAC";
+                mapDetails.Percentage = 0;
+                mapDetails.Limit = 0;
+                mapDetails.AllocationBasis = "";
+                mapDetails.NoOfLines = 0;
+                mapDetails.AllocatedAmount = 0;
+                mapDetails.AllocatedPremium = 0;
+                c.Add(mapDetails);
+            }
             var d = c;
 
             //Preparing Json 

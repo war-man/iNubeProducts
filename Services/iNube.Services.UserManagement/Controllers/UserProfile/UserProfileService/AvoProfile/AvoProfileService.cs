@@ -70,7 +70,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
             var userDetails = user.UserDetails.First();
             //var userAddress = user.UserAddress.FirstOrDefault();
-            EmailTest emailTest = new EmailTest();
+            EmailRequest emailTest = new EmailRequest();
             if (string.IsNullOrEmpty(userDetails.UserId))
             {
                 var aspNet = _context.AspNetUsers.FirstOrDefault(x => x.UserName == userDetails.Email);
@@ -150,7 +150,9 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         _avoRoleService.AssignRole(userRoleMapDTO, apiContext);
                     }
 
-                    SendEmailAsync(emailTest);
+                    //await SendEmailAsync(emailTest);
+
+                    await SendNotificationAsync(apiContext, userDetails.Email);
                     return new UserResponse { Status = BusinessStatus.Created, users = _usersDTOs, Id = _usersDTOs.Id, ResponseMessage = $"User created successfully! \n for user: {_usersDTOs.Email}" };
                 }
                 else
@@ -449,6 +451,37 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 throw;
             }
             return true;
+        }
+
+        public async Task<bool> SendEmailAsync(EmailRequest emailTest, ApiContext apiContext)
+        {
+            try
+            {
+                EmailRequest email = new EmailRequest();
+                email.mailTo.Add(emailTest.To);
+                email.Subject = emailTest.Subject;
+                email.Message = emailTest.Message;
+                var res = await _integrationService.SendEmailAsync(email, apiContext);
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return true;
+        }
+
+        private async Task SendNotificationAsync(ApiContext apiContext, string userEmail)
+        {
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                EmailRequest emailTest = new EmailRequest()
+                {
+                    Message = $"Your account has been created with Username:" + userEmail + " and password: Mica@123 \n" + "This is a system generated password. Kindly reset the same after log in.",
+                    Subject = $"User profile creation",
+                    To = userEmail
+                };
+                await SendEmailAsync(emailTest, apiContext);
+            }
         }
 
         public decimal GetCustomerId(decimal envid, string product)
@@ -774,6 +807,44 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             user.AccessFailedCount = 0;
             var _user = _mapper.Map<UserDTO>(user);
             return new UnlockResponse { Status = BusinessStatus.Updated, Id = _user.Id, ResponseMessage = $"User unlocked successfully!" };
+        }
+
+        public DefaultPasswordReset ResetDefaultPassword(Userpasswordreset userpasswordreset, ApiContext apiContext)
+        {
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, userpasswordreset.EnvId.ToString());
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
+
+            var data = _context.AspNetUsers.FirstOrDefault(a => a.UserName == userpasswordreset.Username);
+            string DefaultPassword = "Mica@123";
+
+            byte[] passwordHash;
+            byte[] passwordSalt;
+
+            if (data != null)
+            {
+                passwordSalt = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+
+                using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
+                {
+                    passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(DefaultPassword));
+                }
+                data.PasswordHash = passwordHash;
+                data.AccessFailedCount = 0;
+                data.LastPasswordChanged = DateTimeNow;
+                _context.AspNetUsers.Update(data);
+                _context.SaveChanges();
+
+                var dto = _mapper.Map<UserDTO>(data);
+                return new DefaultPasswordReset { Status = BusinessStatus.Updated, ResponseMessage = $"Password set to default password " + DefaultPassword + " successfully!" };
+            }
+            else
+            {
+                return new DefaultPasswordReset { Status = BusinessStatus.NotFound, ResponseMessage = $"Username doesn't exist or Invalid Environment" };
+            }
         }
     }
 }

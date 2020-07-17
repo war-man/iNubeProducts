@@ -464,76 +464,84 @@ class RateRules extends React.Component {
         //singleValueIsParameter = [];
     }
     handleRateSave = (event) => {
-        debugger
-        if (this.state.IsParameterGrid==true) {
-            this.state.fields[0].rate = "";
-        }
-
-        this.state.fields[0].dynamicList.push(this.state.TableDbSave);
-    //   this.state.fields[0].dynamicList=this.state.TableDbSave;
-        console.log("fields", this.state.fields);
-
-        console.log("SaveRa", this.state.ratingRules, this.state.ratingRuleConditions, this.state.TableDbSave);
-
-        let stDate = "";
-        let edDate = "";
-             if (this.state.fields.length > 0) {
-            let isActive = 1;
-           
-            if (this.state.fields[0].startDate != "" || this.state.fields[0].endDate != "") {
-                stDate = this.state.fields[0].startDate;
-                edDate = this.state.fields[0].endDate;
-                this.state.fields[0].startDate = this.datechange(this.state.fields[0].startDate)
-                this.state.fields[0].endDate = this.datechange(this.state.fields[0].endDate)
-               // this.state.fields[0].dynamicList.pop();
+        if (this.state.fields[0].startDate != "" && this.state.fields[0].endDate != "" && this.state.fields[0].rateName != "") {
+            debugger
+            if (this.state.IsParameterGrid == true) {
+                this.state.fields[0].rate = "";
             }
-  
-            var data = {
 
-                'dynamicList': this.state.fields[0].dynamicList, 'rateObj': this.state.fields[0].rateObj, 'rateName': this.state.fields.rateName, 'rateType': this.state.fields.rateType,
-                'rate': this.state.fields.rate,//'startDate': startDate, 'endDate': endDate ,
-                'createdDate': date(),  //'isActive': isActive, 'parameterSetDetails': sendArray,
+            this.state.fields[0].dynamicList.push(this.state.TableDbSave);
+            //   this.state.fields[0].dynamicList=this.state.TableDbSave;
+            console.log("fields", this.state.fields);
 
-            };
-                 console.log(data, 'Data');
-            fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CreateRateRulesSet`, {
-                method: 'post',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                },
-                body: JSON.stringify(this.state.fields[0])
-            }).then(response => response.json())
-                .then(data => {
-                    if (data.status == 2) {
-                        swal({
-                            //   title: "Perfect",
-                            text: data.responseMessage,
-                            //  text: "Account Successfully Created",
-                            icon: "success"
-                        });
-                          this.reset();
-                    } else if (data.status == 8) {
-                        swal({
-                            text: data.errors[0].errorMessage,
-                            icon: "error"
-                        });
-                    } else if (data.status == 4) {
-                        swal({
-                            text: data.errors[0].errorMessage,
-                            icon: "error"
-                        });
-                    }
-                     });
-                 this.state.fields[0].startDate = stDate;
-                 this.state.fields[0].endDate = edDate;
-        } else {
-            swal("", "Parameter Should be Added into Grid", "error");
-            this.setState({ errormessage: true });
+            console.log("SaveRa", this.state.ratingRules, this.state.ratingRuleConditions, this.state.TableDbSave);
+
+            let stDate = "";
+            let edDate = "";
+            if (this.state.fields.length > 0) {
+                let isActive = 1;
+
+                if (this.state.fields[0].startDate != "" || this.state.fields[0].endDate != "") {
+                    stDate = this.state.fields[0].startDate;
+                    edDate = this.state.fields[0].endDate;
+                    this.state.fields[0].startDate = this.datechange(this.state.fields[0].startDate)
+                    this.state.fields[0].endDate = this.datechange(this.state.fields[0].endDate)
+                    // this.state.fields[0].dynamicList.pop();
+                }
+
+                var data = {
+
+                    'dynamicList': this.state.fields[0].dynamicList, 'rateObj': this.state.fields[0].rateObj, 'rateName': this.state.fields.rateName, 'rateType': this.state.fields.rateType,
+                    'rate': this.state.fields.rate,//'startDate': startDate, 'endDate': endDate ,
+                    'createdDate': date(),  //'isActive': isActive, 'parameterSetDetails': sendArray,
+
+                };
+                console.log(data, 'Data');
+                fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CreateRateRulesSet`, {
+                    method: 'post',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                    },
+                    body: JSON.stringify(this.state.fields[0])
+                }).then(response => response.json())
+                    .then(data => {
+                        if (data.status == 2) {
+                            swal({
+                                //   title: "Perfect",
+                                text: data.responseMessage,
+                                //  text: "Account Successfully Created",
+                                icon: "success"
+                            });
+                            this.reset();
+                        } else if (data.status == 8) {
+                            swal({
+                                text: data.errors[0].errorMessage,
+                                icon: "error"
+                            });
+                        } else if (data.status == 4) {
+                            swal({
+                                text: data.errors[0].errorMessage,
+                                icon: "error"
+                            });
+                        }
+                    });
+                this.state.fields[0].startDate = stDate;
+                this.state.fields[0].endDate = edDate;
+            } else {
+                swal("", "Parameter Should be Added into Grid", "error");
+                this.setState({ errormessage: true });
+            }
+            //end
+            console.log("ShowOutput", this.state.fields);
         }
-        //end
-        console.log("ShowOutput", this.state.fields);
+        else {
+            swal({
+                text: "Some Fields are missing",
+                icon: "error"
+            });
+        }
     }
    
     ratetabledata = () => {
@@ -559,61 +567,69 @@ class RateRules extends React.Component {
 
      handleChangeStatus = ({ meta, file }, status) => { console.log(status, meta, file) }
 
-     handleSubmit = (files) => {
-        console.log("SubmitData", files.map(f => f.meta))
-        var data = new FormData();
-        if (files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                data.append(files[i].file.name, files[i].file);
+    handleSubmit = (files) => {
+        debugger
+        if (this.state.fields[0].startDate != "" && this.state.fields[0].endDate != "" && this.state.fields[0].rateName != "") {
+            console.log("SubmitData", files.map(f => f.meta))
+            var data = new FormData();
+            if (files.length > 0) {
+                for (var i = 0; i < files.length; i++) {
+                    data.append(files[i].file.name, files[i].file);
 
-            }
-         }
-
-         let that = this;
-         $.ajax({
-            type: "POST",
-            url: `${RateConfig.rateConfigUrl}/api/RatingConfig/RateUpload?RateName=` + this.state.fields[0].rateName + '&RateObj=' + this.state.fields[0].rateObj + '&StartDate=' + this.state.fields[0].startDate + '&Enddate=' + this.state.fields[0].endDate,
-            //url: `https://localhost:44364/api/RatingConfig/RateUpload?RateName=` + this.state.fields[0].rateName + '&RateObj=' + this.state.fields[0].rateObj + '&StartDate=' + this.state.fields[0].startDate + '&Enddate=' + this.state.fields[0].endDate,
-
-            contentType: false,
-            processData: false,
-
-            data: data,
-            beforeSend: function (xhr) {
-                /* Authorization header */
-                xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
-            },
-            success: function (response) {
-                console.log("response ", response.responseMessage);
-                swal({
-                    text: response.responseMessage,
-                    icon: "success"
-                });
-                that.setState({ result: response.gridList });
-
-                console.log(that.state.result, 'Result');
-                if (that.state.result.length > 0) {
-                    that.tabledata(response.gridList);
-                    //this.reset();
                 }
-                else {
-                    setTimeout(
-                        function () {
-                            that.setState({ loader: true, searchTableSec: false, nodata: true });
-                        }.bind(that), 2000
-                    );
-                }
-
-            },
-             error: function () {
-                 that.GridFun(false);
-                swal({
-                    text: "File uploading unsuccessful",
-                    icon: "error"
-                });
             }
-        });
 
+            let that = this;
+            $.ajax({
+                type: "POST",
+                url: `${RateConfig.rateConfigUrl}/api/RatingConfig/RateUpload?RateName=` + this.state.fields[0].rateName + '&RateObj=' + this.state.fields[0].rateObj + '&StartDate=' + this.state.fields[0].startDate + '&Enddate=' + this.state.fields[0].endDate,
+                //url: `https://localhost:44364/api/RatingConfig/RateUpload?RateName=` + this.state.fields[0].rateName + '&RateObj=' + this.state.fields[0].rateObj + '&StartDate=' + this.state.fields[0].startDate + '&Enddate=' + this.state.fields[0].endDate,
+
+                contentType: false,
+                processData: false,
+
+                data: data,
+                beforeSend: function (xhr) {
+                    /* Authorization header */
+                    xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
+                },
+                success: function (response) {
+                    console.log("response ", response.responseMessage);
+                    swal({
+                        text: response.responseMessage,
+                        icon: "success"
+                    });
+                    that.setState({ result: response.gridList });
+
+                    console.log(that.state.result, 'Result');
+                    if (that.state.result.length > 0) {
+                        that.tabledata(response.gridList);
+                        //this.reset();
+                    }
+                    else {
+                        setTimeout(
+                            function () {
+                                that.setState({ loader: true, searchTableSec: false, nodata: true });
+                            }.bind(that), 2000
+                        );
+                    }
+
+                },
+                error: function () {
+                    that.GridFun(false);
+                    swal({
+                        text: "File uploading unsuccessful",
+                        icon: "error"
+                    });
+                }
+            });
+        }
+        else {
+            swal({
+                text: "Some Fields are missing",
+                icon: "error"
+            });
+        }
 
     }
 

@@ -1,10 +1,12 @@
 ﻿using iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices;
 using iNube.Services.Claims.Entities;
 using iNube.Services.Claims.Entities.CNEntities;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -48,6 +50,7 @@ namespace iNube.Services.Claims.Helpers
     public static class DbManager
     {
         public static string DbName;
+        public static ConcurrentDictionary<string, string> lstDbCon = new ConcurrentDictionary<string, string>();
 
         public static string GetDbConnectionString(string dbName)
         {
@@ -78,7 +81,7 @@ namespace iNube.Services.Claims.Helpers
             DbContext context = null;
             //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 
-            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration,new LoggerManager(configuration)));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
             switch (product)
@@ -112,7 +115,7 @@ namespace iNube.Services.Claims.Helpers
             DbContext context = null;
             //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 
-            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration)));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
             switch (product)

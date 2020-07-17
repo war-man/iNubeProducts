@@ -4,6 +4,7 @@ using iNube.Services.Partners.Helpers;
 using iNube.Services.Partners.Models;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.UserManagement.Helpers;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework.Notification;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             _integrationService = integrationService;
             _emailService = emailService;
             _configuration = configuration;
-            dbHelper = new DbHelper(new IntegrationService(configuration));
+            dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration)));
         }
         public async Task<CDAccountResponse> CreateCdAccountAsync(CdAccountsDTO cdAccountsDTO, ApiContext apiContext)
         {

@@ -81,10 +81,11 @@ class CommunicationMethod extends React.Component {
 
                         <GridItem xs={12} sm={4} md={6}>
 
-                            <Dropdown
+                        <MasterDropdown
                                 required={true}
                                 labelText="Preferred language for Policy Document & Correspondence"
-                                lstObject={[]}
+                                lstObject={this.props.MasterDataDto}
+                                filterName='Language'
                                 // value={orgData.selectedlevel}
                                 //name='selectedlevel'
                                 //onChange={(e) => orgData.handlelevels(e)}
@@ -93,10 +94,11 @@ class CommunicationMethod extends React.Component {
                         </GridItem>
                         <GridItem xs={12} sm={4} md={4}>
 
-                            <Dropdown
+                        <MasterDropdown
                                 required={true}
                                 labelText="Premium Method of Communication"
-                                lstObject={[]}
+                            lstObject={this.props.MasterDataDto}
+                            filterName='ModeOfCommunication'
                                 // value={orgData.selectedlevel}
                                 //name='selectedlevel'
                                 //onChange={(e) => orgData.handlelevels(e)}

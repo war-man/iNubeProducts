@@ -375,9 +375,9 @@ class RegularForms extends React.Component {
 
 
     componentDidMount() {
-
+        debugger;
         this.state.BasePremiumDTO.lstIllustation = this.state.lstIllustation;
-        this.state.BasePremiumDTO.objProspect = this.state.objProspect;
+        this.state.BasePremiumDTO.objProspect = this.props.ProspectData;
         this.state.BasePremiumDTO.objProductDetials.plan = this.state.ProductDTO.ProductId; //this.state.ProductDTO.ProductId as it is hardcoded
         this.state.BasePremiumDTO.objProductDetials.variant = this.state.ProductDTO.PlanId;
         this.state.BasePremiumDTO.objProductDetials.policyTerm = this.state.ProductDTO.PolicyID;
@@ -627,12 +627,14 @@ class RegularForms extends React.Component {
         console.log("1stDTO", this.state.BasePremiumDTO);
         this.state.BasePremiumDTO.refNo = 1;
         //Get UserName from Prospect Module Pending
+        this.state.BasePremiumDTO.lstIllustation = this.state.PremiumResponseDTO[0].lstIllustation;
+        this.state.BasePremiumDTO.objProspect = this.props.ProspectData;
         this.state.BasePremiumDTO.userName = this.state.objProspect.userName;
         this.state.BasePremiumDTO.objProductDetials.premiumTerm = this.state.ProductDTO.premiumData;
         this.state.BasePremiumDTO.objProductDetials.pensionPeriod = this.state.ProductDTO.premiumData;
         this.state.BasePremiumDTO.objProductDetials.drawDownPeriod = this.state.ProductDTO.premiumData;
         this.state.BasePremiumDTO.objProductDetials.annualPremium = 0;
-        this.state.BasePremiumDTO.objProductDetials.retirementAge = 60;
+        this.state.BasePremiumDTO.objProductDetials.retirementAge = 60;//To do why?
 
         //this.state.BasePremiumDTO.objBenefitDetails.annualModeLoadingAmount = "0";
         //this.state.BasePremiumDTO.objBenefitDetails.annualModeDiscountAmount = "0";
@@ -658,28 +660,33 @@ class RegularForms extends React.Component {
 
 
     handleQuoteChange(type, event) {
-
         const name = event.target.name;
         const obj = this.state.ProductDTO;
         obj[name] = event.target.value;
 
         ///https://inubeservicesproductconfiguration.azurewebsites.net/api/Product/GetProductMasterAvo?masterType=
 
-        fetch(`${NewBusinessConfig.ProductConfig}/api/Product/GetProductMasterAvo?masterType=` + type + `&parentID=` + event.target.value)
+        fetch(`${NewBusinessConfig.ProductConfig}/api/Product/GetProductMasterAvo?masterType=` + type + `&parentID=` + event.target.value +  `` ,{
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
             .then(response => response.json())
             .then(data => {
 
+                
+
                 if (type == "Plan") {
                     this.setState({ Plandata: data });
-
+                    console.log("Plandata", this.state.Plandata);
+                   
                 }
                 if (type == "Policy Term") {
-
                     this.setState({ Policydata: data });
-
                     const filterData = this.state.Plandata.filter(item => item.mID == event.target.value);
-
-
                     obj['planCode'] = filterData[0].planCode;
                     this.setState({ obj });
                 }
@@ -1008,7 +1015,7 @@ class RegularForms extends React.Component {
                                 <div>
                                     <Button color="info"
                                         round className={this.props.classes.marginRight}
-                                        //onClick={props.handlepartnerdata}
+                                        onClick={this.GetRidersData}
                                         id="cancelBtn" >
                                         Get Risk Benifits
                                 </Button>
