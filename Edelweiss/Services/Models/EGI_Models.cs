@@ -896,7 +896,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
     public partial class GetSwitchResponse : ResponseStatus
     {
         public dynamic PolicyData { get; set; }
-        public dynamic PartnerData { get; set; }
+        public CDBalanceDTO PartnerData { get; set; }
         public GetScheduleDTO ScheduleData { get; set; }
     }
 

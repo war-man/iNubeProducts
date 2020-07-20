@@ -10800,6 +10800,24 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     ADFROMTAXPERDAY = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "ADPMPDFTTAX").EValue);
                     ADTOTAXPERDAY = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "ADPMPDTTTAX").EValue);
 
+                    decimal AdDebitAmount = ADPERDAY + ADFROMTAXPERDAY + ADTOTAXPERDAY;
+
+                    if (GetSchedule.PartnerData.TotalAvailableBalance < AdDebitAmount)
+                    {
+                        errorInfo = new ErrorInfo();
+                        response.ResponseMessage = "AD Balance is not sufficient";
+                        response.Status = BusinessStatus.Ok;
+                        errorInfo.ErrorMessage = "The Vehicle Number:" + VehicleNumber + "AD Balance Low - Transaction Failed";
+                        errorInfo.ErrorCode = "ExtSWT";
+                        errorInfo.PropertyName = "PremiumFail";
+                        response.Errors.Add(errorInfo);
+                        return response;
+                    }
+                    else
+                    {
+                        //Do Nothing Because AD Balance Exsists.
+                    }
+
                 }
                 catch
                 {
