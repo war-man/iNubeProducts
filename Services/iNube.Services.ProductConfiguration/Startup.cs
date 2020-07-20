@@ -21,6 +21,7 @@ using iNube.Services.ProductConfiguration.Controllers.Product.IntegrationService
 using Microsoft.Extensions.Options;
 using iNube.Services.ProductConfiguration.Controllers.PSD.PSD_Service;
 using iNube.Utility.Framework.LogPrivider.LogService;
+using Microsoft.AspNetCore.Internal;
 
 namespace iNube.Services.ProductConfiguration
 {
@@ -87,7 +88,7 @@ namespace iNube.Services.ProductConfiguration
         {
             app.InitializedCommonConfiguration(env, Configuration);
             // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
-            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
+            app.ConfigureExceptionHandler(new LoggerManager(Configuration));
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -97,6 +98,7 @@ namespace iNube.Services.ProductConfiguration
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseEndpointRouting();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();
@@ -130,7 +132,6 @@ namespace iNube.Services.ProductConfiguration
             });
 
             services.AddScoped<IProductService, ProductService>();
-            //services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IAvoProductConfigService, AvoProductService>();
             services.AddScoped<IIntegrationService, IntegrationService>();
         }
