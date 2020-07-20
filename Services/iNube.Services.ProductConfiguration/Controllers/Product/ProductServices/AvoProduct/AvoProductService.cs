@@ -337,7 +337,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //entity.SaveChanges();
             //#endregion
 
-             var connectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+            var connectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
 
             System.Data.SqlClient.SqlConnection con = new System.Data.SqlClient.SqlConnection(connectionString);
             con.Open();
@@ -443,14 +443,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             }
 
-            var IllustrationData = GetIllustration(objLifeQuote,apiContext);
+            var IllustrationData = GetIllustration(objLifeQuote, apiContext);
             objLifeQuote = await IllustrationData;
 
             return objLifeQuote;
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public async Task<MapQuoteDTO> GetIllustration(MapQuoteDTO objLifeQuote,ApiContext apiContext)
+        public async Task<MapQuoteDTO> GetIllustration(MapQuoteDTO objLifeQuote, ApiContext apiContext)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             string xmlStr = MapQuotePremiumObject(objLifeQuote);
@@ -468,7 +468,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //#endregion
 
 
-             var connectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+            var connectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
 
             System.Data.SqlClient.SqlConnection con = new System.Data.SqlClient.SqlConnection(connectionString);
             con.Open();
@@ -612,7 +612,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public async Task<MapQuoteDTO> GetRiderSumAssured(MapQuoteDTO objLifeQuote,ApiContext apiContext)
+        public async Task<MapQuoteDTO> GetRiderSumAssured(MapQuoteDTO objLifeQuote, ApiContext apiContext)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             //using (AVOAIALifeEntities entity = new AVOAIALifeEntities())
@@ -631,7 +631,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //entity.tbllogxmls.Add(objlogxml);
             //entity.SaveChanges();
             //#endregion
-           // var connectionString = _configuration.GetConnectionString("PRConnection");
+            // var connectionString = _configuration.GetConnectionString("PRConnection");
             var connectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
 
             System.Data.SqlClient.SqlConnection con = new System.Data.SqlClient.SqlConnection(connectionString);
@@ -1022,6 +1022,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         }
 
         public async Task<List<object>> GetSingleEntitiesById(int Id, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+        public async Task<List<object>> GetEntitiesById(int Id, string relation, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
