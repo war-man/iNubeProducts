@@ -83,7 +83,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<bool> RetryPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context);
         Task<dynamic> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo, string CallType,ApiContext context);
         Task<SwitchOnOffResponse> NewSwitchOnOff(SwitchOnOffDTO switchOnOff, ApiContext context);
-        Task<bool> NewPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context);
+        Task<ResponseStatus> NewPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -11040,10 +11040,241 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        public async Task<bool> NewPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context)
+        public async Task<ResponseStatus> NewPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context)
         {
-            return true;
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+            DateTime? IndianTime = null;
+            IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            var CurrentDay = IndianTime.Value.DayOfWeek.ToString();
+            var CurrentTimeHour = IndianTime.Value.Hour;
+            var CurrentDate = IndianTime.Value.Date;
+            string BatchName = "PremiumBooking";
+            string BatchMode = "Fresh";
+            string BatchSteps = "BatchStarted";
+            int PolicyCount = 0;
+            int SucessCount = 0;
+            int FailCount = 0;
+            List<string> FailedPolicyLst = new List<string>();
+            bool? SwitchStatus = false;
+
+
+            if (dateTime != null)
+            {
+                IndianTime = dateTime;
+                CurrentDay = dateTime.Value.DayOfWeek.ToString();
+                CurrentTimeHour = dateTime.Value.Hour;
+                CurrentDate = dateTime.Value.Date;
+            }
+
+
+            string ProductCode = ModuleConstants.ProductCode;
+
+            ResponseStatus Response = new ResponseStatus();
+            TblBatchJobLog BatchJobLog = new TblBatchJobLog();
+            TblBatchJobDetailsLog BatchJobDetailsLog = new TblBatchJobDetailsLog();
+
+            List<TblSwitchLog> SwitchLogData = new List<TblSwitchLog>();
+            List<TblSchedule> ScheduleData = new List<TblSchedule>();
+            TblPremiumBookingLog BookingLog = new TblPremiumBookingLog();
+            TblDailyActiveVehicles DailyActiveVehicles = new TblDailyActiveVehicles();
+            
+            List<string> PolicyNumberList = new List<string>();
+            Response.Status = BusinessStatus.Ok;
+
+
+            try
+            {
+                if (PolicyNoList.Count > 0)
+                {
+                    PolicyNumberList = PolicyNoList;
+                    BatchMode = "Retry";
+                }
+                else
+                {
+                    var BatchLogData = _context.TblBatchJobLog.Where(x => x.StartDateTime.Value.Date == CurrentDate &&
+                                                                    x.BatchName == BatchName).ToList();
+                    int BatchCount = BatchLogData.Count();
+
+                   
+                    if (BatchCount > 0)
+                    {
+                        BatchMode = "Retry";
+
+                        var LatestBatchLog = BatchLogData.OrderByDescending(x=>x.StartDateTime).FirstOrDefault();
+
+                       
+                        var BatchDetailsData = _context.TblBatchJobDetailsLog.Where(x => x.BatchLogId == LatestBatchLog.BatchLogId
+                                                                                    && x.TxnStatus == false).ToList();
+
+                        PolicyNumberList = BatchDetailsData.Select(x => x.TxnKey).Distinct().ToList();
+
+                        if (BatchCount == ModuleConstants.BatchCircuitBreak)
+                        {
+                            //Circuit Breaker Ret-Try Cannot Be More than 3 Times
+                            Response.ResponseMessage = "MANUAL CHECK NEEDED - " + "BatchName -" + BatchName + "Batch Mode - " + BatchMode
+                                                      + "Batch Circuit Breaker Ret-Try Cannot Be EXECUTED More than 3 Times"
+                                                      + "Failed Policys -" + string.Join(",", PolicyNumberList);
+                            return Response;
+                        }
+
+                    }
+                    else
+                    {
+                        var ActivePolicyCall = await _integrationService.PolicyActivate(context);
+
+                        var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, context);
+
+                        PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
+
+                    }
+
+                }
+
+                PolicyCount = PolicyNumberList.Count;
+
+                if (PolicyCount == 0)
+                {           
+                    BatchSteps = "NoPolicyList";
+                    Response.ResponseMessage = "BatchName - " + BatchName + "Batch Mode - " + BatchMode + "Policy Count - Zero. Batch Is Terminated";
+                    return Response;
+                }
+
+
+                BatchJobLog.BatchName = BatchName;
+                BatchJobLog.BatchMode = BatchMode;
+                BatchJobLog.StartDateTime = IndianTime;
+                BatchJobLog.SuccessCount = 0;
+                BatchJobLog.FailCount = 0;
+                BatchJobLog.TotalCount = PolicyCount;
+                BatchJobLog.IsActive = true;
+
+                _context.TblBatchJobLog.Add(BatchJobLog);
+                _context.SaveChanges();
+
+                foreach(var PolicyNumber in PolicyNumberList)
+                {
+                    BatchJobDetailsLog = new TblBatchJobDetailsLog();
+                    BatchJobDetailsLog.BatchLogId = BatchJobLog.BatchLogId;
+                    BatchJobDetailsLog.TxnKey = PolicyNumber;
+                    BatchJobDetailsLog.TxnDescription = BatchSteps;
+                    BatchJobDetailsLog.TxnStartDateTime = IndianTime;
+
+                    try
+                    {
+                        BatchSteps = "GetPolicyDetails";
+                        var PolicyData = await GetPolicyDetails(PolicyNumber,context);
+
+
+                        if(PolicyData.Status != BusinessStatus.Ok)
+                        {
+                            BatchJobDetailsLog.TxnErrorDescription = PolicyData.ResponseMessage;
+                            BatchJobDetailsLog.TxnStatus = false;
+                            BatchJobDetailsLog.TxnEndDateTime = IndianTime;
+                            _context.TblBatchJobDetailsLog.Add(BatchJobDetailsLog);
+                            _context.SaveChanges();
+                            continue;
+                        }
+
+                        BatchSteps = "FetchSchedule";
+                        ScheduleData = _context.TblSchedule.Where(x=>x.PolicyNo == PolicyNumber && x.IsActive == true).ToList();
+
+                        if(ScheduleData.Count <= 0)
+                        {
+                            BatchJobDetailsLog.TxnErrorDescription = "Schedule Data Not Found";
+                            BatchJobDetailsLog.TxnStatus = false;
+                            BatchJobDetailsLog.TxnEndDateTime = IndianTime;
+                            _context.TblBatchJobDetailsLog.Add(BatchJobDetailsLog);
+                            _context.SaveChanges();
+                            continue;
+                        }
+
+                        var ActiveVehicleData = GetActiveVehicleCount(ScheduleData,PolicyNumber,CurrentDate);
+
+
+                    }
+                    catch(Exception InternalEx)
+                    {
+
+                        switch (BatchSteps)
+                        {
+                            case "PolicyDetailCall":
+
+                                break;
+
+                            default:
+
+                                break;
+                        }
+                    }
+
+                    FailedPolicyLst.Add(PolicyNumber);
+                }
+
+                string FailedPolicyMsg = "";
+
+                if(FailedPolicyLst.Count > 0)
+                {
+                    FailedPolicyMsg = "Failed Policy's - " + string.Join(",", FailedPolicyLst);
+                }
+
+                Response.ResponseMessage = "BatchName - " + BatchName + "Batch Mode - " + BatchMode + ""; 
+
+            }
+            catch (Exception Ex)
+            {
+                Response.ResponseMessage ="Basic BatchJob Log Saving Gave Exception - " + Ex.Message.ToString();
+            }
+
+            return Response;
         }
+
+        private ActiveVehicleResponse GetActiveVehicleCount(List<TblSchedule> ScheduleData,string PolicyNumber,DateTime IndianDateTime)
+        {
+            var CurrentDate = IndianDateTime.Date;
+            ActiveVehicleResponse response = new ActiveVehicleResponse();
+           
+
+            foreach (var Vehicle in ScheduleData)
+            {
+                VehicleDetails vehicleDetails = new VehicleDetails();
+
+                vehicleDetails.VehicleNumber = Vehicle.VehicleRegistrationNo;
+                
+               var SwitchLogData = _context.TblSwitchLog.Where(x => x.PolicyNo == PolicyNumber && 
+                                                               x.VehicleNumber == Vehicle.VehicleRegistrationNo &&
+                                                               x.CreatedDate.Value.Date == CurrentDate &&
+                                                               x.SwitchType == "Manual").ToList();
+                if (SwitchLogData.Count > 0)
+                {
+                    vehicleDetails.ManualIntervension = true;
+                    vehicleDetails.SwitchStatus = SwitchLogData.OrderByDescending(x => x.CreatedDate).FirstOrDefault().SwitchStatus;
+                }
+                else
+                {
+                    vehicleDetails.ManualIntervension = false;
+                    vehicleDetails.SwitchStatus = CurrentDaySwitchStatus(Vehicle);
+                }
+
+                if(vehicleDetails.SwitchStatus == true)
+                {
+                    if(Vehicle.VehicleType == "PC")
+                    {
+                        response.ActivePC += 1;
+                    }
+                    else if (Vehicle.VehicleType == "TW")
+                    {
+                        response.ActiveTW += 1;
+                    }
+                }
+
+                response.VehicleDetails.Add(vehicleDetails);
+            }
+
+            return response;
+        }
+
+
     }
 }
 
