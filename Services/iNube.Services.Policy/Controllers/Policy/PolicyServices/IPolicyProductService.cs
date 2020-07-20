@@ -81,5 +81,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<ResponseStatus> PolicyActivate(ApiContext apiContext);
         Task<ResponseStatus> UpdateCardDetails(UpdateCardDetails updateCardDetails, ApiContext apiContext);
         Task<PolicyResponse> LeadPolicy(LeadInfoDTO leadInfo, ApiContext apiContext);
+        Task<PolicyDetailsDTOResponse> InternalGetPolicyDetailsByPolicyNumber(string policyNumber, ApiContext apiContext);
     }
 }

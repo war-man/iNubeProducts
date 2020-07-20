@@ -5657,6 +5657,34 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         }
 
+        public async Task<PolicyDetailsDTOResponse> InternalGetPolicyDetailsByPolicyNumber(string policyNumber, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyNumber).FirstOrDefault();
+            if (tblPolicy != null)
+            {
+                var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == tblPolicy.PolicyId);
+                var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                var json1 = JsonConvert.DeserializeObject<ExpandoObject>(insurableItem);
+                AddProperty(json1, "CDAccountNumber", tblPolicy.CdaccountNumber);
+                AddProperty(json1, "PolicyStageStatusId", tblPolicy.PolicyStageStatusId);
+                AddProperty(json1, "PolicyStageId", tblPolicy.PolicyStageId);
+                AddProperty(json1, "PolicyStatusId", tblPolicy.PolicyStatusId);
+                AddProperty(json1, "PolicyStatus", tblPolicy.PolicyStatus);
+                var json = JsonConvert.SerializeObject(json1);
+
+                var json2 = JsonConvert.DeserializeObject<object>(json);
+
+                return new PolicyDetailsDTOResponse { Status = BusinessStatus.Ok, PolicyDetails = json2 };
+            }
+            else
+            {
+                return new PolicyDetailsDTOResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"No Record found for this PolicyNumber: {policyNumber}" };
+            }
+
+        }
+
         public async Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -6352,6 +6380,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         if (CancellationRequest["Remarks"] != null)
                         {
                             AddProperty(endObj, "Remarks", (string)CancellationRequest["Remarks"]);
+                            AddProperty(endObj, "PolicyStatus", "Cancel");
                         }
                         var exptempobj = JsonConvert.SerializeObject(endObj);
                         json = JsonConvert.DeserializeObject<dynamic>(exptempobj.ToString());

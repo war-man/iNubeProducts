@@ -1820,7 +1820,10 @@ namespace iNube.Services.Policy.Models
         public string MobileNumber { get; set; }
         public string RefrenceNumber { get; set; }
     }
-
+    public partial class PolicyDetailsDTOResponse : ResponseStatus
+    {
+        public dynamic PolicyDetails { get; set; }
+    }
 }
 
 

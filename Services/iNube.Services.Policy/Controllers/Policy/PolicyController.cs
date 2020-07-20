@@ -586,8 +586,23 @@ namespace iNube.Services.Policy.Controllers.Policy
             var response = await _policyService.InternalGetPolicyDetailsByNumber(policyNumber, Context);
             return Ok(response);
         }
+        [HttpGet]
+        public async Task<IActionResult> InternalGetPolicyDetailsByPolicyNumber(string policyNumber)
+        {
+            var response = await _policyService.InternalGetPolicyDetailsByPolicyNumber(policyNumber, Context);
+            switch (response.Status)
+            {
+ 
+                case BusinessStatus.Ok:
+                    return Ok(response);
+                case BusinessStatus.NotFound:
+                    return Ok(response);
 
-          [HttpGet]
+                default:
+                    return NotFound(response);
+            }
+        }
+        [HttpGet]
         public async Task<IActionResult> InternalGetProposalDetailsByNumber(string proposalNumber)
         {
             var response = await _policyService.InternalGetProposalDetailsByNumber(proposalNumber, Context);
