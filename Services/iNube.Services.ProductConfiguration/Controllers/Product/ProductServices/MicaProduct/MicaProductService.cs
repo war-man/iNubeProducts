@@ -1959,7 +1959,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             var result = _mapper.Map<List<EntityDetailsDTO>>(data);
             List<object> Finalentity = new List<object>();
-
+            _logger.LogRequest("TblEntityDetails", "GetSingleEntitiesById", "Product", Guid.NewGuid().ToString(), null, apiContext);
             foreach (var item in result)
             {
                 List<object> attributelist = new List<object>();
@@ -2011,6 +2011,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<bool> GetChildAttributeListAsync(decimal id, List<object> Finalentity, string relationship, ApiContext apiContext)
         {
+            _logger.LogRequest("TblEntityDetails", "GetChildAttributeListAsync", "Product", Guid.NewGuid().ToString(), null, apiContext);
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var data = _context.TblEntityDetails.Where(a => a.ParentId == id && a.Relationship == relationship)

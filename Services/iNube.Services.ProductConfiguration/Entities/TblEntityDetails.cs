@@ -9,7 +9,6 @@ namespace iNube.Services.ProductConfiguration.Entities
         {
             TblEntityAttributes = new HashSet<TblEntityAttributes>();
         }
-
         public decimal EntityId { get; set; }
         public string EntityLevel { get; set; }
         public decimal? ParentId { get; set; }
