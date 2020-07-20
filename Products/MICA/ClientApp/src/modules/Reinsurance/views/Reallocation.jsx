@@ -81,6 +81,7 @@ class Reallocation extends React.Component {
             QuotaShare: false,
             surplus: false,
             rimappingId: "",
+
             Modifydto: {
                 allocationAmount: "",
                 Level: "",
@@ -277,6 +278,7 @@ class Reallocation extends React.Component {
         Data[evt.target.name] = evt.target.value;
         this.setState({ Data });
         console.log("Data2:", this.state.treatyDTO, this.state.reinsurerCode)
+        console.log('data1', this.state.participant)
         if (evt.target.name == 'reInsurerId') {
             //let  temp = this.state.rimasterList[0].mdata.filter(x => x.mID == evt.target.value);
             //  this.state.ddllist = [...this.state.ddllist, ...temp];
