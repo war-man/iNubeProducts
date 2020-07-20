@@ -1309,6 +1309,49 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                                 participant.Share = Convert.ToDecimal(item1.SharePercentage);
                                 participant.CommissionRate = Convert.ToDecimal(item1.RicommissionPercentage);
                                 participant.BrokerageRate = Convert.ToDecimal(item1.BrokeragePercentage);
+
+                                if (item1.ReInsurerId != null || item1.ReInsurerId != 0)
+                                {
+                                    participant.ReInsurerId = Convert.ToDecimal(item1.ReInsurerId);
+                                }
+                                else
+                                {
+                                    participant.ReInsurerId = 0;
+
+                                }
+
+                                if (item1.ReInsurerBranchId != null || item1.ReInsurerBranchId != 0)
+                                {
+                                    participant.ReinsurerBranchId = Convert.ToDecimal(item1.ReInsurerBranchId);
+                                }
+                                else
+                                {
+                                    participant.ReinsurerBranchId = 0;
+
+                                }
+
+                                if (item1.BrokerId != null || item1.BrokerId != 0)
+                                {
+                                    participant.BrokerId = Convert.ToDecimal(item1.BrokerId);
+                                }
+                                else
+                                {
+                                    participant.BrokerId = 0;
+
+                                }
+
+                                if (item1.BrokerBranchId != null || item1.BrokerBranchId != 0)
+                                {
+                                    participant.BrokerBranchId = Convert.ToDecimal(item1.BrokerBranchId);
+                                }
+                                else
+                                {
+                                    participant.BrokerBranchId = 0;
+
+                                }
+
+
+
                                 //  participant.Commission= item1.   I think need to be calculated
                                 participant.AllocatedAmount = 0;//need to ask the calculation
                                 participant.AllocatedPremium = 0;//need to ask the caluation
@@ -1421,6 +1464,51 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                                 participant.Share = Convert.ToDecimal(item1.SharePercentage);
                                 participant.CommissionRate = Convert.ToDecimal(item1.RicommissionPercentage);
                                 participant.BrokerageRate = Convert.ToDecimal(item1.BrokeragePercentage);
+                                if (item1.ReInsurerId != null || item1.ReInsurerId!=0)
+                                {
+                                    participant.ReInsurerId = Convert.ToDecimal(item1.ReInsurerId);
+                                }
+                                else
+                                {
+                                    participant.ReInsurerId = 0;
+
+                                }
+
+                                if (item1.ReInsurerBranchId != null || item1.ReInsurerBranchId!=0)
+                                {
+                                    participant.ReinsurerBranchId = Convert.ToDecimal(item1.ReInsurerBranchId);
+                                }
+                                else
+                                {
+                                    participant.ReinsurerBranchId=0;
+
+                                }
+
+                                if (item1.BrokerId != null || item1.BrokerId!=0)
+                                {
+                                    participant.BrokerId = Convert.ToDecimal(item1.BrokerId);
+                                }
+                                else
+                                {
+                                    participant.BrokerId = 0;
+
+                                }
+
+                                if (item1.BrokerBranchId != null || item1.BrokerBranchId != 0)
+                                {
+                                    participant.BrokerBranchId = Convert.ToDecimal(item1.BrokerBranchId);
+                                }
+                                else
+                                {
+                                    participant.BrokerBranchId = 0;
+
+                                }
+
+
+
+                             //   participant.ReinsurerBranchId = Convert.ToDecimal(item1.ReInsurerBranchId);
+                               // participant.BrokerId = Convert.ToDecimal(item1.BrokerId);
+                              //  participant.BrokerBranchId = Convert.ToDecimal(item1.BrokerBranchId);
                                 //  participant.Commission= item1.   I think need to be calculated
                                 participant.AllocatedAmount = 0;//need to ask the calculation
                                 participant.AllocatedPremium = 0;//need to ask the caluation

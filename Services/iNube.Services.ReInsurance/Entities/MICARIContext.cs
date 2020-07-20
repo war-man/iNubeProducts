@@ -39,13 +39,13 @@ namespace iNube.Services.ReInsurance.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com;Database=EdelWeissTest;User ID=admin;Password=micaadmin;");
+                optionsBuilder.UseSqlServer("Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<TblArrangement>(entity =>
             {
@@ -352,30 +352,27 @@ namespace iNube.Services.ReInsurance.Entities
                 entity.HasOne(d => d.BrokerBranch)
                     .WithMany(p => p.TblParticipantBrokerBranch)
                     .HasForeignKey(d => d.BrokerBranchId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_BrokerBranch");
 
                 entity.HasOne(d => d.Broker)
                     .WithMany(p => p.TblParticipantBroker)
                     .HasForeignKey(d => d.BrokerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ParticipantBroker");
 
                 entity.HasOne(d => d.ReInsurerBranch)
                     .WithMany(p => p.TblParticipantReInsurerBranch)
                     .HasForeignKey(d => d.ReInsurerBranchId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ReInsurerBranch");
 
                 entity.HasOne(d => d.ReInsurer)
                     .WithMany(p => p.TblParticipantReInsurer)
                     .HasForeignKey(d => d.ReInsurerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ParticipantReInsurer");
 
                 entity.HasOne(d => d.Treaty)
                     .WithMany(p => p.TblParticipant)
                     .HasForeignKey(d => d.TreatyId)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_TreatyID");
             });
 

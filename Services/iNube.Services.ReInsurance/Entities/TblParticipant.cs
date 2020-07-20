@@ -6,11 +6,11 @@ namespace iNube.Services.ReInsurance.Entities
     public partial class TblParticipant
     {
         public decimal ParticipantId { get; set; }
-        public decimal TreatyId { get; set; }
-        public decimal ReInsurerId { get; set; }
-        public decimal ReInsurerBranchId { get; set; }
-        public decimal BrokerId { get; set; }
-        public decimal BrokerBranchId { get; set; }
+        public decimal? TreatyId { get; set; }
+        public decimal? ReInsurerId { get; set; }
+        public decimal? ReInsurerBranchId { get; set; }
+        public decimal? BrokerId { get; set; }
+        public decimal? BrokerBranchId { get; set; }
         public int? SharePercentage { get; set; }
         public int? BrokeragePercentage { get; set; }
         public int? RicommissionPercentage { get; set; }

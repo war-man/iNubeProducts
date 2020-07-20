@@ -603,6 +603,10 @@ namespace iNube.Services.ReInsurance.Models
     public class Participant
     {
         public int ParticipantId { get; set; }
+        public decimal ReInsurerId { get; set; }
+        public decimal ReinsurerBranchId { get; set; }
+        public decimal BrokerId { get; set; }
+        public decimal BrokerBranchId { get; set; }
         public string Branch { get; set; }
         public decimal Share { get; set; }
         public decimal CommissionRate { get; set; }
