@@ -83,6 +83,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<bool> RetryPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context);
         Task<dynamic> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo, string CallType,ApiContext context);
         Task<SwitchOnOffResponse> NewSwitchOnOff(SwitchOnOffDTO switchOnOff, ApiContext context);
+        Task<bool> NewPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -9770,6 +9771,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         {
 
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            var CurrentTimeHour = IndianTime.Hour;
+            var CurrentDate = IndianTime.Date;
             GetSwitchResponse response = new GetSwitchResponse();
             ErrorInfo errorInfo;
                 
@@ -9821,6 +9824,70 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //Sending Partner Data - This Will Be Used in SwitchOnOff Method
                 response.PartnerData = CheckBalance.Data;
+
+                var AnyBatchRunning = _context.TblBatchJobLog.Any(x => x.StartDateTime.Value.Date == CurrentDate &&
+                                                                      x.IsActive == true);
+
+                if (AnyBatchRunning)
+                {
+                    //errorInfo = new ErrorInfo();
+
+                    //response.ResponseMessage = "Trasactions are not allowed.Batch Job Running";
+                    response.Status = BusinessStatus.Error;
+                    //errorInfo = new ErrorInfo();
+                    //errorInfo.ErrorMessage = "Trasactions are not allowed.Batch Job Running";
+                    //errorInfo.ErrorCode = "Exp002";
+                    //errorInfo.PropertyName = "BatchRun";
+                    //response.Errors.Add(errorInfo);
+
+                    return response;
+                }
+                else
+                {
+                    //Do Nothing Bcz No Batch Running.
+                }
+
+
+                if (CurrentTimeHour < ModuleConstants.SchedulerRunTime)
+                {
+                    //Do Nothing Bcz PBS Will Run After 9AM
+                }
+                else
+                {                   
+                    var PbsLog = _context.TblBatchJobDetailsLog.LastOrDefault(x=>x.TxnKey == PolicyNumber &&
+                                                                              x.TxnStartDateTime.Value.Date == CurrentDate);
+
+                    if(PbsLog == null)
+                    {
+                        //This Case is handled directly in GetSchedule 
+                        //This Cannot be checked here bcz if a new policy or a schedule is created after 9AM
+                        //TblBatchJobDetailsLog - Will Not Have an entry of it so
+                    }
+                    else
+                    {
+                        if (PbsLog.TxnStatus == false)
+                        {
+                            //errorInfo = new ErrorInfo();
+
+                            //response.ResponseMessage = "Trasactions are not allowed.PBS Has Failed";
+                            response.Status = BusinessStatus.Error;
+                            //errorInfo = new ErrorInfo();
+                            //errorInfo.ErrorMessage = "Trasactions are not allowed.PBS Has Failed";
+                            //errorInfo.ErrorCode = "Exp002";
+                            //errorInfo.PropertyName = "PBSFail";
+                            //response.Errors.Add(errorInfo);
+
+                            return response;
+                        }
+                        else
+                        {
+                            //Do Nothing Bcz PBS has Successfully Run for this Policy Number
+                        }
+                    }
+
+                }
+
+
                 response.Status = BusinessStatus.Ok;
                 response.ResponseMessage = "No Exception";
                
@@ -10343,6 +10410,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         response.GetSchedule.SwitchStatus = false;
                         response.GetSchedule.SwitchEnabled = false;
+                        response.ResponseMessage = ExpCheck.ResponseMessage;
+                        response.Errors = ExpCheck.Errors;
                         response.Status = BusinessStatus.Ok;
                         return response;
                     }
@@ -10526,9 +10595,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             try
             {
                 //Call the Policy Service to Get Policy Details.
-                var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, context);
+                var PolicyResponse = await _integrationService.NewGetPolicyDetails(PolicyNumber, context);
 
-                if (PolicyData != BusinessStatus.Ok)
+                dynamic PolicyData = null;
+
+                if (PolicyResponse.Status != BusinessStatus.Ok)
                 {
                     errorInfo = new ErrorInfo();
 
@@ -10536,10 +10607,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     response.Status = BusinessStatus.ServiceUnAvailable;
                     errorInfo.ErrorMessage = "Policy Record Not Found";
                     errorInfo.ErrorCode = "ExpPolicy";
-                    errorInfo.PropertyName = "InternalGetPolicyDetailsByNumber";
+                    errorInfo.PropertyName = "GetPolicyDetails";
                     response.Errors.Add(errorInfo);
 
                     return response;
+                }
+                else
+                {
+                    PolicyData = PolicyResponse.PolicyDetails;
                 }
 
 
@@ -10939,7 +11014,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     errorInfo = new ErrorInfo();
 
                     response.ResponseMessage = "MICA CD Balance Update Method Failed";
-                    response.Status = BusinessStatus.Error;
+                    response.Status = BusinessStatus.Ok;
                     errorInfo.ErrorMessage = "The Vehicle Number: " + VehicleNumber + " CD Balance Update Failed";
                     errorInfo.ErrorCode = "ExtSWT009";
                     errorInfo.PropertyName = "CDUpdateFail";
@@ -10963,7 +11038,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             response.Status = BusinessStatus.Updated;
             return response;
 
-        }        
+        }
+
+        public async Task<bool> NewPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context)
+        {
+            return true;
+        }
     }
 }
 

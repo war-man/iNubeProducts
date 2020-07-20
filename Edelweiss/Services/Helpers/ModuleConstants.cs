@@ -13,6 +13,7 @@ namespace MicaExtension_EGI.Helpers
         public const string EGIRatingId = "37";
         public const string EGIWrapperRatingId = "41";
         public const string EGIEndoRatingId = "50";
-        public const string EGINewRatingId = "87";
+        public const string DevEGINewRatingId = "87";
+        public const string EGINewRatingId = "51";
     }
 }

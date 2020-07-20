@@ -67,6 +67,9 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         //New Rating Calculator
         Task<dynamic> NewRatingCalculator(SchedulerPremiumDTO dynamicData, ApiContext apiContext);
 
+        //InternalGetPolicyDetailsByPolicyNumber - New Method with response status updated
+        Task<PolicyDetailsDTOResponse> NewGetPolicyDetails(string PolicyNo, ApiContext apiContext);
+
     }
     public class IntegrationService : IIntegrationService
     {
@@ -273,6 +276,13 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerTypeSettings?customerid=" + apiContext.OrgId + "&type=" + Type + "&envid=" + apiContext.ServerType;
             return await GetListApiInvoke<CustomerSettingsDTO>(uri, apiContext);
         }
+
+        public async Task<PolicyDetailsDTOResponse> NewGetPolicyDetails (string PolicyNo, ApiContext apiContext)
+        {
+            var uri = PolicyUrl + "/api/Policy/InternalGetPolicyDetailsByPolicyNumber?policyNumber=" + PolicyNo;
+            return await GetApiInvoke<PolicyDetailsDTOResponse>(uri, apiContext);
+        }
+
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {

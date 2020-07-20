@@ -900,5 +900,11 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public GetScheduleDTO ScheduleData { get; set; }
     }
 
+    public partial class PolicyDetailsDTOResponse : ResponseStatus
+    {
+
+        public dynamic PolicyDetails { get; set; }
+
+    }
 }
 
