@@ -65,46 +65,35 @@ namespace iNube.Services.Dispatcher.Models
     {
         public DispatcherDTO()
         {
-            DispatcherSetDTO = new HashSet<DispatcherSetDTO>();
+            DispatcherTaskDTO = new HashSet<DispatcherTaskDTO>();
         }
 
         public decimal DispatcherId { get; set; }
-        public string DispatcherName { get; set; }
+        public string DispatcherTaskName { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public bool? IsActive { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public string InputObject { get; set; }
+        public string OutputObject { get; set; }
 
-        public virtual ICollection<DispatcherSetDTO> DispatcherSetDTO { get; set; }
+        public virtual ICollection<DispatcherTaskDTO> DispatcherTaskDTO { get; set; }
     }
 
-    public partial class DispatcherSetDTO
+    public partial class DispatcherTaskDTO
     {
-        public DispatcherSetDTO()
-        {
-            DispatcherSetDetailsDTO = new HashSet<DispatcherSetDetailsDTO>();
-        }
-
-        public decimal DispatcherSetId { get; set; }
+        public decimal DispatcherTaskId { get; set; }
         public decimal? DispatcherId { get; set; }
-        public string Object { get; set; }
-        public string Event { get; set; }
-        public bool? IsActive { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public string Api { get; set; }
+        public string ResponseMsg { get; set; }
+        public string InputObject { get; set; }
+        public string OutputObject { get; set; }
+        public string InputTypeObject { get; set; }
+        public string OutputTypeObject { get; set; }
 
         public virtual DispatcherDTO Dispatcher { get; set; }
-        public virtual ICollection<DispatcherSetDetailsDTO> DispatcherSetDetailsDTO { get; set; }
     }
-    public partial class DispatcherSetDetailsDTO
-    {
-        public decimal DispatcherSetDetailsId { get; set; }
-        public decimal? DispatcherSetId { get; set; }
-        public string Parameter { get; set; }
-        public bool? IsActive { get; set; }
-        public DateTime? CreatedDate { get; set; }
 
-        public virtual DispatcherSetDTO DispatcherSet { get; set; }
-    }
 
     public class DispatcherParamListDTO
     {
@@ -116,36 +105,11 @@ namespace iNube.Services.Dispatcher.Models
         public string Obj { get; set; }
     }
 
-    public class DispatcherTaskDTO
+    public class DispatcherResponse : ResponseStatus
     {
-        public DispatcherTaskDTO()
-        {
-            DispatcherTaskDetailsDTO = new HashSet<DispatcherTaskDetailsDTO>();
-        }
-
-        public decimal DispatcherTaskId { get; set; }
-        public string DispatcherTaskName { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-        public bool? IsActive { get; set; }
-        public DateTime? CreatedDate { get; set; }
-
-        public virtual ICollection<DispatcherTaskDetailsDTO> DispatcherTaskDetailsDTO { get; set; }
+        public DispatcherDTO dispatcher { get; set; }
     }
-    public class DispatcherTaskDetailsDTO
-    {
-        public decimal DispatcherTaskDetailsId { get; set; }
-        public decimal? DispatcherTaskId { get; set; }
-        public string Event { get; set; }
-        public string Api { get; set; }
-        public string InputObject { get; set; }
-        public string OutputObject { get; set; }
-        public bool? IsActive { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public string ResponseMsg { get; set; }
 
-        public virtual DispatcherTaskDTO DispatcherTask { get; set; }
-    }
 
     public partial class ObjMapDetailsDTO
     {

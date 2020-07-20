@@ -128,5 +128,27 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mic
             }
             return dict[OutputObject];
         }
+
+        public async Task<DispatcherResponse> CreateDispatcherTask(DispatcherDTO dispatcherDto, ApiContext Context)
+        {
+            if (_context == null)
+            {
+                _context = (MICADTContext)(await DbManager.GetContextAsync(Context.ProductType, Context.ServerType, _configuration));
+            }
+            try
+            {
+                var dto = _mapper.Map<TblDispatcher>(dispatcherDto);
+                _context.TblDispatcher.Add(dto);
+                _context.SaveChanges();
+                var disDTO = _mapper.Map<DispatcherDTO>(dto);
+                return new DispatcherResponse { Status = BusinessStatus.Created, ResponseMessage = $"Configuration of Dispatcher Task Succesfully Done! \n Dispatcher Task Name: {disDTO.DispatcherTaskName}" };
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+        
     }
 }

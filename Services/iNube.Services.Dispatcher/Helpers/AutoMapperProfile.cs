@@ -12,6 +12,9 @@ namespace iNube.Services.Dispatcher.Helpers
             CreateMap<TblMapper, MapperDTO>()
                 .ForMember(dest => dest.MapperDetailsDTO, opt => opt.MapFrom(src => src.TblMapperDetails)).ReverseMap();
 
+            CreateMap<TblDispatcher, DispatcherDTO>()
+                .ForMember(dest => dest.DispatcherTaskDTO, opt => opt.MapFrom(src => src.TblDispatcherTask)).ReverseMap();
+
             CreateMap<TblMapperDetails, MapperDetailsDTO>().ReverseMap();
 
             

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService;
 using iNube.Services.Dispatcher.Helpers;
+using iNube.Services.Dispatcher.Models;
 using iNube.Utility.Framework;
 using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -51,6 +52,22 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher
         {
             var response = await _dispatcherService.DispatcherEvent(DispatcherEventObject, EventType, Context);
             return Ok(response);
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateDispatcherTask([FromBody]DispatcherDTO tblDispatcher)
+        {
+            var response = await _dispatcherService.CreateDispatcherTask(tblDispatcher, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return Ok(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized();
+                default:
+                    return Forbid();
+            }
         }
 
         [HttpGet]

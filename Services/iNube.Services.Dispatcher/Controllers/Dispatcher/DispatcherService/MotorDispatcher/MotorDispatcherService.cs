@@ -17,5 +17,10 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mot
         {
             throw new NotImplementedException();
         }
+        public async Task<DispatcherResponse> CreateDispatcherTask(DispatcherDTO dispatcherDto, ApiContext Context)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
