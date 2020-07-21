@@ -62,9 +62,9 @@ const MLFamilyBackGround = (props) => {
                     <FormControlLabel
                         control={
                             <Radio
-                                checked={props.selectedValue === "TabacoYes"}
-                                onChange={props.handleRadioChangeT}
-                                value="TabacoYes"
+                                checked={props.selectedValue === "FBQues1Yes"}
+                                onChange={props.handleRadioChangeFB}
+                                value="FBQues1Yes"
                                 name="radio1"
                                 aria-label="B"
                                 icon={
@@ -92,9 +92,9 @@ const MLFamilyBackGround = (props) => {
                     <FormControlLabel
                         control={
                             <Radio
-                                checked={props.selectedValue === "TabacoNo"}
-                                onChange={props.handleRadioChangeT}
-                                value="TabacoNo"
+                                checked={props.selectedValue === "FBQues1No"}
+                                onChange={props.handleRadioChangeFB}
+                                value="FBQues1No"
                                 name="radio1"
                                 aria-label="B"
                                 icon={
@@ -120,7 +120,17 @@ const MLFamilyBackGround = (props) => {
                     />
                 </GridItem>
             </GridContainer>
+            {props.showFBQ1 && 
 
+                <GridItem xl={12} sm={4} md={3}>
+                    <Button color="info"
+                        round className={props.classes.marginRight}
+                        //onClick={props.handleLeadSave}
+                        id="saveBtn" >
+                        Add Family Member History
+                                </Button>
+                </GridItem>
+}
 
 
         </div>
