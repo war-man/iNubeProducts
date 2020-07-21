@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Http;
 using iNube.Utility.Framework.Extensions.DefaultSecurityHeader;
+using Microsoft.AspNetCore.Internal;
 
 namespace iNube.Services.Billing
 {
@@ -106,6 +107,7 @@ namespace iNube.Services.Billing
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseEndpointRouting();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
