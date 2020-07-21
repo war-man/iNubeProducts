@@ -533,7 +533,7 @@ class ClaimProcess extends React.Component {
                             //      if (data.status == 200) {
                             //  this.state.claimId = data.claimId;
                             //  this.setState({ claimnumber: data.claimNumber });
-                            this.setState({ responseflag: false });
+                          
                             if (data.status == 3) {
                                 swal({
                                     text: data.responseMessage,
@@ -541,11 +541,12 @@ class ClaimProcess extends React.Component {
                                     buttons: [false, "OK"],
                                 }).then((willDelete) => {
                                     if (willDelete) {
+                                        this.setState({ responseflag: false });
                                         this.handlepagereload();
                                     }
                                 });
                             } else if (data.status == 7) {
-
+                                this.setState({ responseflag: false });
                                 if (data.errors.length > 0) {
                                     swal({
 
@@ -562,6 +563,7 @@ class ClaimProcess extends React.Component {
 
 
                             } else if (data.status == 9) {
+                                this.setState({ responseflag: false });
                                 if (data.errors.length > 0) {
                                     swal({
                                         text: data.errors[0].errorMessage,
