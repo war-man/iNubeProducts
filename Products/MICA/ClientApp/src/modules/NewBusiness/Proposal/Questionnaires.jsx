@@ -36,9 +36,6 @@ class Questionnaries extends React.Component {
             PCQuesDTO:[], 
  
             
-         
-
-
             showMLLS: false,
             selectedValue: null,
             selectedValueMLLSQ2: null,
@@ -64,6 +61,8 @@ class Questionnaries extends React.Component {
             showMHQ8: false,
             showMHQ9: false,
             showMHQ10: false,
+
+            showFBQ1: false,
             data: [],
             radioVal: "",
             radioValPCIns: "",
@@ -408,7 +407,25 @@ class Questionnaries extends React.Component {
         }
     }
     
+    handleRadioChangeFB = (e) => {
+       
+        this.state.radioValFB = e.target.value;
+        this.state.selectedValueFB = e.target.value;
 
+        console.log("radioValFB", this.state.radioValFB)
+        console.log("selectedValueFB", this.state.selectedValueFB)
+        
+        if (this.state.radioValMH == "FBQues1Yes") {
+            this.setState({
+                showFBQ1: true
+            })
+        }
+        else if (this.state.radioValMH == "FBQues1No") {
+            this.setState({
+                showFBQ1: false
+            })
+        }
+    }
 
 
     getRadioButtonVal = event => {
@@ -423,6 +440,8 @@ class Questionnaries extends React.Component {
                     <QuestioneriesWizard
                         LifeStyleQA={this.props.LifeStyleQA}
                         QuestionalDetailsSetValue={this.props.QuestionalDetailsSetValue}
+                        QuestionAddButton={this.props.QuestionAddButton}
+                        tobaccodata={this.props.tobaccodata}
                         MasterDataDto={this.state.MasterDataDto}
                         LifeStyleQuesDTO={this.state.LifeStyleQuesDTO}
                         MedHistQuesDTO={this.state.MedHistQuesDTO}
@@ -455,7 +474,7 @@ class Questionnaries extends React.Component {
                         data1={this.state.data1}
 
 
-                        //MH
+                        //MEDICAL HISTORY
                         handleRadioChangeMH={this.handleRadioChangeMH}
                         showMHQ1={this.state.showMHQ1}
                         showMHQ2={this.state.showMHQ2}
@@ -467,9 +486,10 @@ class Questionnaries extends React.Component {
                         showMHQ8={this.state.showMHQ8}
                         showMHQ9={this.state.showMHQ9}
                         showMHQ10={this.state.showMHQ10}
-                        
-                       
-                       
+
+                        // FAMILY BACKGROUND
+                        handleRadioChangeFB={this.handleRadioChangeFB}
+                        showFBQ1={this.state.showFBQ1}
 
                     />
                     </GridItem>
