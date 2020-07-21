@@ -855,7 +855,6 @@ class ClaimProcess extends React.Component {
     }
    
 
-
     datechange = (date) => {
         const _date = date.split('/');
         const dateObj = { month: _date[1], year: _date[2], day: _date[0] };

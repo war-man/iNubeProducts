@@ -745,7 +745,6 @@ class InboxClaimProcess extends React.Component {
             this.setState({ approved: true });
         }
 
-
         // this.handleBankdetails(oid);
         this.setState({ showtable: false });
         //this.claimAmountTable();
