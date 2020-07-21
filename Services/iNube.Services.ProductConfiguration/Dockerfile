@@ -13,7 +13,7 @@ COPY . "iNube.Services.ProductConfiguration/"
 WORKDIR "/src/iNube.Services.ProductConfiguration"
 
 RUN dotnet build "iNube.Services.ProductConfiguration.csproj" -c Release -o /app 
-
+ 
 FROM build AS publish
 RUN dotnet publish "iNube.Services.ProductConfiguration.csproj" -c Release -o /app
 
