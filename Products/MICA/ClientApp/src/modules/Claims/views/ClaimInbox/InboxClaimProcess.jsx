@@ -752,8 +752,9 @@ class InboxClaimProcess extends React.Component {
 
     }
 
+
     componentDidMount() {
-        this.setState({ responseflag: false });
+     
         this.tableshow();
         let claimdecision = "Claims Status";
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + claimdecision + ``, {
@@ -834,7 +835,7 @@ class InboxClaimProcess extends React.Component {
         datamodel["Financier"] = {};
         datamodel["Nominee"] = {};
         datamodel["Surveyor"] = {};
-        this.setState({ datamodel });
+        this.setState({ datamodel, responseflag: false });
 
         console.log("datamodel ", datamodel);
     }

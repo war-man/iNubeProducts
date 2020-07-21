@@ -755,6 +755,7 @@ class ClaimProcess extends React.Component {
     }
 
     componentDidMount() {
+    
         let ClaimDecision = "Claims Decision";
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + ClaimDecision + ``, {
             method: 'get',
@@ -849,7 +850,7 @@ class ClaimProcess extends React.Component {
         datamodel["Nominee"] = {};
         datamodel["Surveyor"] = {};
 
-        this.setState({ datamodel });
+        this.setState({ datamodel, responseflag: false  });
         console.log("datamodel ", datamodel);
     }
 
