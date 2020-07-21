@@ -17,7 +17,7 @@ RUN dotnet build "iNube.Services.ProductConfiguration.csproj" -c Release -o /app
 FROM build AS publish
 RUN dotnet publish "iNube.Services.ProductConfiguration.csproj" -c Release -o /app
 
-FROM base AS final
+FROM base AS final 
 WORKDIR /app
 COPY --from=publish /app .
 ENTRYPOINT ["dotnet", "iNube.Services.ProductConfiguration.dll"]
