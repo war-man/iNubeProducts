@@ -507,7 +507,7 @@ class InboxClaimProcess extends React.Component {
                         body: JSON.stringify(field)
                     }).then(response => response.json())
                         .then(data => {
-                            this.setState({ responseflag: false });
+                          
                             //this.setState({ responseflag:false});
                             console.log("response: ", data)
                             //      if (data.status == 200) {
@@ -521,12 +521,13 @@ class InboxClaimProcess extends React.Component {
                                 })
                                     .then((willDelete) => {
                                         if (willDelete) {
+                                            this.setState({ responseflag: false });
                                               this.handlepagereload();
                                         }
                                     });
                               //  this.handlepagereload();
                             } else if (data.status == 7) {
-
+                                this.setState({ responseflag: false });
                                 if (data.errors.length > 0) {
                                     swal({
 
@@ -544,7 +545,7 @@ class InboxClaimProcess extends React.Component {
 
                             }
                             else if (data.status == 9) {
-
+                                this.setState({ responseflag: false });
                                 if (data.errors.length > 0) {
                                     swal({
 
@@ -752,6 +753,7 @@ class InboxClaimProcess extends React.Component {
     }
 
     componentDidMount() {
+        this.setstatus({ responseflag: false });
         this.tableshow();
         let claimdecision = "Claims Status";
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + claimdecision + ``, {

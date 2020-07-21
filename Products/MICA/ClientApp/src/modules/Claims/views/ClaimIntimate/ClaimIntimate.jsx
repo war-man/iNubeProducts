@@ -441,20 +441,23 @@ class ClaimIntimate extends React.Component {
                     }).then(response => response.json())
                         .then(data => {
                             console.log("responseData", data);
-                            this.setState({ response:false});
+                         
                             if (data.status == 2) {
                                 this.state.claimId = data.claimId;
                                 this.setState({ docpage: true, claimnumber: data.claimNumber });
                                 swal({
                                     text: "Claim intimated successfully! \n your claim number: " + this.state.claimnumber,
-                                    icon: "success"
-                                }).then(() => {
-                                    this.setState({ redirect: true });
-                                    this.renderRedirect();
+                                    icon: "success",
+                                    buttons: [false, "OK"],
+                                }).then((willDelete) => {
+                                    if (willDelete) {
+                                        this.setState({ redirect: true, response: false });
+                                        this.renderRedirect();
+                                    }
                                 });
                                 // this.setState({ redirect: true });
                             } else if (data.status == 7) {
-
+                                this.setState({ response: false });
                                 if (data.errors.length > 0) {
                                     swal({
 
