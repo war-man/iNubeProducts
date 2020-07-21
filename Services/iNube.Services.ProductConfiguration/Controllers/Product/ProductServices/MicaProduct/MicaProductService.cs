@@ -2013,7 +2013,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return Finalentity;
         }
 
-        //Fetching Relationship=Multiple datas
+        //Fetching datas based on Parentid
         public async Task<List<object>> GetMultipleEntitiesById(int Id, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
