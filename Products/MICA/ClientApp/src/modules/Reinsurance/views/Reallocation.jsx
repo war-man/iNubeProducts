@@ -59,13 +59,16 @@ class Reallocation extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            facadjustrealloc: "",
+            total: 0,
+            facadjustprem: "",
             dynamicList: [],
             indexList: [],
             redirect: false,
             rimasterList: [],
             bkmasterList: [],
             bkbcmasterList: [],
-            bcmasterList:[],
+            bcmasterList: [],
             qoutaflag: false,
             Participantflag: false,
             showparticipantgrid: false,
@@ -81,7 +84,22 @@ class Reallocation extends React.Component {
             QuotaShare: false,
             surplus: false,
             rimappingId: "",
-
+            faclist:[],
+            reallocationparticiant: {
+                ParticipantId: "",
+                ReInsurerId: "",
+                ReinsurerBranchId: "",
+                BrokerId: "",
+                BrokerBranchId: "",
+                Branch: "",
+                Share: "",
+                CommissionRate: "",
+                BrokerageRate: "",
+                Commission: "",
+                Brokerage: "",
+                AllocatedAmount: "",
+                AllocatedPremium: ""
+            },
             Modifydto: {
                 allocationAmount: "",
                 Level: "",
@@ -279,6 +297,26 @@ class Reallocation extends React.Component {
         this.setState({ Data });
         console.log("Data2:", this.state.treatyDTO, this.state.reinsurerCode)
         console.log('data1', this.state.participant)
+        this.state.reallocationparticiant.ReInsurerId = this.state.participant.reInsurerId;
+        this.state.reallocationparticiant.ReinsurerBranchId = this.state.participant.reInsurerBranchId;
+        this.state.reallocationparticiant.BrokerId = this.state.participant.brokerId;
+        this.state.reallocationparticiant.BrokerBranchId = this.state.participant.brokerBranchId;
+        this.state.reallocationparticiant.Share = this.state.participant.sharePercentage;
+        this.state.reallocationparticiant.BrokerageRate = this.state.participant.brokeragePercentage;
+        this.state.reallocationparticiant.CommissionRate = this.state.participant.ricommissionPercentage;
+        console.log("Facvlue", this.state.facadjustrealloc);
+        console.log("Facvlue1", this.state.facadjustprem);
+        console.log("Facvlue2", this.state.participant.sharePercentage);
+        // console.log("Facvlue3", this.state.reallocationparticiant.AllocatedPremium);
+        console.log("Facvlue4", this.state.participant.ricommissionPercentage);
+        console.log("Facvlue5", this.state.participant.brokeragePercentage);
+        console.log('share', this.state.participant.sharePercentage);
+        this.state.reallocationparticiant.AllocatedAmount = ((this.state.facadjustrealloc * (parseInt(this.state.participant.sharePercentage))) / 100).toFixed(2);
+        this.state.reallocationparticiant.AllocatedPremium = ((this.state.facadjustprem * (parseInt(this.state.participant.sharePercentage))) / 100).toFixed(2);
+        this.state.reallocationparticiant.Commission = ((this.state.reallocationparticiant.AllocatedPremium * (this.state.participant.ricommissionPercentage)) / 100).toFixed(2);
+        this.state.reallocationparticiant.Brokerage = ((this.state.reallocationparticiant.AllocatedPremium * (this.state.participant.brokeragePercentage)) / 100).toFixed(2);
+        this.setState({});
+        console.log('data3', this.state.reallocationparticiant);
         if (evt.target.name == 'reInsurerId') {
             //let  temp = this.state.rimasterList[0].mdata.filter(x => x.mID == evt.target.value);
             //  this.state.ddllist = [...this.state.ddllist, ...temp];
@@ -412,7 +450,7 @@ class Reallocation extends React.Component {
         this.dataTable();
     }
     onInputChange2 = (evt, index) => {
-    
+
         //this.state.reallocationlist = this.state.masterList;
 
 
@@ -434,8 +472,8 @@ class Reallocation extends React.Component {
         let TSTotal = 100;
         let TotalSuminsured;
         let TotalPremium;
-        let facadjustamount=0;
-        let facpremium=0;
+        let facadjustamount = 0;
+        let facpremium = 0;
         let qssuminsuared;
         let qspremium;
         let qssuminsuared1;
@@ -444,17 +482,18 @@ class Reallocation extends React.Component {
         let qspremium2;
         let surplusadjustsi;
         let surplusadjustpremium;
+
         //console.log("d", d);
-        let QSTotal = this.state.masterLists.reduce((sum, m) => { if (m.Type == "QS") { return (sum + m.AllocatedAmount) } else { return (sum+0)} }, 0 );
-        let QSPremiumTotal = this.state.masterLists.reduce((sum, m) => { if (m.Type == "QS") { return (sum + m.AllocatedPremium) } else { return (sum+0)} }, 0 );
-        let QSTSTotal = this.state.masterLists.reduce((sum, m) => { if (m.Type == "QS") { return (sum + m.Percentage) } else { return (sum+0)} }, 0 );
+        let QSTotal = this.state.masterLists.reduce((sum, m) => { if (m.Type == "QS") { return (sum + m.AllocatedAmount) } else { return (sum + 0) } }, 0);
+        let QSPremiumTotal = this.state.masterLists.reduce((sum, m) => { if (m.Type == "QS") { return (sum + m.AllocatedPremium) } else { return (sum + 0) } }, 0);
+        let QSTSTotal = this.state.masterLists.reduce((sum, m) => { if (m.Type == "QS") { return (sum + m.Percentage) } else { return (sum + 0) } }, 0);
         console.log("calorieTotal", QSTotal, QSPremiumTotal, QSTSTotal)
 
         let spParcentage = 0;
         this.state.masterLists.map((item, key) => {
             let type = item.Type;
             if (type == "Retention") {
-              
+
                 spParcentage = TSTotal - ((Number(QSTSTotal)) + Number(this.state.reallocationlist.mapDetails[key].Percentage));
                 console.log("spParcentage", this.state.reallocationlist.mapDetails[key].Percentage, spParcentage);
                 caldata = ((this.state.reallocationlist.AllocationAmount * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
@@ -463,11 +502,11 @@ class Reallocation extends React.Component {
                 this.state.reallocationlist.mapDetails[key].AllocatedPremium = calpremium;
             }
             if (this.state.reallocationlist.mapDetails[key].Type == "QS") {
-              
+
                 let limit = item.Limit;
                 let percentage = item.Percentage;
                 if (limit == 0) {
-                   
+
                     this.state.reallocationlist.mapDetails[key].AllocatedAmount = (((this.state.reallocationlist.AllocationAmount - caldata) * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
                     this.state.reallocationlist.mapDetails[key].AllocatedPremium = (((this.state.reallocationlist.PremiumAmount - calpremium) * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
                     console.log(this.state.reallocationlist.mapDetails[key].AllocatedPremium, "qspremium");
@@ -475,25 +514,25 @@ class Reallocation extends React.Component {
                     qspremium = this.state.reallocationlist.mapDetails[key].AllocatedPremium;
                 }
                 if (percentage == 0) {
-                   
+
                     let qslimit = (this.state.reallocationlist.AllocationAmount - caldata);
                     if (qslimit <= item.Limit) {
                         this.state.reallocationlist.mapDetails[key].AllocatedAmount = (this.state.reallocationlist.AllocationAmount - caldata);
                         this.state.reallocationlist.mapDetails[key].AllocatedPremium = (this.state.reallocationlist.PremiumAmount - calpremium);
                     }
                     else {
-                        
+
                         this.state.reallocationlist.mapDetails[key].AllocatedAmount = item.Limit;
                         this.state.reallocationlist.mapDetails[key].AllocatedPremium = item.AllocatedPremium;
                     }
-                   
+
                     qssuminsuared = this.state.reallocationlist.mapDetails[key].AllocatedAmount;
                     qspremium = this.state.reallocationlist.mapDetails[key].AllocatedPremium;
                     //this.state.reallocationlist.mapDetails[key].AllocatedAmount
                     //this.state.reallocationlist.mapDetails[key].AllocatedAmount = this.state.reallocationlist.MapDetails[key].Limit
                     //this.state.reallocationlist.mapDetails[key].AllocatedPremium
                 }
-                if (limit != 0 && percentage!=0)   {
+                if (limit != 0 && percentage != 0) {
                     let qslimit = (this.state.reallocationlist.AllocationAmount - caldata);
                     let availblesuminsured = (((this.state.reallocationlist.AllocationAmount - caldata) * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
                     let availblepremium = (((this.state.reallocationlist.PremiumAmount - calpremium) * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
@@ -505,10 +544,10 @@ class Reallocation extends React.Component {
                         this.state.reallocationlist.mapDetails[key].AllocatedAmount = item.Limit;
                         //this.state.reallocationlist.mapDetails[key].AllocatedPremium = item.AllocatedPremium;
                     }
-                    qssuminsuared= this.state.reallocationlist.mapDetails[key].AllocatedAmount;
+                    qssuminsuared = this.state.reallocationlist.mapDetails[key].AllocatedAmount;
                     qspremium = this.state.reallocationlist.mapDetails[key].AllocatedPremium;
                 }
-                
+
             }
 
             if (this.state.reallocationlist.mapDetails[key].Type == "Surplus") {
@@ -517,18 +556,18 @@ class Reallocation extends React.Component {
                 //deductionPremiumAmount = this.state.reallocationlist.PremiumAmount - (QSPremiumTotal + calpremium);
                 //this.state.reallocationlist.mapDetails[key].AllocatedPremium = deductionPremiumAmount / SPcount;
                 //this.state.reallocationlist.mapDetails[key].Percentage = spParcentage / SPcount;
-                this.state.reallocationlist.mapDetails[key].AllocatedAmount = (( caldata * this.state.reallocationlist.mapDetails[key].NoOfLines) / 100);
+                this.state.reallocationlist.mapDetails[key].AllocatedAmount = ((caldata * this.state.reallocationlist.mapDetails[key].NoOfLines) / 100);
                 this.state.reallocationlist.mapDetails[key].AllocatedPremium = ((calpremium * this.state.reallocationlist.mapDetails[key].NoOfLines) / 100);
                 surplusadjustsi = this.state.reallocationlist.mapDetails[key].AllocatedAmount;
                 surplusadjustpremium = this.state.reallocationlist.mapDetails[key].AllocatedPremium;
-                console.log("deductionAmount", deductionAmount, deductionPremiumAmount, spParcentage,this.state.reallocationlist.mapDetails[key].AllocatedAmount)
+                console.log("deductionAmount", deductionAmount, deductionPremiumAmount, spParcentage, this.state.reallocationlist.mapDetails[key].AllocatedAmount)
             }
             //if (this.state.reallocationlist.mapDetails[key].Type == "FAC" && qssuminsuared != undefined && qspremium != undefined && surplusadjustsi != undefined && surplusadjustpremium!=undefined) {
             //    debugger;
-              
+
             //}
-           
-           
+
+
         });
         let FACindex = this.state.reallocationlist.mapDetails.findIndex(s => s.Type == "FAC")
         if (FACindex != -1) {
@@ -541,6 +580,14 @@ class Reallocation extends React.Component {
             console.log(facpremium, 'fac2');
             console.log("deductionAmount", deductionAmount, this.state.reallocationlist.mapDetails)
             console.log("calculatedValue", caldata, this.state.masterLists);
+            this.state.facadjustrealloc = facadjustamount;
+            this.state.facadjustprem = facpremium;
+            this.setState({})
+            console.log('fac111', this.state.facadjustrealloc, this.state.facadjustprem);
+            //this.state.reallocationparticiant.AllocatedAmount = ((facadjustamount * 100) / (this.state.reallocationparticiant.Share));
+            //this.state.reallocationparticiant.AllocatedPremium = ((facpremium * 100) / (this.state.reallocationparticiant.Share));
+            //this.state.reallocationparticiant.Commission = ((this.state.reallocationparticiant.AllocatedPremium * 100) / (this.state.reallocationparticiant.CommissionRate));
+            //this.state.reallocationparticiant.Brokerage = ((this.state.reallocationparticiant.AllocatedPremium * 100) / (this.state.reallocationparticiant.BrokerageRate));
         }
         //this.state.reallocationlist.mapDetails[key].AllocatedAmount = caldata;
         //this.state.reallocationlist.mapDetails[key].AllocatedPremium = calpremium;
@@ -727,7 +774,7 @@ class Reallocation extends React.Component {
                     if (item.Type == "QS") {
                         item.AllocatedAmount = "";
                         item.AllocatedPremium = "";
-                       
+
                     }
                     if (item.Type == "FAC") {
                         //item.AllocatedAmount = "";
@@ -748,6 +795,16 @@ class Reallocation extends React.Component {
         //this.setState({ masterList });
         console.log("masterdata1", this.state.masterLists);
     }
+
+    //    checkAdult = (item) => {
+    //        if(item.Type == "FAC")
+    //        {
+    //            item.participant.push(this.state.reallocationparticiant)
+    //}
+    //    }
+
+
+
     onFormUpdate = () => {
         debugger;
         this.state.Modifydto.mappingId = this.state.reallocationlist.MappingId;
@@ -755,32 +812,81 @@ class Reallocation extends React.Component {
         this.state.Modifydto.premium = this.state.reallocationlist.PremiumAmount;
         this.state.Modifydto.policyNo = this.state.reallocationlist.PolicyNumber;
         this.state.Modifydto.Level = this.state.reallocationlist.Level;
-        this.state.Modifydto.allocationDetails = JSON.stringify(this.state.reallocationlist);
-        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/ModifyReAllocation?MappingId=` + this.state.reallocationlist.MappingId, {
-            method: 'PUT',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-            body: JSON.stringify(this.state.Modifydto)
-        })//.then(response => response.json())
-            .then(data => {
-                swal({
-                    //text: data.responseMessage,
-                    text: "data Reallocated successfully",
-                    icon: "success"
-                });
-                this.setState({ Retention: data });
-                console.log(data, 'Mydata')
-                console.log("Accountss data: ", data);
+        this.state.reallocationlist.mapDetails.map((item, key) => {
+            if (item.Type == "FAC") {
+                item.participants = this.state.faclist;
+            }
+        });
+        //var previos = parseInt(this.state.treatyDTO.tblParticipant[0].sharePercentage);
+        //if (this.state.treatyDTO.tblParticipant.length - 1 < 1) {
+        //    this.state.total = parseInt(this.state.treatyDTO.tblParticipant[0].sharePercentage)
+        //}
+        //for (let j = 0; j < this.state.treatyDTO.tblParticipant.length - 1; j++) {
+        //    debugger;
+        //    var current = parseInt(this.state.treatyDTO.tblParticipant[j].sharePercentage);
+        //    var data = previos + parseInt(this.state.treatyDTO.tblParticipant[j + 1].sharePercentage);
+        //    previos = data;
+        //    console.log(data, "data1");
+        //    this.state.total = data;
+        //    console.log(this.state.total, 'total1')
+        //}
 
-            });
+        console.log("facjson", this.state.reallocationlist);
+        this.state.Modifydto.allocationDetails = JSON.stringify(this.state.reallocationlist);
+        //this.state.allocationDetails.mapDetails.map((item, key) => {
+        //    if (item.Type == "FAC") {
+        //        item.participants.push(this.state.reallocationparticiant)
+        //    }
+        //});
+       
+            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/ModifyReAllocation?MappingId=` + this.state.reallocationlist.MappingId, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(this.state.Modifydto)
+            })//.then(response => response.json())
+                .then(data => {
+                    swal({
+                        //text: data.responseMessage,
+                        text: "data Reallocated successfully",
+                        icon: "success"
+                    });
+                    this.setState({ Retention: data });
+                    console.log(data, 'Mydata')
+                    console.log("Accountss data: ", data);
+
+                });
+        
+        
+            
     }
     AddParticipant = () => {
-        this.state.treatyDTO.tblParticipant.push(this.state.participant);
-        this.state.participantdto.push(this.state.participantdetail);
+        let partdetailcopy = JSON.parse(JSON.stringify(this.state.participant));
+        this.state.treatyDTO.tblParticipant.push(partdetailcopy);
+        let partcopy = JSON.parse(JSON.stringify(this.state.participantdetail));
+        this.state.participantdto.push(partcopy);
+        
+        let copyfac = JSON.parse(JSON.stringify(this.state.reallocationparticiant));
 
+        this.state.faclist.push(copyfac);
+        this.state.reallocationparticiant = {
+            ParticipantId: "",
+            ReInsurerId: "",
+            ReinsurerBranchId: "",
+            BrokerId: "",
+            BrokerBranchId: "",
+            Branch: "",
+            Share: "",
+            CommissionRate: "",
+            BrokerageRate: "",
+            Commission: "",
+            Brokerage: "",
+            AllocatedAmount: "",
+            AllocatedPremium: ""
+        };
         this.state.participant = {
             "reInsurerId": "",
             "brokername": "",
@@ -1189,28 +1295,28 @@ class Reallocation extends React.Component {
                                         />
                                         </GridItem>
 
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="ReAllocated SI"
-                                        name="AllocationAmount"
-                                        value={this.state.reallocationlist.mapDetails[key].AllocatedAmount}
-                                        disabled={true}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="ReAllocated Premium"
-                                        name="AllocatedPremium"
-                                        disabled={true}
-                                        value={this.state.reallocationlist.mapDetails[key].AllocatedPremium}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="ReAllocated SI"
+                                            name="AllocationAmount"
+                                            value={this.state.reallocationlist.mapDetails[key].AllocatedAmount}
+                                            disabled={true}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="ReAllocated Premium"
+                                            name="AllocatedPremium"
+                                            disabled={true}
+                                            value={this.state.reallocationlist.mapDetails[key].AllocatedPremium}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
                                     </GridContainer>
 
                                     <GridContainer justify="center">
@@ -1382,39 +1488,39 @@ class Reallocation extends React.Component {
                                                 fullWidth: true
                                             }}
                                         />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="Adjustment %"
-                                        name="NoOfLines"
-                                        value={this.state.reallocationlist.mapDetails[key].NoOfLines}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="ReAllocated SI"
-                                        name="AllocationAmount"
-                                        value={this.state.reallocationlist.mapDetails[key].AllocatedAmount}
-                                        //disabled={true}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="ReAllocated Premium"
-                                        name="AllocatedPremium"
-                                        //disabled={true}
-                                        value={this.state.reallocationlist.mapDetails[key].AllocatedPremium}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Adjustment %"
+                                            name="NoOfLines"
+                                            value={this.state.reallocationlist.mapDetails[key].NoOfLines}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="ReAllocated SI"
+                                            name="AllocationAmount"
+                                            value={this.state.reallocationlist.mapDetails[key].AllocatedAmount}
+                                            //disabled={true}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="ReAllocated Premium"
+                                            name="AllocatedPremium"
+                                            //disabled={true}
+                                            value={this.state.reallocationlist.mapDetails[key].AllocatedPremium}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
 
                                     </GridContainer>
 
@@ -1504,7 +1610,7 @@ class Reallocation extends React.Component {
                             </GridContainer>}
 
                     </div>);
-                   
+
                 })}
                 {this.state.qoutaflag && this.state.masterLists.map((item, key) => {
 
@@ -1525,67 +1631,148 @@ class Reallocation extends React.Component {
                                 <CardBody>
                                     <GridContainer>
 
-                                     
+
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Retention Allocation SI"
                                             name="AllocatedAmount"
-                                        disabled={true}
-
-                                        value={this.state.reallocationlist.mapDetails[key].AllocatedAmount}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                            formControlProps={{
-                                                fullWidth: true
-                                            }}
-                                        />
-                                    </GridItem>
-                                      
-                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                            labelText="Premium Amount"
-                                            name="AllocatedPremium"
                                             disabled={true}
-                                        value={this.state.reallocationlist.mapDetails[key].AllocatedPremium}
-                                        onChange={(e) => this.onInputChange2(e, key)}
+
+                                            value={this.state.reallocationlist.mapDetails[key].AllocatedAmount}
+                                            onChange={(e) => this.onInputChange2(e, key)}
                                             formControlProps={{
                                                 fullWidth: true
                                             }}
                                         />
                                         </GridItem>
-                                   
 
-                                 
-                                
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Premium Amount"
+                                            name="AllocatedPremium"
+                                            disabled={true}
+                                            value={this.state.reallocationlist.mapDetails[key].AllocatedPremium}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
 
-                                   
-                                
-                                   
 
-                                </GridContainer>
-                                <GridContainer>
-                                <GridItem xs={3} sm={3} md={3}>
-                                    <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.handleParticipant()}>AddParticipant</Button>
 
-                                    </GridItem>
-                                </GridContainer>
-                            </CardBody>
-                            {this.state.Participantflag &&
-                                <CardBody>
-                                <AddParticipant AddParticipant={this.AddParticipant} TreatytableData={this.state.TreatytableData} participantstableData={this.state.participantstableData} participantdata={this.state.participantdata} bkmasterList={this.state.bkmasterList} masterList={this.state.masterList} onddlChange={this.onddlChange} participant={this.state.participant} newdata={this.state.newdata}
-                                    onddChange={this.onddChange} onparticipantInputChange={this.onparticipantInputChange} AddParticipant={this.AddParticipant} Brokerageflag={this.state.Brokerageflag} showparticipantgrid={this.state.showparticipantgrid} treatyDTO={this.state.treatyDTO} rimasterList={this.state.rimasterList} bcmasterList={this.state.bcmasterList} bkbcmasterList={this.state.bkbcmasterList} reinsurername={this.state.reinsurername} />
-                                {this.state.showparticipantgrid ? <ParticipantGrid deleteParticipantRecord={this.deleteParticipantRecord} participantdata={this.state.participantdata} participantstableData={this.state.participantstableData} newdata={this.state.newdata} /> : null}
 
+
+
+
+
+
+                                    </GridContainer>
+                                    <GridContainer>
+                                        <GridItem xs={3} sm={3} md={3}>
+                                            <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.handleParticipant()}>AddParticipant</Button>
+
+                                        </GridItem>
+                                    </GridContainer>
+                                    <GridContainer justify="center">
+                                        <GridItem xs={3} sm={3} md={3}>
+                                            <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.onChangeTreaty(key)}>ParticipantDetails</Button>
+
+                                        </GridItem>
+
+                                    </GridContainer>
                                 </CardBody>
+                                {this.state.Participantflag &&
+                                    <CardBody>
+                                        <AddParticipant AddParticipant={this.AddParticipant} TreatytableData={this.state.TreatytableData} participantstableData={this.state.participantstableData} participantdata={this.state.participantdata} bkmasterList={this.state.bkmasterList} masterList={this.state.masterList} onddlChange={this.onddlChange} participant={this.state.participant} newdata={this.state.newdata}
+                                            onddChange={this.onddChange} onparticipantInputChange={this.onparticipantInputChange} AddParticipant={this.AddParticipant} Brokerageflag={this.state.Brokerageflag} showparticipantgrid={this.state.showparticipantgrid} treatyDTO={this.state.treatyDTO} rimasterList={this.state.rimasterList} bcmasterList={this.state.bcmasterList} bkbcmasterList={this.state.bkbcmasterList} reinsurername={this.state.reinsurername} />
+                                        {this.state.showparticipantgrid ? <ParticipantGrid deleteParticipantRecord={this.deleteParticipantRecord} participantdata={this.state.participantdata} participantstableData={this.state.participantstableData} newdata={this.state.newdata} /> : null}
+
+                                    </CardBody>
+
                                 }
 
                             </Card>
-                            
-                        }
 
+                        }
+                        {
+                            item.Type == "FAC" &&
+                            (this.state.indexList.findIndex(s => s == key) != -1 ? true : false) &&
+                            <GridContainer xl={12}>
+                                <GridItem lg={12}>
+
+
+
+                                    <ReactTable
+                                        title={"Participant Details"}
+                                        data={item.participants}
+                                        filterable
+                                        columns={[
+                                            {
+                                                Header: "Reinsurer",
+                                                accessor: "ReInsurerId",
+                                                Width: "20px"
+
+                                            },
+                                            {
+                                                Header: "Broker",
+                                                accessor: "BrokerId",
+                                                Width: "20px"
+
+                                            },
+                                            {
+                                                Header: "Share",
+                                                accessor: "Share",
+
+                                            },
+                                            {
+                                                Header: "Amount",
+                                                accessor: "AllocatedAmount",
+                                                //Width: "10px"
+                                            },
+                                            {
+                                                Header: "Premium",
+                                                accessor: "AllocatedPremium",
+                                                //Width: "20px"
+                                            },
+                                            {
+                                                Header: "Brokerage",
+                                                accessor: "Brokerage",
+                                                //Width: "10px"
+                                            },
+                                            {
+                                                Header: "Commission",
+                                                accessor: "Commission",
+                                                //Width: "10px"
+                                            }
+
+                                        ]}
+                                        defaultPageSize={5}
+                                        showPaginationTop={false}
+                                        showPaginationBottom
+                                        //pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
+                                        //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                        className="-striped -highlight"
+                                    />
+
+
+                                </GridItem>
+
+
+                                <Paper className={classes.root} style={{ marginLeft: '75px', marginRight: '75px' }} >
+
+
+                                </Paper>
+
+
+
+
+
+                            </GridContainer>}
 
                     </div>);
 
 
                 })}
-                
+
             </div>
         );
     }
