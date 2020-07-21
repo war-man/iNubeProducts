@@ -208,7 +208,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
 
                 leadDTO = _mapper.Map<LeadDTO>(lead);
 
-                return new LeadResponse { Status = BusinessStatus.Created, product = leadDTO, ResponseMessage = $"Lead  Saved successfully ! \n Product ID: {leadDTO.ContactID}" };
+                return new LeadResponse { Status = BusinessStatus.Created, product = leadDTO, ResponseMessage = $"Lead  Saved successfully ! \n Contact ID: {leadDTO.ContactID}" };
 
             }
 
@@ -424,7 +424,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
 
             var leaddto = _mapper.Map<LeadDTO>(lead);
             //return leaddto;
-            return new LeadResponse { Status = BusinessStatus.Created, product = leaddto, ResponseMessage = $"Lead  modified successfully ! \n Product ID: {leaddto.ContactID}" };
+            return new LeadResponse { Status = BusinessStatus.Created, product = leaddto, ResponseMessage = $"Lead  modified successfully ! \n Contact ID: {leaddto.ContactID}" };
 
         }
 

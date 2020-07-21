@@ -203,7 +203,9 @@ class Lead extends React.Component {
                 }
                 {
                     this.state.ShowPool &&
-                    <LeadPool />
+                    <LeadPool // isShowLead1={true}
+
+                    />
                 }
 
 

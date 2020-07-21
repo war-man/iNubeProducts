@@ -53,7 +53,7 @@ class NeedAnalysCompleted extends React.Component {
         super(props);
         this.state = {
             dataRows: [],
-
+            isShowLeadPoolHeadr: false,
             editModal: false,
             btnvisibility: false,
             disabled: false,
@@ -91,6 +91,7 @@ class NeedAnalysCompleted extends React.Component {
                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
 
                         <CommonModify isShowGrid={true} type={this.state.type}
+                            isShowLeadPoolHeadr={false}
                             isShowCreateLead={this.state.isShowCreateLead} />
 
 

@@ -52,7 +52,7 @@ class ConfirmProspect extends React.Component {
         super(props);
         this.state = {
             dataRows: [],
-           
+            isDntShowLeadPoolHeadr: false,
             editModal: false,
             btnvisibility: false,
             disabled: false,
@@ -88,15 +88,16 @@ class ConfirmProspect extends React.Component {
                 </CardHeader>
 
                     </Card>
-
+                    <CardBody>
                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
 
                         <CommonModify isShowGrid={true} type={this.state.type}
+                            isDntShowLeadPoolHeadr={false}
                             isShowCreateLead={this.state.isShowCreateLead} />
 
 
                     </Animated>
-                  
+                        </CardBody>
                
                 </GridItem>
 
