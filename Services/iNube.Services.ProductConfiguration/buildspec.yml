@@ -15,11 +15,6 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - apt-get update && apt-get install -y curl 
-      - curl -Iv google.com 
-      - curl -Iv https://api.nuget.org/v3-flatcontainer/inube.utility.framework/index.json
-      - docker network ls
-      - docker info
       - docker build -t $REPOSITORY_URI:productlatest Services/iNube.Services.ProductConfiguration
       - docker tag $REPOSITORY_URI:productlatest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
