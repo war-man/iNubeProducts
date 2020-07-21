@@ -25,7 +25,9 @@ import CardHeader from "components/Card/CardHeader.jsx";
 import CardText from "components/Card/CardText.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
 import CardBody from "components/Card/CardBody.jsx";
-import ReactTable from "react-table";
+//import ReactTable from "react-table";
+import ReactTable from "components/MuiTable/MuiTable.jsx";
+
 import regularFormsStyle from "assets/jss/material-dashboard-pro-react/views/regularFormsStyle";
 
 import FormControl from "@material-ui/core/FormControl";
