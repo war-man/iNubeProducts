@@ -752,7 +752,6 @@ class InboxClaimProcess extends React.Component {
 
     }
 
-
     componentDidMount() {
      
         this.tableshow();

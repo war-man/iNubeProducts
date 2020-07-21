@@ -390,7 +390,6 @@ class ClaimIntimate extends React.Component {
     };
 
 
-
     onFormSubmit = (evt) => {
         this.state.validateUI = false;
         this.state.ValidationUI = true;

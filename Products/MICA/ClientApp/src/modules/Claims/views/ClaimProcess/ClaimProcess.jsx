@@ -853,7 +853,6 @@ class ClaimProcess extends React.Component {
         this.setState({ datamodel, responseflag: false  });
         console.log("datamodel ", datamodel);
     }
-
    
 
 
