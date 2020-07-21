@@ -1025,7 +1025,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             throw new NotImplementedException();
         }
-        public async Task<List<object>> GetEntitiesById(int Id, string relation, ApiContext apiContext)
+        public async Task<List<object>> GetRelationEntitiesById(int Id, string relation, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

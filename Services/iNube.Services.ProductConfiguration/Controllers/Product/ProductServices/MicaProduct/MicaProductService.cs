@@ -1980,18 +1980,19 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return Finalentity;
         }
 
-        public async Task<List<object>> GetEntitiesById(int Id, string relation, ApiContext apiContext)
+        //Fetching data based on Relationship
+        public async Task<List<object>> GetRelationEntitiesById(int Id, string relation, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.EntityId == Id && a.Relationship == relation)
+            var data = _context.TblEntityDetails.Where(a => a.ParentId == Id && a.Relationship == relation)
                 .Include(a => a.TblEntityAttributes)
                 .Select(a => a).ToList();
             var componentType = _context.TblmasDynamic.Select(a => a);
 
             var result = _mapper.Map<List<EntityDetailsDTO>>(data);
             List<object> Finalentity = new List<object>();
-            _logger.LogRequest("TblEntityDetails", "GetEntitiesById", "Product", Guid.NewGuid().ToString(), null, apiContext);
+            _logger.LogRequest("TblEntityDetails", "GetRelationEntitiesById", "Product", Guid.NewGuid().ToString(), null, apiContext);
             foreach (var item in result)
             {
                 List<object> attributelist = new List<object>();
@@ -2007,7 +2008,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
                 //attributelist.AddRange(list);
                 Finalentity.Add(result);
-                var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, relation, apiContext);
+                //var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, relation, apiContext);
             }
             return Finalentity;
         }

@@ -551,9 +551,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetEntitiesById(int Id, string relation)
+        public async Task<IActionResult> GetRelationEntitiesById(int Id, string relation)
         {
-            var response = await _productService.GetEntitiesById(Id, relation, Context);
+            var response = await _productService.GetRelationEntitiesById(Id, relation, Context);
             return Ok(response);
         }
 
