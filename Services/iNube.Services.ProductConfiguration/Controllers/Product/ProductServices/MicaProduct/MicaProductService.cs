@@ -2067,7 +2067,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     }
 
                     //list.AddRange(attributes);
-                    Finalentity.Add(item);
+                    Finalentity.Add(result);
 
                     //var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, relationship, apiContext);
                 }
