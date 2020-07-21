@@ -919,9 +919,18 @@ namespace iNube.Services.MicaExtension_EGI.Models
         {
             VehicleDetails = new List<VehicleDetails>();
         }
-        public int ActivePC { get; set; }
-        public int ActiveTW { get; set; }
+        public int ActivePCCount { get; set; }
+        public int ActiveTWCount { get; set; }
+        public dynamic SwitchLogsData { get; set; }
         public List<VehicleDetails> VehicleDetails { get; set; }
+    }
+
+    public partial class ADCalculateDTO : ResponseStatus
+    {
+        public decimal AdPerDayAmount { get; set; }
+        public decimal AdPerDayFromTaxAmount { get; set; }
+        public decimal AdPerDayToTaxAmount { get; set; }
+        public decimal AdTotalAmount { get; set; }
     }
 
 }
