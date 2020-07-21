@@ -32,6 +32,11 @@ import { Redirect } from 'react-router-dom';
 import FiberManualRecord from "@material-ui/icons/FiberManualRecord";
 import Radio from "@material-ui/core/Radio";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import LeadAccordian from "./LeadAcordian.jsx";
+import LeadPool from "./LeadPool.jsx";
+import Accordion from "components/Accordion/Accordion.jsx";
+import NeedAnalysis from "modules/NewBusiness/Prospect/NeedAnalysis.jsx";
+import LeadInformation from "modules/NewBusiness/Lead/LeadInformation.jsx";
 
 
 
@@ -74,6 +79,12 @@ class CommonModify extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            datename: [],
+            datetime: [],
+            datetemp: [],
+            isDntShowLeadPoolHeadr: true,
+            isShowLead1: true,
+            isDontShowLeadAccordian: true,
             redirectL: false,
             isDontShowCreateLead: true,
             isDontShowCreateLeadBtn: true,
@@ -220,8 +231,11 @@ class CommonModify extends React.Component {
             type: "",
 
         }
+        this.state.isDntShowLeadPoolHeadr = props.isShowLeadPoolHeadr;
+        this.state.isDontShowLeadAccordian = props.isShowLeadAccordian;
         this.state.isDontShowCreateLead = props.isShowCreateLead;
         this.state.isDontShowGrid = props.isShowGrid;
+        this.state.isDontShowCreateLeadBtn = props.isShowCreateLeadBtn;
         this.state.isDontShow = props.isShow;
         this.state.isDontShowQtnBtn = props.isShowQtnBtn;
         this.state.isDntShowQtnRadioBtn = props.isShowQtnRadioBtn;
@@ -231,7 +245,7 @@ class CommonModify extends React.Component {
 
 
     GetLocationService = (type, pID) => {
-       
+
         fetch(`${NewBusinessConfig.NewBusinessConfigUrl}/api/Lead/GetLocation?locationType=` + type + `&parentID=` + pID, {
             // fetch(`https://localhost:44347/api/Lead/GetLocation?locationType=` + type + `&parentID=` + pID, {
 
@@ -252,17 +266,20 @@ class CommonModify extends React.Component {
             });
     };
 
+
+
+
     onDateChange = (format, name, event) => {
         debugger
         var today = event.toDate();
-        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-      //  var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
+       // var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+        var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
         var date2 = new Date();
         var date1 = new Date(today);
         let Lead = this.state.LeadDTO[0];
         Lead[name] = date;
         if (name == "dateOfBirth") {
-           
+
             var ageDifMs = Date.now() - date1.getTime();
             var ageDate = new Date(ageDifMs);
             var age = Math.abs(ageDate.getUTCFullYear() - 1970);
@@ -272,7 +289,31 @@ class CommonModify extends React.Component {
             console.log("datediff", age, ageDate);
         }
         this.setState({ Lead });
+        const LeadDateDTO = this.state.LeadDTO[0];
+        LeadDateDTO[name] = date;
+        this.setState({ LeadDateDTO });
+        if (this.state.datename.length == 0) {
+            this.state.datename.push(name);
+            this.state.datetemp.push(date);
+            this.state.datetime.push(this.datechange(date));
+        } else {
+            for (var i = 0; i <= this.state.datetime.length - 1; i++) {
+                if (this.state.datename[i] !== name) {
+                    this.state.datename.push(name);
+                    this.state.datetemp.push(date);
+                    this.state.datetime.push(this.datechange(date));
+                }
+            }
+        }
 
+    }
+
+
+    datechange = (date) => {
+        const _date = date.split('/');
+        const dateObj = { month: _date[1], year: _date[2], day: _date[0] };
+
+        return dateObj.year + '-' + dateObj.month + '-' + dateObj.day;
     }
 
     GetLocation = (type, event) => {
@@ -312,7 +353,7 @@ class CommonModify extends React.Component {
 
 
         this.GetLocationService('Country', 0);
-        
+
         console.log('mount-- ', this.props);
         if (this.props.type != undefined) {
             this.state.type = this.props.type;
@@ -346,8 +387,8 @@ class CommonModify extends React.Component {
                     if (data[0] !== null) {
                         debugger
                         this.setState({ addressDTO: data[0].address });
-                      this.GetLocationService('Country', 0);
-                        
+                        this.GetLocationService('Country', 0);
+
                     }
                     console.log("address", this.state.addressDTO);
                 });
@@ -477,8 +518,8 @@ class CommonModify extends React.Component {
         debugger
         let addressdto = [];
         this.setState({ open: true });
-                fetch(`${NewBusinessConfig.NewBusinessConfigUrl}/api/Lead/LoadSuspectInformation?ContactID=` + contactid, {
-                                    //  fetch(`https://localhost:44347/api/Lead/LoadSuspectInformation?ContactID=` + contactid, {
+        fetch(`${NewBusinessConfig.NewBusinessConfigUrl}/api/Lead/LoadSuspectInformation?ContactID=` + contactid, {
+            //  fetch(`https://localhost:44347/api/Lead/LoadSuspectInformation?ContactID=` + contactid, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -494,9 +535,12 @@ class CommonModify extends React.Component {
 
                 if (data[0] !== null) {
                     this.setState({ addressDTO: data[0].address });
-                   
-                 
+
+
                     if (this.state.addressDTO.countryId != null) {
+
+
+                        this.state.LeadDTO[0].dateOfBirth = new Date(data[0].dateOfBirth).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
                         let addr = this.state.addressDTO;
 
 
@@ -516,9 +560,16 @@ class CommonModify extends React.Component {
                 }
                 console.log("address", this.state.addressDTO);
                 console.log("addressDTO1", this.state.addressDTO1);
+                this.setState({
+                    isDontShowLeadAccordian: true, isDontShowLead1: false, isDontShowGrid: false,
+                });
+                console.log("isDontShowLead1", this.state.isDontShowLead1);
             });
-        this.setState({ isDontShowCreateLead: true, isDontShowGrid: false, isDontShow: true, isDontShowCreateLeadBtn: false });
+        //previous Edit
+        //this.setState({ isDontShowCreateLead: true, isDontShowGrid: false, isDontShow: true, isDontShowCreateLeadBtn: false });
+        //this.setState({ isDontShowLeadAccordian: true, isDontShowLead1: false, isDontShowCreateLead: false, isDontShowGrid: false, isDontShow: false, isDontShowCreateLeadBtn: false});
 
+        //  console.log("isDontShowLead1", this.state.isDontShowLead1, this.props.isDontShowLead1);
     }
 
 
@@ -592,6 +643,7 @@ class CommonModify extends React.Component {
         this.setState({ [event.target.name]: event.target.value });
     };
     SetValue = (type, event) => {
+     
         let LeadDTO = this.state.LeadDTO;
         let name = event.target.name;
         let value = event.target.value;
@@ -636,6 +688,7 @@ class CommonModify extends React.Component {
                 });
         }
     }
+
     SetaddressValue = ((type, event) => {
         let addressDTO = this.state.addressDTO;
         let name = event.target.name;
@@ -653,8 +706,12 @@ class CommonModify extends React.Component {
         let add = [];
         add.push(this.state.addressDTO);
         leaddto.address = this.state.addressDTO;
+        //date
+        for (var i = 0; i <= this.state.datename.length - 1; i++) {
 
-
+            this.state.LeadDateDTO[this.state.datename[i]] = this.state.datetime[i];
+        }
+        //
         console.log("leaddto", this.state.LeadDTO);
         console.log("DntShwFlag", this.state.isDontShow, this.state.errormessage);
         var data = {
@@ -663,6 +720,7 @@ class CommonModify extends React.Component {
             'gender': this.state.LeadDTO[0].gender,
             'maritalStatusID': this.state.LeadDTO[0].maritalStatusID,
             'dateOfBirth': this.state.LeadDTO[0].dateOfBirth,
+          
             'age': this.state.LeadDTO[0].age,
             'address1': this.state.addressDTO.address1, 'address2': this.state.addressDTO.address2,
             'countryId': this.state.addressDTO.countryId, 'stateId': this.state.addressDTO.stateId,
@@ -671,7 +729,7 @@ class CommonModify extends React.Component {
         }; console.log("Check", this.state.addressDTO)
         if (this.state.LeadDTO[0].nicno != null && this.state.LeadDTO[0].emailID != null && this.state.LeadDTO[0].gender != null && this.state.LeadDTO[0].maritalStatusID != null && this.state.LeadDTO[0].dateOfBirth != null && this.state.LeadDTO[0].age != null &&
             this.state.addressDTO.address1 != null && this.state.addressDTO.address2 != null && this.state.addressDTO.countryId != null && this.state.addressDTO.stateId != null && this.state.addressDTO.districtId != null && this.state.addressDTO.cityId != null && this.state.addressDTO.areaId != null) {
-            
+
             fetch(`${NewBusinessConfig.NewBusinessConfigUrl}/api/Lead/ModifySuspect`, {
                 method: 'POST',
                 body: JSON.stringify(this.state.LeadDTO[0]),
@@ -697,6 +755,7 @@ class CommonModify extends React.Component {
                         // this.setState({ addressDTO: data.address });
                         // this.setState({ LocationDTO: data.address });
                         console.log('address server:', data);
+                        this.setState({ redirectL: true });
                         this.setState({ errormessage: false });
                     } else if (data.status == 8) {
 
@@ -787,16 +846,99 @@ class CommonModify extends React.Component {
         const props = this.props;
 
         return (
-            <GridContainer xl={12}>
+            <GridContainer>
+                {
+                    this.state.isDntShowLeadPoolHeadr &&
+
+                    <GridItem xs={12} sm={12} md={12}>
+                        <Card >
+                            <CardHeader color="rose" icon>
+                                <CardIcon color="rose">
+                                    <Icon><img id="icon" src={leadPool} /></Icon>
+                                </CardIcon>
+                                {
+                                    <h4 >
+                                        <small> Lead Pool </small>
+                                    </h4>
+                                }
+                            </CardHeader>
+
+                        </Card>
+                    </GridItem>
+                }
                 {
                     this.state.isDontShowGrid &&
+                    <GridContainer>
+                        <GridItem xs={12} sm={12} md={12}>
+
+                            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                <LeadGrid newdata={this.state.newdata} isDontShowQtnBtn={this.state.isDontShowQtnBtn}
+                                    CreateQuoteFun={this.CreateQuoteFun}
+                                />
+                            </Animated>
+
+                        </GridItem>
+                    </GridContainer>
+                }
 
 
-                    <LeadGrid newdata={this.state.newdata} isDontShowQtnBtn={this.state.isDontShowQtnBtn}
-                        CreateQuoteFun={this.CreateQuoteFun}
 
-                    />
+                {
+                    this.state.isDontShowLeadAccordian &&
+                    <GridContainer>
+                        <GridItem xs={12} sm={12} md={12}>
 
+
+
+                            <CardBody>
+
+                                <Accordion
+
+                                    // active={0}
+                                    collapses={[
+                                        {
+                                            title: "Lead Information",
+                                            content: <LeadInformation LeadDTO={this.state.LeadDTO} SetValue={this.SetValue}
+                                                errormessage={this.state.errormessage} isDontShow={true} masterList={this.state.masterList}
+                                                onDateChange={this.onDateChange} selectedValue={this.state.selectedValue}
+                                                handleRadioChangeT={this.handleRadioChangeT} SetaddressValue={this.SetaddressValue}
+                                                addressDTO={this.state.addressDTO} LocationDTO={this.state.LocationDTO} GetLocation={this.GetLocation}
+                                                modifySuspect={this.modifySuspect} isDontShowCreateLeadBtn={false}
+
+                                                nicnoState={this.state.nicnoState} firstNameState={this.state.firstNameState} lastNameState={this.state.lastNameState}
+                                                mobileNoState={this.state.mobileNoState} phoneNoState={this.state.phoneNoState} workState={this.state.workState}
+                                                emailIDState={this.state.emailIDState} placeState={this.state.placeState} passportNoState={this.state.passportNoState}
+                                                dateOfBirthState={this.state.dateOfBirthState} ageState={this.state.ageState} occupationIDState={this.state.occupationIDState}
+                                                monthlyIncomeState={this.state.monthlyIncomeState} address1State={this.state.address1State} address2State={this.state.address2State}
+                                                address3State={this.state.address3State}
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                            />
+
+                                        },
+                                        {
+                                            title: "Need Analysis",
+                                            content: <NeedAnalysis />
+                                        }
+
+                                    ]}
+
+                                />
+
+                            </CardBody>
+
+
+                        </GridItem>
+                    </GridContainer>
 
                 }
 
@@ -804,8 +946,7 @@ class CommonModify extends React.Component {
                 {
                     this.state.isDontShowCreateLead &&
 
-                    <Card>
-                   
+                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                         <CardBody>
                             <GridContainer >
 
@@ -813,7 +954,7 @@ class CommonModify extends React.Component {
                                     <CustomInput
                                         success={this.state.nicnoState === "success"}
                                         error={this.state.nicnoState === "error"}
-                                       // labelText="Emirates ID"
+                                        // labelText="Emirates ID"
                                         labelText="Identification No"
                                         id="emiratesId"
                                         name="nicno"
@@ -1051,7 +1192,7 @@ class CommonModify extends React.Component {
                                         {this.state.errormessage && this.state.isDontShow && (this.state.LeadDTO[0].maritalStatusID == "") ? <p className="error">
                                             This Field is Required</p> : null}
                                     </GridItem>
-                           
+
                                     <GridItem xs={12} sm={12} md={3}>
                                         <CustomDatetime
                                             required={true}
@@ -1393,11 +1534,12 @@ class CommonModify extends React.Component {
 
                         </CardBody>
 
-                  
+                    </Animated>
 
 
 
-                    </Card>
+
+
 
                 }  {this.renderRedirectL()}
                 {this.renderRedirect()}

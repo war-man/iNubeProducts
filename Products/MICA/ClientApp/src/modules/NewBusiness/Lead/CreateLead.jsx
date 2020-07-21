@@ -54,6 +54,7 @@ class CreateLead extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            isShowCreateLeadBtn: true,
             selectedValue: null,
             isShow: false,
             masterList: [],
@@ -174,16 +175,17 @@ class CreateLead extends React.Component {
                     </CardHeader>
               
                 </Card>  
-               
+                <Card>  
                 <Animated animationIn="fadeInDown" animationOut="fadeOut" isVisible={true}>
-                          
+                     
 
-                                    <CommonModify isShow={this.state.isShow} isShowCreateLead={true} isDontShowCreateLeadBtn={true}/>
+                        <CommonModify isShow={this.state.isShow} isShowCreateLead={true} //isDontShowCreateLeadBtn={true}
+                            isShowCreateLeadBtn={this.state.isShowCreateLeadBtn}/>
                
                                 
                 </Animated>    
                
-               
+                </Card>  
             </div>
         );
     }
