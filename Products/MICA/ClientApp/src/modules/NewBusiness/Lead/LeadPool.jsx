@@ -61,8 +61,9 @@ class LeadPool extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            //isShowGrid: true,
-            //isDontShowGrid: true,
+         
+            isShowLeadPoolHeadr: true,
+            isDontShowLead1: true,
             isShowCreateLead: false,
             isShow: false,
             editModal: false,
@@ -81,10 +82,13 @@ class LeadPool extends React.Component {
             submitshow: false,
             modifypage: false,
 
-
+            isDontShowLead1: true,
         }
+      // this.state.isDontShowLead1 =this.props.isShowLead1;
+       // this.state.isShowLead1 = props.isDontShowLead1;
 
     };
+    
 
     componentDidMount() {
 
@@ -97,29 +101,26 @@ class LeadPool extends React.Component {
         return (
            
             <GridContainer xl={12}>
-                <GridItem lg={12}>
-                    <Card >
-                        <CardHeader color="rose" icon>
-                            <CardIcon color="rose">
-                                <Icon><img id="icon" src={leadPool} /></Icon>
-                            </CardIcon>
-                            {
-                                <h4 >
-                                    <small> Lead Pool </small>
-                                </h4>
-                            }
-                        </CardHeader>
+                {
+                    this.state.isDontShowLead1 &&
 
-                    </Card>
-                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                            
-                                <CommonModify isShowGrid={true} type={this.state.type}
-                                    isShowCreateLead={this.state.isShowCreateLead} />
+                    <GridItem lg={12}>
+                        
+                        <CardBody>
+                        <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
 
-                           
-                    </Animated>
+                            <CommonModify isShowGrid={true} type={this.state.type}
+                                isShowLeadPoolHeadr={this.state.isShowLeadPoolHeadr}
+                                isShowCreateLead={this.state.isShowCreateLead} />
+
+
+                        </Animated>
+                            </CardBody>
+                          
+                       
 
                     </GridItem>
+                }
               
                 </GridContainer >
             
