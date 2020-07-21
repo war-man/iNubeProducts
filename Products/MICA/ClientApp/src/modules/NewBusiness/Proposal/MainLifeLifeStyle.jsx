@@ -118,7 +118,7 @@ const MainlifeLifeStyle = (props) => {
         </GridContainer>
         <GridContainer lg={12}>
             <GridItem xs={12}>
-                   <h6> <p>Do You Consume Tobacco ?</p></h6>
+                <p>Do You Consume Tobacco ?</p>
                 </GridItem>
 
                 <GridItem xs={12} sm={6} >
@@ -325,7 +325,7 @@ const MainlifeLifeStyle = (props) => {
         {/*Alcohol*/}
          <GridContainer lg={12}>
                 <GridItem xs={12}>
-                   <h6> <p>Do You Consume Alcohol ?</p></h6>
+                   <p>Do You Consume Alcohol ?</p>
                 </GridItem>
 
                 <GridItem xs={12} sm={6}>
@@ -621,9 +621,9 @@ const MainlifeLifeStyle = (props) => {
             <GridContainer lg={12}>
                 <GridItem xs={12}>
                   
-                    <h6>
-                        <p>1.{(props.LifeStyleQuesDTO[0] !== undefined) ? props.LifeStyleQuesDTO[0].questionText:""}</p>
-                    </h6>
+                   
+                        <p>1. {(props.LifeStyleQuesDTO[0] !== undefined) ? props.LifeStyleQuesDTO[0].questionText:""}</p>
+                    
                 </GridItem>
            
             
@@ -694,13 +694,13 @@ const MainlifeLifeStyle = (props) => {
                 </GridItem>
 
 
-
+            </GridContainer>
 
 
            
             {props.showQuestion1 &&
                 <GridContainer lg={12}>
-                <GridItem xs={12}>
+                <GridItem xs={6}>
                     
                     <CustomInput
                         labelText={(props.LifeStyleQuesDTO[4] !== undefined) ? props.LifeStyleQuesDTO[4].questionText : ""}
@@ -711,14 +711,14 @@ const MainlifeLifeStyle = (props) => {
                     />
                 </GridItem>
                     </GridContainer>}
-                </GridContainer>
+               
 
             {/*Question2*/}
             <GridContainer lg={12}>
                 <GridItem xs={24}>
-                    <h6>
-                        {<p>1.{(props.LifeStyleQuesDTO[1] !== undefined) ? props.LifeStyleQuesDTO[1].questionText : ""}</p>}
-                    </h6>
+                    
+                        {<p>2. {(props.LifeStyleQuesDTO[1] !== undefined) ? props.LifeStyleQuesDTO[1].questionText : ""}</p>}
+                    
                 </GridItem>
            
                 <GridItem xs={4} sm={6}>
@@ -786,12 +786,8 @@ const MainlifeLifeStyle = (props) => {
                         />
                     </div>
                 </GridItem>
-
-
-
-
-
             </GridContainer>
+
             {props.showQuestion2 &&
                 <GridContainer lg={12}>
                 <GridItem xs={6}>
@@ -809,9 +805,9 @@ const MainlifeLifeStyle = (props) => {
             {/*Question3*/}
             <GridContainer lg={12}>
                 <GridItem xs={24}>
-                    <h6>
-                        {<p>1.{(props.LifeStyleQuesDTO[2] !== undefined) ? props.LifeStyleQuesDTO[2].questionText : ""}</p>}
-                    </h6>
+                    
+                        {<p>3. {(props.LifeStyleQuesDTO[2] !== undefined) ? props.LifeStyleQuesDTO[2].questionText : ""}</p>}
+                    
                 </GridItem>
            
             
@@ -881,14 +877,11 @@ const MainlifeLifeStyle = (props) => {
                     </div>
                 </GridItem>
 
-
-
-
-
             </GridContainer>
-            {props.showQuestion3 && <GridContainer lg={12}>
+            {props.showQuestion3 &&
+                <GridContainer lg={12}>
              
-                <GridItem xs={6}>
+                <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.LifeStyleQuesDTO[6] !== undefined) ? props.LifeStyleQuesDTO[6].questionText : ""}
                         id="Specification"

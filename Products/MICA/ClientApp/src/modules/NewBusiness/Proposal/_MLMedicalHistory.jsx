@@ -65,9 +65,9 @@ const MLMedicalHistory = (props) => {
             {/*Question1*/}
             <GridContainer lg={12}>
                 <GridItem>
-                    <h6>
-                     <p>1.{(props.MedHistQuesDTO[2] !== undefined) ? props.MedHistQuesDTO[2].questionText : ""}</p>
-                    </h6>
+                   
+                     <p>1. {(props.MedHistQuesDTO[2] !== undefined) ? props.MedHistQuesDTO[2].questionText : ""}</p>
+                    
                 </GridItem>
             
                 <GridItem xs={12}>
@@ -145,6 +145,7 @@ const MLMedicalHistory = (props) => {
                 </GridItem>}
 
                 {props.showMHQ1 && <GridItem xs={12}>
+                    
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[54] !== undefined) ? props.MedHistQuesDTO[54].questionText : ""}
                         id="MHQ1.2"
@@ -189,10 +190,9 @@ const MLMedicalHistory = (props) => {
             {/*Question2*/}
             <GridContainer lg={12}>
                 <GridItem xs={12}>
-                 
-                    <h6>
-                        <p>2.{(props.MedHistQuesDTO[3] !== undefined) ? props.MedHistQuesDTO[3].questionText : ""}</p>
-                    </h6>
+                  
+                        <p>2. {(props.MedHistQuesDTO[3] !== undefined) ? props.MedHistQuesDTO[3].questionText : ""}</p>
+                   
                 </GridItem>
                 <GridItem xs={12}>
                     <FormControlLabel
@@ -259,7 +259,7 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[37] !== undefined) ? props.MedHistQuesDTO[37].questionText : ""}
-                        //id="MHQ1.5"
+                        //id="MHQ2.1"
                         formControlProps={{
                             fullWidth: true
                         }}
@@ -388,9 +388,9 @@ const MLMedicalHistory = (props) => {
             {/*Question3*/}
             <GridContainer lg={12}>
                 <GridItem>
-                    <h6>
-                        <p>3.{(props.MedHistQuesDTO[4] !== undefined) ? props.MedHistQuesDTO[4].questionText : ""}</p>
-                    </h6>
+                    
+                        <p>3. {(props.MedHistQuesDTO[4] !== undefined) ? props.MedHistQuesDTO[4].questionText : ""}</p>
+                    
                 </GridItem>
                 <GridItem xs={12}>
                     <FormControlLabel
@@ -453,7 +453,7 @@ const MLMedicalHistory = (props) => {
                         label="No"
                     />
                 </GridItem>
-
+            
                 {props.showMHQ3 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
@@ -468,9 +468,9 @@ const MLMedicalHistory = (props) => {
             {/*Question4*/}
             <GridContainer lg={12}>
                 <GridItem>
-                    <h6>
-                        <p>4.{(props.MedHistQuesDTO[5] !== undefined) ? props.MedHistQuesDTO[5].questionText : ""}</p>
-                    </h6>
+                    
+                        <p>4. {(props.MedHistQuesDTO[5] !== undefined) ? props.MedHistQuesDTO[5].questionText : ""}</p>
+                   
                 </GridItem>
                 <GridItem xs={12}>
                     <FormControlLabel
@@ -536,9 +536,9 @@ const MLMedicalHistory = (props) => {
 
 
                 {props.showMHQ4 && <GridItem xs={12}>
-                    <label>4.1 Please state the precise diagnosis, or nature of the condition that you are suffering from e.g Rheumatoid Arthritis, Osteoarthritis, Ank .Reiters Psoriatic Arthritis, etc</label>
+                    
                     <CustomInput
-                        //labelText="4.1 Please state the precise diagnosis, or nature of the condition that you are suffering from e.g Rheumatoid Arthritis, Osteoarthritis, Ank .Reiters Psoriatic Arthritis, etc"
+                        labelText={(props.MedHistQuesDTO[7] !== undefined) ? props.MedHistQuesDTO[7].questionText : ""}
                         id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -551,9 +551,9 @@ const MLMedicalHistory = (props) => {
             {/*Question5*/}
             <GridContainer lg={12}>
                 <GridItem>
-                    <h6>
-                        <p>5.{(props.MedHistQuesDTO[6] !== undefined) ? props.MedHistQuesDTO[6].questionText : ""}</p>
-                    </h6>
+                    
+                        <p>5. {(props.MedHistQuesDTO[6] !== undefined) ? props.MedHistQuesDTO[6].questionText : ""}</p>
+                   
                 </GridItem>
                 <GridItem xs={12}>
                     <FormControlLabel
@@ -562,7 +562,7 @@ const MLMedicalHistory = (props) => {
                                 checked={props.selectedValueMH === "MHQues5Yes"}
                                 onChange={props.handleRadioChangeMH}
                                 value="MHQues5Yes"
-                                //name="radio3"
+                                name="radio1"
                                 aria-label="B"
                                 icon={
                                     <FiberManualRecord
@@ -592,7 +592,7 @@ const MLMedicalHistory = (props) => {
                                 checked={props.selectedValueMH === "MHQues5No"}
                                 onChange={props.handleRadioChangeMH}
                                 value="MHQues5No"
-                                //name="radio3"
+                                name="radio1"
                                 aria-label="B"
                                 icon={
                                     <FiberManualRecord
@@ -617,15 +617,25 @@ const MLMedicalHistory = (props) => {
                     />
                 </GridItem>
 
-                
+            
+
+            {props.showMHQ5 && <GridItem xs={12}>
+                <CustomInput
+                    labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
+                    //id="MHQ1.5"
+                    formControlProps={{
+                        fullWidth: true
+                    }}
+                />
+                </GridItem>}
             </GridContainer>
 
             {/*Question6*/}
             <GridContainer lg={12}>
                 <GridItem>
-                    <h6>
-                        <p>6.{(props.MedHistQuesDTO[32] !== undefined) ? props.MedHistQuesDTO[32].questionText : ""}</p>
-                    </h6>
+                    
+                        <p>6. {(props.MedHistQuesDTO[32] !== undefined) ? props.MedHistQuesDTO[32].questionText : ""}</p>
+                    
                 </GridItem>
                 <GridItem xs={12}>
                     <FormControlLabel
@@ -688,14 +698,25 @@ const MLMedicalHistory = (props) => {
                         label="No"
                     />
                 </GridItem>
+            
+
+            {props.showMHQ6 && <GridItem xs={12}>
+                <CustomInput
+                    labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
+                    //id="MHQ1.5"
+                    formControlProps={{
+                        fullWidth: true
+                    }}
+                />
+                </GridItem>}
             </GridContainer>
 
             {/*Question7*/}
             <GridContainer lg={12}>
                 <GridItem>
-                    <h6>
-                        <p>7.{(props.MedHistQuesDTO[33] !== undefined) ? props.MedHistQuesDTO[33].questionText : ""}</p>
-                    </h6>
+                    
+                        <p>7. {(props.MedHistQuesDTO[33] !== undefined) ? props.MedHistQuesDTO[33].questionText : ""}</p>
+                   
                 </GridItem>
                 <GridItem xs={12}>
                     <FormControlLabel
@@ -758,14 +779,25 @@ const MLMedicalHistory = (props) => {
                         label="No"
                     />
                 </GridItem>
+            
+
+            {props.showMHQ7 && <GridItem xs={12}>
+                <CustomInput
+                    labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
+                    //id="MHQ1.5"
+                    formControlProps={{
+                        fullWidth: true
+                    }}
+                />
+                </GridItem>}
             </GridContainer>
 
             {/*Question8*/}
             <GridContainer lg={12}>
                 <GridItem>
-                    <h6>
-                        <p>8.{(props.MedHistQuesDTO[34] !== undefined) ? props.MedHistQuesDTO[34].questionText : ""}</p>
-                    </h6>
+                    
+                        <p>8. {(props.MedHistQuesDTO[34] !== undefined) ? props.MedHistQuesDTO[34].questionText : ""}</p>
+                    
                 </GridItem>
                 <GridItem xs={12}>
                     <FormControlLabel
@@ -828,14 +860,25 @@ const MLMedicalHistory = (props) => {
                         label="No"
                     />
                 </GridItem>
+            
+
+            {props.showMHQ8 && <GridItem xs={12}>
+                <CustomInput
+                    labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
+                    //id="MHQ1.5"
+                    formControlProps={{
+                        fullWidth: true
+                    }}
+                />
+                </GridItem>}
             </GridContainer>
 
             {/*Question9*/}
             <GridContainer lg={12}>
                 <GridItem>
-                    <h6>
-                        <p>9.{(props.MedHistQuesDTO[35] !== undefined) ? props.MedHistQuesDTO[35].questionText : ""}</p>
-                    </h6>
+                   
+                        <p>9. {(props.MedHistQuesDTO[35] !== undefined) ? props.MedHistQuesDTO[35].questionText : ""}</p>
+               
                 </GridItem>
                 <GridItem xs={12}>
                     <FormControlLabel
@@ -898,15 +941,26 @@ const MLMedicalHistory = (props) => {
                         label="No"
                     />
                 </GridItem>
+            
+
+            {props.showMHQ9 && <GridItem xs={12}>
+                <CustomInput
+                    labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
+                    //id="MHQ1.5"
+                    formControlProps={{
+                        fullWidth: true
+                    }}
+                />
+                </GridItem>}
             </GridContainer>
 
 
             {/*Question10*/}
             <GridContainer lg={12}>
                 <GridItem>
-                    <h6>
-                        <p>10.{(props.MedHistQuesDTO[36] !== undefined) ? props.MedHistQuesDTO[36].questionText : ""}</p>
-                    </h6>
+                   
+                        <p>10. {(props.MedHistQuesDTO[36] !== undefined) ? props.MedHistQuesDTO[36].questionText : ""}</p>
+                    
                 </GridItem>
                 <GridItem xs={12}>
                     <FormControlLabel
@@ -969,6 +1023,16 @@ const MLMedicalHistory = (props) => {
                         label="No"
                     />
                 </GridItem>
+            
+            {props.showMHQ10 && <GridItem xs={12}>
+                <CustomInput
+                    labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
+                    //id="MHQ1.5"
+                    formControlProps={{
+                        fullWidth: true
+                    }}
+                />
+            </GridItem>}
             </GridContainer>
         </div>
     )

@@ -53,8 +53,8 @@ const QuestioneriesWizard = (props) => {
                 <Wizard
                     validate
                     steps={[
-                        { stepName: "Main Life", stepComponent: MainLife , stepId: "", stepData: props },
-                        { stepName: "Spouse", stepComponent: Spouse, stepId: "", stepData: props },
+                        { stepName: "Main Life", stepComponent: MainLife , stepId: "", stepData: props }
+                       // { stepName: "Spouse", stepComponent: Spouse, stepId: "", stepData: props },
 
                     ]}
                     title=""

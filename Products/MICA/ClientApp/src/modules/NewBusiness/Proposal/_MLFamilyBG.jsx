@@ -53,9 +53,11 @@ const MLFamilyBackGround = (props) => {
             
             {/*Question1*/}
             <GridContainer lg={12}>
-                <h6>
-                    <p>1.{(props.FBQuesDTO[0] !== undefined) ? props.FBQuesDTO[0].questionText : ""}</p>
-                </h6>
+                <GridItem>
+               
+                    <p>   1. {(props.FBQuesDTO[0] !== undefined) ? props.FBQuesDTO[0].questionText : ""}</p>
+                  
+                </GridItem>
                 <GridItem xs={12}>
                     <FormControlLabel
                         control={

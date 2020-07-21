@@ -56,11 +56,11 @@ const PrevCurrLifeInsurance = (props) => {
            
             {/*Question1*/}
             <GridContainer lg={12}>
+                <GridItem xs={24}> 
                
-                <h6>
-                    <p>1.{(props.PCQuesDTO[0] !== undefined) ? props.PCQuesDTO[0].questionText : ""}</p>
-                </h6>
-            
+                    <p>1. {(props.PCQuesDTO[0] !== undefined) ? props.PCQuesDTO[0].questionText : ""}</p>
+                   
+                </GridItem>
                 <GridItem xs={12}>
                     <FormControlLabel
                         control={
@@ -226,10 +226,17 @@ const PrevCurrLifeInsurance = (props) => {
                         </div>
                     </GridItem> </div>}
 
+            </GridContainer>
+
             {/*Question2*/}
-                <h6>
-                    <p>2.{(props.PCQuesDTO[1] !== undefined) ? props.PCQuesDTO[1].questionText : ""}</p>
-                </h6>
+
+            <GridContainer lg={12}>
+                <GridItem xs={24}>
+
+                    <p>2. {(props.PCQuesDTO[1] !== undefined) ? props.PCQuesDTO[1].questionText : ""}</p>
+
+                </GridItem>
+               
 
                 <GridItem xs={12}>
                     <FormControlLabel
@@ -292,12 +299,17 @@ const PrevCurrLifeInsurance = (props) => {
                         label="No"
                     />
                 </GridItem>
+            </GridContainer>
 
              {/*Question3*/}
-                <h6>
-                    <p>2.{(props.PCQuesDTO[2] !== undefined) ? props.PCQuesDTO[2].questionText : ""}</p>
-                </h6>
+           
+            <GridContainer lg={12}>
+                <GridItem xs={24}>
 
+                    <p>3. {(props.PCQuesDTO[2] !== undefined) ? props.PCQuesDTO[2].questionText : ""}</p>
+
+                </GridItem>
+               
                 <GridItem xs={12}>
                     <FormControlLabel
                         control={
@@ -360,8 +372,8 @@ const PrevCurrLifeInsurance = (props) => {
                     />
                 </GridItem>
 
-            
             </GridContainer>
+            
 
           
         </div>

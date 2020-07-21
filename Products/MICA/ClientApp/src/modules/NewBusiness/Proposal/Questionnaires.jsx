@@ -311,7 +311,7 @@ class Questionnaries extends React.Component {
                 showMHQ1: false
             })
         }
-        else if (this.state.radioValMH == "MHQues2Yes ") {
+        else if (this.state.radioValMH == "MHQues2Yes") {
             this.setState({
                 showMHQ2: true
             })
