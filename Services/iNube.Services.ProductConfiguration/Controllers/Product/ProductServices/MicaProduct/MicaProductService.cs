@@ -2007,7 +2007,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 //list.AddRange(attributes);
 
                 //attributelist.AddRange(list);
-                Finalentity.Add(result);
+                Finalentity.Add(item);
                 //var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, relation, apiContext);
             }
             return Finalentity;
