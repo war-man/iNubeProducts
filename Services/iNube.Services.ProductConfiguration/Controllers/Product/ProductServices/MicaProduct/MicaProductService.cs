@@ -1947,7 +1947,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return data;
         }
 
-        //Fetching Relationship=Single datas
+        //Fetching entities Relationship=Single datas
         public async Task<List<object>> GetSingleEntitiesById(int Id, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -1980,7 +1980,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return Finalentity;
         }
 
-        //Fetching data based on Relationship
+        //Fetching entities data based on Relationship
         public async Task<List<object>> GetRelationEntitiesById(int Id, string relation, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
