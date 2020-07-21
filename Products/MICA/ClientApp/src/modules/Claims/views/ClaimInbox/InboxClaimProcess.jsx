@@ -753,7 +753,7 @@ class InboxClaimProcess extends React.Component {
     }
 
     componentDidMount() {
-        this.setstatus({ responseflag: false });
+        this.setState({ responseflag: false });
         this.tableshow();
         let claimdecision = "Claims Status";
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + claimdecision + ``, {
