@@ -1952,7 +1952,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.EntityId == Id && a.Relationship == "Single")
+            var data = _context.TblEntityDetails.Where(a => a.EntityId == Id /*&& a.Relationship == "Single"*/)
                 .Include(a => a.TblEntityAttributes)
                 .Select(a => a).ToList();
             var componentType = _context.TblmasDynamic.Select(a => a);
@@ -2018,7 +2018,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.ParentId == Id && a.Relationship == "Multiple")
+            var data = _context.TblEntityDetails.Where(a => a.ParentId == Id /*&& a.Relationship == "Multiple"*/)
                 .Include(a => a.TblEntityAttributes)
                 .Select(a => a).ToList();
             var componentType = _context.TblmasDynamic.Select(a => a);
@@ -2047,7 +2047,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _logger.LogRequest("TblEntityDetails", "GetChildAttributeListAsync", "Product", Guid.NewGuid().ToString(), null, apiContext);
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.ParentId == id && a.Relationship == relationship)
+            var data = _context.TblEntityDetails.Where(a => a.ParentId == id /*&& a.Relationship == relationship*/)
            .Include(a => a.TblEntityAttributes)
            .Select(a => a).ToList();
             var result = _mapper.Map<List<EntityDetailsDTO>>(data);
@@ -2067,9 +2067,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     }
 
                     //list.AddRange(attributes);
-                    Finalentity.Add(result);
+                    Finalentity.Add(item);
 
-                    var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, relationship, apiContext);
+                    //var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, relationship, apiContext);
                 }
                 return true;
             }
