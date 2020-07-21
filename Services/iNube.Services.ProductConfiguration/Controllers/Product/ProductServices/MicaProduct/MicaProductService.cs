@@ -1980,39 +1980,6 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return Finalentity;
         }
 
-        //Fetching entities data based on Relationship
-        public async Task<List<object>> GetRelationEntitiesById(int Id, string relation, ApiContext apiContext)
-        {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-            var data = _context.TblEntityDetails.Where(a => a.ParentId == Id && a.Relationship == relation)
-                .Include(a => a.TblEntityAttributes)
-                .Select(a => a).ToList();
-            var componentType = _context.TblmasDynamic.Select(a => a);
-
-            var result = _mapper.Map<List<EntityDetailsDTO>>(data);
-            List<object> Finalentity = new List<object>();
-            _logger.LogRequest("TblEntityDetails", "GetRelationEntitiesById", "Product", Guid.NewGuid().ToString(), null, apiContext);
-            foreach (var item in result)
-            {
-                List<object> attributelist = new List<object>();
-                //List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
-
-                //var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.EntityAttributes);
-                foreach (var item1 in item.EntityAttributes)
-                {
-                    item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
-                    item1.Relationship = item.Relationship;
-                }
-                //list.AddRange(attributes);
-
-                //attributelist.AddRange(list);
-                Finalentity.Add(item);
-                //var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, relation, apiContext);
-            }
-            return Finalentity;
-        }
-
         //Fetching datas based on Parentid
         public async Task<List<object>> GetMultipleEntitiesById(int Id, ApiContext apiContext)
         {

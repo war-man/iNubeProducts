@@ -1,5 +1,6 @@
 ﻿
 using iNube.Services.ReInsurance.Models;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Model;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,11 +26,14 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
     }
     public class IntegrationService : IIntegrationService
     {
+        private ILoggerManager _logger;
         private IConfiguration _configuration;
         readonly string PolicyUrl, BillingUrl, RatingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, ExtensionUrl;
-        public IntegrationService(IConfiguration configuration)
-        {
+        private static readonly HttpClient _httpClient = new HttpClient();
 
+        public IntegrationService(IConfiguration configuration, ILoggerManager logger)
+        {
+            _logger = logger;
             _configuration = configuration;
             PolicyUrl = _configuration["Integration_Url:Policy:PolicyUrl"];
             BillingUrl = _configuration["Integration_Url:Billing:BillingUrl"];
@@ -89,25 +94,43 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
             var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
             return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
         }
+        public async Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext)
+        {
+
+            var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerSettings?customerid=" + apiContext.OrgId + "&type=" + TimeZone;//+"&envid="+apiContext.ServerType;
+
+            return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+
+        }
+
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
-            HttpClient client = new HttpClient();
-            if (!string.IsNullOrEmpty(apiContext.Token))
+            try
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
-            }
-            using (var response = await client.GetAsync(url))
-            using (var content = response.Content)
-            {
-                if (response.IsSuccessStatusCode)
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                if (!string.IsNullOrEmpty(apiContext.Token))
                 {
-                    var serviceResponse = await content.ReadAsAsync<TResponse>();
-                    if (serviceResponse != null)
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    _httpClient.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                }
+
+                using (var response = await _httpClient.GetAsync(url))
+                using (var content = response.Content)
+                {
+                    if (response.IsSuccessStatusCode)
                     {
-                        return serviceResponse;
+                        var serviceResponse = await content.ReadAsAsync<TResponse>();
+                        if (serviceResponse != null)
+                        {
+                            return serviceResponse;
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "ReInsurance", MethodBase.GetCurrentMethod().Name, url, null, apiContext);
             }
             return new TResponse();
         }
@@ -116,17 +139,13 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
             try
             {
 
-
-                HttpClient client = new HttpClient();
-                //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                //client.BaseAddress = new Uri(url);
+                _httpClient.DefaultRequestHeaders.Clear();
                 if (!string.IsNullOrEmpty(apiContext.Token))
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    _httpClient.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
                 }
-                using (var response = await client.GetAsync(url))
+                using (var response = await _httpClient.GetAsync(url))
                 using (var content = response.Content)
                 {
                     if (response.IsSuccessStatusCode)
@@ -138,44 +157,37 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
                         }
                     }
                 }
-
-
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                //throw;
+                _logger.LogError(ex, "ReInsurance", MethodBase.GetCurrentMethod().Name, url, null, apiContext);
             }
             return new List<TResponse>();
         }
-        public async Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext)
-        {
 
-            var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerSettings?customerid=" + apiContext.OrgId + "&type=" + TimeZone;//+"&envid="+apiContext.ServerType;
 
-            return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
-
-        }
-        private async Task<TResponse> PostApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
+        private async Task<TResponse> PostApiInvoke<TRequest, TResponse>(string requestUri, TRequest request, ApiContext apiContext) where TRequest : new() where TResponse : new()
         {
             try
             {
-                HttpClient client = new HttpClient();
-
+                _httpClient.DefaultRequestHeaders.Clear();
                 if (!string.IsNullOrEmpty(apiContext.Token))
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    _httpClient.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
                 }
                 HttpContent contentPost = null;
                 if (request != null)
                 {
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    //client.BaseAddress = new Uri(baseUrl);
+                    //client.DefaultRequestHeaders.Accept.Clear();
+                    // client.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken.auth_token);
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
                 }
-                using (var response = await client.PostAsync(requestUri, contentPost))
+                using (var response = await _httpClient.PostAsync(requestUri, contentPost))
                 {
                     using (var content = response.Content)
                     {
@@ -183,9 +195,9 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                _logger.LogError(ex, "ReInsurance", MethodBase.GetCurrentMethod().Name, requestUri + "" + request, null, apiContext);
                 return new TResponse();
             }
 
@@ -195,21 +207,21 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
         {
             try
             {
-                HttpClient client = new HttpClient();
                 HttpContent contentPost = null;
+                _httpClient.DefaultRequestHeaders.Clear();
                 if (!string.IsNullOrEmpty(apiContext.Token))
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    _httpClient.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
                 }
                 if (request != null)
                 {
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
                 }
-                using (var response = await client.PostAsync(requestUri, contentPost))
+                using (var response = await _httpClient.PostAsync(requestUri, contentPost))
                 {
                     using (var content = response.Content)
                     {
@@ -217,11 +229,40 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "ReInsurance", MethodBase.GetCurrentMethod().Name, requestUri + ": " + request, null, apiContext);
+                return new List<TResponse>();
+            }
 
-            catch (Exception)
+        }
+        private async Task<TResponse> PutApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
+        {
+            try
             {
 
-                return new List<TResponse>();
+                HttpContent contentPost = null;
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                if (request != null)
+                {
+                    string postBody = JsonConvert.SerializeObject(request);
+                    var content = new StringContent(postBody, Encoding.UTF8, "application/json");
+                    contentPost = content;
+                }
+                using (var response = await _httpClient.PutAsync(requestUri, contentPost))
+                {
+                    using (var content = response.Content)
+                    {
+                        return await content.ReadAsAsync<TResponse>();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "ReInsurance", MethodBase.GetCurrentMethod().Name, requestUri + " " + request, null, apiContext);
+                return new TResponse();
             }
 
         }

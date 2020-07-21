@@ -19,6 +19,7 @@ using iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService;
 using iNube.Services.ReInsurance.Entities;
 using iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices;
 using iNube.Utility.Framework.LogPrivider.LogService;
+using Microsoft.AspNetCore.Internal;
 
 namespace iNube.Services.ReInsurance
 {
@@ -97,6 +98,7 @@ namespace iNube.Services.ReInsurance
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseEndpointRouting();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();

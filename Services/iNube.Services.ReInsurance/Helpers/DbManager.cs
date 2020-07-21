@@ -3,6 +3,7 @@
 //using iNube.Services.Accounting.Entities;
 using iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices;
 using iNube.Services.ReInsurance.Entities;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -78,7 +79,7 @@ namespace iNube.Services.ReInsurance.Helpers
         public static async Task<DbContext> GetContextAsync(string product, string connectionKey, IConfiguration configuration)
         {
             DbContext context = null;
-            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration,new LoggerManager(configuration)));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
 
