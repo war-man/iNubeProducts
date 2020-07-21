@@ -3,6 +3,7 @@ using iNube.Services.Accounting.Controllers.AccountConfig.IntegrationServices;
 using iNube.Services.Accounting.Entities;
 using iNube.Services.Accounting.Helpers;
 using iNube.Services.Accounting.Models;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -28,15 +29,17 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         private readonly Func<string, IAccountingConfigService> _accountsService;
         private IConfiguration _configuration;
         public DbHelper dbHelper;
+        private ILoggerManager _logger;
         public MicaAccountConfigService(Func<string, IAccountingConfigService> accountsService, IMapper mapper, MICAACContext context,
-            IOptions<AppSettings> appSettings, IConfiguration configuration)
+            IOptions<AppSettings> appSettings, IConfiguration configuration, ILoggerManager logger)
         {
             _mapper = mapper;
             _appSettings = appSettings.Value;
             _context = context;
             _accountsService = accountsService;
             _configuration = configuration;
-            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
+            _logger = logger;
+            dbHelper = new DbHelper(new IntegrationService(configuration,_logger)); ;
         }
 
         public async Task<AccountResponce> CreateAccounts(CoaaccountsDto coaacountsdto, ApiContext apiContext)
