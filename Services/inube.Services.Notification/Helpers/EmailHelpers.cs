@@ -107,7 +107,7 @@ namespace inube.Services.Notification.Helpers
             catch (Exception ex)
             {
                 responseStatus.Status = BusinessStatus.Error;
-                _logger.LogError(ex, "Notifiaction SendEmail Fail-"+request.mailTo[0], context);
+                _logger.LogError(ex,"Notification", "Notifiaction SendEmail Fail-"+request.mailTo[0],null,null, context);
             }
             return responseStatus;
         }

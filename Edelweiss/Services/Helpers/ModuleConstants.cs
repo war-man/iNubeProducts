@@ -15,5 +15,7 @@ namespace MicaExtension_EGI.Helpers
         public const string EGIEndoRatingId = "50";
         public const string DevEGINewRatingId = "87";
         public const string EGINewRatingId = "51";
+        public const string ProductCode = "DBI001";
+        public const int BatchCircuitBreak = 5;
     }
 }

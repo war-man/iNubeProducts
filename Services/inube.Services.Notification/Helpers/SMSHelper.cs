@@ -73,7 +73,7 @@ namespace inube.Services.Notification.Helpers
             catch (Exception ex)
             {
                 responseStatus.Status = BusinessStatus.Error;
-                _logger.LogError(ex, "Notifiaction SendSMS Fail-" + request.RecipientNumber, context);
+                _logger.LogError(ex,"SMSHelper","SendSMS", "Notifiaction SendSMS Fail-" + request.RecipientNumber, null,context);
             }
             return responseStatus;
         }

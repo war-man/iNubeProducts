@@ -389,8 +389,6 @@ class ClaimIntimate extends React.Component {
 
     };
 
-
-
     onFormSubmit = (evt) => {
         this.state.validateUI = false;
         this.state.ValidationUI = true;
@@ -441,20 +439,23 @@ class ClaimIntimate extends React.Component {
                     }).then(response => response.json())
                         .then(data => {
                             console.log("responseData", data);
-                            this.setState({ response:false});
+                         
                             if (data.status == 2) {
                                 this.state.claimId = data.claimId;
                                 this.setState({ docpage: true, claimnumber: data.claimNumber });
                                 swal({
                                     text: "Claim intimated successfully! \n your claim number: " + this.state.claimnumber,
-                                    icon: "success"
-                                }).then(() => {
-                                    this.setState({ redirect: true });
-                                    this.renderRedirect();
+                                    icon: "success",
+                                    buttons: [false, "OK"],
+                                }).then((willDelete) => {
+                                    if (willDelete) {
+                                        this.setState({ redirect: true, response: false });
+                                        this.renderRedirect();
+                                    }
                                 });
                                 // this.setState({ redirect: true });
                             } else if (data.status == 7) {
-
+                                this.setState({ response: false });
                                 if (data.errors.length > 0) {
                                     swal({
 
@@ -537,8 +538,9 @@ class ClaimIntimate extends React.Component {
 
     };
 
+
     IsValidProductDetails = () => {
-        debugger;
+       
         console.log("ValidationAdditionalDetails", this.state.DetailsDTO.AdditionalDetails['Vehicle Location'])
 
         if (this.state.DetailsDTO.lossDateTime !== null && this.state.DetailsDTO.locationOfLoss !== "" && this.state.DetailsDTO.lossIntimatedBy !== "" && this.state.DetailsDTO.lossDescription !== ""
@@ -734,7 +736,7 @@ class ClaimIntimate extends React.Component {
     }
 
     componentDidMount() {
-
+        this.setState({ response: false });
         //this.state.DataModel = Model;
         //this.setState({});
         let masterlist = "Claim Intimated By";

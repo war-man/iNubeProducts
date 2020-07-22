@@ -27,6 +27,7 @@ import Edit from "@material-ui/icons/Edit";
 import Download from "@material-ui/icons/GetApp";
 import Proposal from './Proposal.jsx';
 import NewBusinessConfig from 'modules/NewBusiness/NewBusinessConfig.js';
+import Delete from "@material-ui/icons/Delete";
 
 const dataTable = {
     headerRow: ["ProposalNo", "ProposerName", "NIC", "LeadNo", "BancaIntroducerCode", "ProposalStatus", "Actions"],
@@ -84,10 +85,7 @@ class ProposalIncomplete extends React.Component {
             citizenshipCheckboxSelected: false,
             singleValue: "0",
             singleValue1: "0",
-
-
-
-
+            
             editModal: false,
             btnvisibility: false,
             disabled: false,
@@ -155,7 +153,10 @@ class ProposalIncomplete extends React.Component {
             //  Master Data for all the dropdowns
             MasterData: [],
             MasterDataDto: [],
-
+            tobaccodata: [],
+            TobData: [],
+            alcoholdata: [],
+            AlcoData: [],
 
             //Questionaris part start from here
             LifeStyleQA: [{
@@ -416,18 +417,125 @@ class ProposalIncomplete extends React.Component {
     // Setting values for questinaries part
 
     QuestionalDetailsSetValue = (evt) => {
-
+        debugger;
         let LifeStyleQA = this.state.LifeStyleQA;
         LifeStyleQA[0][evt.target.name] = evt.target.value;
         this.setState({ LifeStyleQA });
 
-        console.log("lifeStyleQa ", this.state.LifeStyleQA)
+        console.log("lifeStyleQa ", this.state.LifeStyleQA);
+        
     }
+
+    tobaccoDataTable = () => {
+
+        this.setState({
+            tobaccodata: this.state.TobData.map((prop, key) => {
+                return {
+                    Type: prop.smoketype,
+                    SticksCount: prop.smokecount,
+                    Years: prop.smokeduration,
+                    actions: (
+                        <div className="actions-right">
+                            <Button color="danger" justIcon round simple className="edit" onClick={() => this.onDeleteTobaccodata()} ><Delete /></Button>
+                        </div>
+                    )
+                };
+            }
+            )
+        }
+        )
+    }
+
+    onDeleteTobaccodata = () => {
+        debugger;
+        this.state.TobData = [];
+        this.setState({});
+
+        this.tobaccoDataTable();
+    }
+
 
     //Questionaries Part Button Add to show the enterd data
 
-    QuestionAddButton = (evt) => {
+    TobaccoQuestionAddButton = () => {
+        debugger;
 
+        var obj = {};
+
+        const LifeStyleQA = this.state.LifeStyleQA;
+
+        const MasterDataDto1 = this.state.MasterDataDto[143].mdata;
+        const MasterDataDto2 = this.state.MasterDataDto[223].mdata;
+
+        obj.smokecount = MasterDataDto2.filter(a => a.mID == LifeStyleQA[0].SmokeQuantity)[0].mValue === undefined
+            ? [] : MasterDataDto2.filter(a => a.mID == LifeStyleQA[0].SmokeQuantity)[0].mValue;
+       
+        obj.smoketype = MasterDataDto1.filter(a => a.mID == LifeStyleQA[0].SmokeType)[0].mValue === undefined
+            ? [] : MasterDataDto1.filter(a => a.mID == LifeStyleQA[0].SmokeType)[0].mValue;
+
+        obj.smokeduration = LifeStyleQA[0].SmokeDuration;
+
+        this.state.TobData.push(obj);
+        this.setState({});
+        console.log("abcwwededs", this.state.TobData);
+        this.tobaccoDataTable();
+    }
+
+
+    AlcoholQuestionAddButton = () => {
+        debugger;
+
+        var obj = {};
+
+        const LifeStyleQA = this.state.LifeStyleQA;
+
+        const MasterDataDto3 = this.state.MasterDataDto[145].mdata;
+        const MasterDataDto4 = this.state.MasterDataDto[142].mdata;
+
+        console.log("MasterDataDto1", MasterDataDto3, MasterDataDto4, MasterDataDto3.filter(a => a.mID == LifeStyleQA[0].AlcoholTypes) );
+
+        obj.alcoholType = MasterDataDto3.filter(a => a.mID == LifeStyleQA[0].AlcholType)[0].mValue === undefined
+            ? [] : MasterDataDto3.filter(a => a.mID == LifeStyleQA[0].AlcholType)[0].mValue;
+
+        obj.alcoholPer = MasterDataDto4.filter(a => a.mID == LifeStyleQA[0].AlcholPerDay)[0].mValue === undefined
+            ? [] : MasterDataDto4.filter(a => a.mID == LifeStyleQA[0].AlcholPerDay)[0].mValue;
+
+        obj.alcoholQuantity = LifeStyleQA[0].AlcholQuantity;
+        obj.alcoholDuration = LifeStyleQA[0].AlcholDuration;
+
+        this.state.AlcoData.push(obj);
+        this.setState({});
+        console.log("AlcoData", this.state.AlcoData);
+        this.alcoholDataTable();
+    }
+
+    alcoholDataTable = () => {
+
+        this.setState({
+            alcoholdata: this.state.AlcoData.map((prop, key) => {
+                return {
+                    type: prop.alcoholType,
+                    quantity: prop.alcoholQuantity,
+                    per: prop.alcoholPer,
+                    longYears: prop.alcoholDuration,
+                    actions: (
+                        <div className="actions-right">
+                            <Button color="danger" justIcon round simple className="edit" onClick={() => this.onDeleteAlcoholdata()} ><Delete /></Button>
+                        </div>
+                    )
+                };
+            }
+            )
+        }
+        )
+    }
+
+    onDeleteAlcoholdata = () => {
+        debugger;
+        this.state.AlcoData = [];
+        this.setState({});
+
+        this.alcoholDataTable();
     }
 
 
@@ -689,7 +797,7 @@ class ProposalIncomplete extends React.Component {
                                                         </Button>
                                                         */}
                         {this.state.open &&
-                            <ModifyProposal handlePolicyOwnerData={this.handlePolicyOwnerData} DateChange={this.DateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails} SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer} singleValueSelected={this.state.singleValueSelected} handleRadioChange={this.handleRadioChange} handleRadioOnChange={this.handleRadioOnChange} leadTable={this.leadTable} SetValue={this.SetValue} MasterDataDto={this.state.MasterDataDto} filterData={this.state.filterData} PolicyOwnerDetailsDto={this.state.PolicyOwnerDetailsDto} PolicyOwnerDetailsSetValue={this.PolicyOwnerDetailsSetValue} PolicyOwnerDetailsdataOnYesConditioinDto={this.state.PolicyOwnerDetailsdataOnYesConditioinDto} PolicyOwnerDetailsdataOnNoCondition={this.state.PolicyOwnerDetailsdataOnNoCondition} handleClose={this.handleClose} SetPermanentAddCheckBox={this.SetPermanentAddCheckBox} singleValueCheckboxSelected={this.state.singleValueCheckboxSelected} citizenshipCheckboxSelected={this.state.citizenshipCheckboxSelected} SetCitizenshipCheckBox={this.SetCitizenshipCheckBox} />
+                            <ModifyProposal AlcoholQuestionAddButton={this.AlcoholQuestionAddButton} alcoholdata={this.state.alcoholdata} TobaccoQuestionAddButton={this.TobaccoQuestionAddButton} tobaccodata={this.state.tobaccodata} handlePolicyOwnerData={this.handlePolicyOwnerData} DateChange={this.DateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails} SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer} singleValueSelected={this.state.singleValueSelected} handleRadioChange={this.handleRadioChange} handleRadioOnChange={this.handleRadioOnChange} leadTable={this.leadTable} SetValue={this.SetValue} MasterDataDto={this.state.MasterDataDto} filterData={this.state.filterData} PolicyOwnerDetailsDto={this.state.PolicyOwnerDetailsDto} PolicyOwnerDetailsSetValue={this.PolicyOwnerDetailsSetValue} PolicyOwnerDetailsdataOnYesConditioinDto={this.state.PolicyOwnerDetailsdataOnYesConditioinDto} PolicyOwnerDetailsdataOnNoCondition={this.state.PolicyOwnerDetailsdataOnNoCondition} handleClose={this.handleClose} SetPermanentAddCheckBox={this.SetPermanentAddCheckBox} singleValueCheckboxSelected={this.state.singleValueCheckboxSelected} citizenshipCheckboxSelected={this.state.citizenshipCheckboxSelected} SetCitizenshipCheckBox={this.SetCitizenshipCheckBox} />
                         }
                         {/*</div>
                     </Modal>*/}

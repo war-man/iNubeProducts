@@ -46,7 +46,7 @@ const radioAlign = {
 }
 
 const MainlifeLifeStyle = (props) => {
-    console.log("My Life Styleprops", props.LifeStyleQuesDTO);
+    console.log("My Life Styleprops", props.LifeStyleQuesDTO, "proppsdata", props);
     console.log("masterdto13", props.MasterDataDto);
 
    
@@ -118,7 +118,7 @@ const MainlifeLifeStyle = (props) => {
         </GridContainer>
         <GridContainer lg={12}>
             <GridItem xs={12}>
-                   <h6> <p>Do You Consume Tobacco ?</p></h6>
+                <p>Do You Consume Tobacco ?</p>
                 </GridItem>
 
                 <GridItem xs={12} sm={6} >
@@ -186,17 +186,16 @@ const MainlifeLifeStyle = (props) => {
                         />
                     </div>
                 </GridItem>
-
-                {props.showradioval &&
+            </GridContainer>
+                {props.showradioval && 
+                    <GridContainer lg={12}>
                     <GridItem xl={12} sm={4} md={4}>
                     <MasterDropdown
-                        labelText="Cigarettes"
-                        // id="LeadDTO.gender"
+                        labelText="Type"
                         value={props.LifeStyleQA.SmokeType}
                         lstObject={props.MasterDataDto}
-                        filterName='Smoke'
-                        //  model="LeadDTO"
-                        name='SmokeTypes'
+                        filterName='SmokeTypes'
+                        name='SmokeType'
                         onChange={(e) => props.QuestionalDetailsSetValue(e)}
                         formControlProps={{
                             fullWidth: true
@@ -204,18 +203,13 @@ const MainlifeLifeStyle = (props) => {
                     />
                     
 
-                </GridItem>}
-                {props.showradioval && 
-
-                   
+                </GridItem>
                    <GridItem xl={12} sm={4} md={5}>
                     <MasterDropdown
-                        labelText="how many sticks per day"
-                        // id="LeadDTO.gender"
+                        labelText="How many sticks per day"
                         value={props.LifeStyleQA.SmokeQuantity}
                         lstObject={props.MasterDataDto}
-                        filterName='SmokeTypes'
-                        //  model="LeadDTO"
+                        filterName='SmokeSticks'
                         name='SmokeQuantity'
                         onChange={(e) => props.QuestionalDetailsSetValue(e)}
                         formControlProps={{
@@ -226,19 +220,12 @@ const MainlifeLifeStyle = (props) => {
 
                     </GridItem>
                 
-                }
-          
                
-
-               
-            </GridContainer>
-            {props.showradioval &&
-                <GridContainer lg={12}>
+                
                 <GridItem xl={12} sm={4} md={4}>
                     <CustomInput
                         labelText="How Long(Years)?"
                         id="SmokeDuration"
-                        name="SmokeDuration"
                         value={props.LifeStyleQA.SmokeDuration}
                         name="SmokeDuration"
                         onChange={(e) => props.QuestionalDetailsSetValue(e)}
@@ -251,14 +238,14 @@ const MainlifeLifeStyle = (props) => {
                 <GridItem xl={12} sm={4} md={3}>
                 <Button color="info"
                     round className={props.classes.marginRight}
-                    //onClick={props.handleLeadSave}
+                        onClick={props.QuestionAddButton}
                     id="saveBtn" >
                         ADD
                                 </Button>
                     </GridItem>
-            </GridContainer>}
-        {props.showradioval && 
+                </GridContainer>}
 
+        {props.showradioval && 
 
                 <GridContainer xl={12}>
                     <GridItem lg={12}>
@@ -266,7 +253,7 @@ const MainlifeLifeStyle = (props) => {
                         <CardBody>
 
                         <ReactTable
-                            data={props.data1}
+                            data={props.tobaccodata}
                             filterable
                             columns={[
                                 {
@@ -280,7 +267,7 @@ const MainlifeLifeStyle = (props) => {
                                 },
                                 {
                                     Header: "HOW MANY STICKS PER DAY",
-                                    accessor: "LeadNo",
+                                    accessor: "SticksCount",
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
                                     minWidth: 100,
@@ -292,7 +279,7 @@ const MainlifeLifeStyle = (props) => {
                                 {
 
                                     Header: "HOW LONG(YEARS)?",
-                                    accessor: "LeadDate",
+                                    accessor: "Years",
                                     //minWidth: 150,
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -302,7 +289,7 @@ const MainlifeLifeStyle = (props) => {
                                 {
 
                                     Header: "DELETE",
-                                    accessor: "LeadDate",
+                                    accessor: "actions",
                                     //minWidth: 150,
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -321,11 +308,13 @@ const MainlifeLifeStyle = (props) => {
                     </CardBody>
                 </GridItem>
             </GridContainer>}
-
+            <br />
+            <br />
+           
         {/*Alcohol*/}
          <GridContainer lg={12}>
                 <GridItem xs={12}>
-                   <h6> <p>Do You Consume Alcohol ?</p></h6>
+                   <p>Do You Consume Alcohol ?</p>
                 </GridItem>
 
                 <GridItem xs={12} sm={6}>
@@ -393,143 +382,60 @@ const MainlifeLifeStyle = (props) => {
                         />
                     </div>
                 </GridItem>
-
-
-           
-
-
             </GridContainer>
             {props.showAlcoholradioval &&
                 <GridContainer lg={12}>
 
-                <GridItem xs={4}>
-                    <FormControl fullWidth className={classes.selectFormControl}>
-                        <InputLabel
-                            htmlFor="ddlval"
-                            className={classes.selectLabel}
-                        >
-                            Type
-                        </InputLabel>
-                        <Select
-                            MenuProps={{
-                                className: classes.selectMenu
-                            }}
-                            classes={{
-                                select: classes.select
-                            }}
-                            value={props.showMLLS}
-                            onChange={(e) => props.handleSimple(e)}
-                            inputProps={{
-                                name: "ddlval",
-                                id: "ddlval"
-                            }}
-                        >
+                <GridItem xl={12} sm={4} md={4}>
+                    <MasterDropdown
+                        labelText="Type"
+                        value={props.LifeStyleQA.AlcholType}
+                        lstObject={props.MasterDataDto}
+                        filterName='AlcoholTypes'
+                        name='AlcholType'
+                        onChange={(e) => props.QuestionalDetailsSetValue(e)}
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
 
 
-                            <MenuItem
-                                disabled
-                                classes={{
-                                    root: classes.selectMenuItem,
-                                    selected: classes.selectMenuItemSelected
-                                }}
-
-                            >
-                                SELECT
-                                    </MenuItem>
-                            <MenuItem
-                                disabled
-                                classes={{
-                                    root: classes.selectMenuItem,
-                                    selected: classes.selectMenuItemSelected
-                                }}
-                                value="1"
-                            >
-
-                                HARD LIQUOR
-                                    </MenuItem>
-                            <MenuItem
-                                disabled
-                                classes={{
-                                    root: classes.selectMenuItem,
-                                    selected: classes.selectMenuItemSelected
-                                }}
-                                value="2"
-                            >
-
-                                BEER
-                                    </MenuItem>
-
-                            <MenuItem
-                                disabled
-                                classes={{
-                                    root: classes.selectMenuItem,
-                                    selected: classes.selectMenuItemSelected
-                                }}
-                                value="3"
-                            >
-
-                                WINE
-                                    </MenuItem>
-
-                        </Select>
-                    </FormControl>
                 </GridItem>
 
-                <GridItem xs={4}>
+                <GridItem xl={12} sm={4} md={4}>
                     <CustomInput
                         labelText="Quantity(ml)"
-                        id="Weight"
+                        value={props.LifeStyleQA.AlcholQuantity}
+                        name="AlcholQuantity"
+                        onChange={(e) => props.QuestionalDetailsSetValue(e)}
                         formControlProps={{
                             fullWidth: true
                         }}
                     />
                 </GridItem>
-                <GridItem xs={4}>
-                    <FormControl fullWidth className={classes.selectFormControl}>
-                        <InputLabel
-                            htmlFor="time-interval"
-                            className={classes.selectLabel}
-                        >
-                            Per
-                        </InputLabel>
-                        <Select
-                            MenuProps={{
-                                className: classes.selectMenu
-                            }}
-                            classes={{
-                                select: classes.select
-                            }}
-                            value={props.showMLLS}
-                            onChange={(e) => props.handleSimple(e)}
-                            inputProps={{
-                                name: "ddlval",
-                                id: "ddlval"
-                            }}
-                        >
+
+                <GridItem xl={12} sm={4} md={4}>
+                    <MasterDropdown
+                        labelText="Per"
+                        value={props.LifeStyleQA.AlcholPerDay}
+                        lstObject={props.MasterDataDto}
+                        filterName="Smoke&AlcoholPer"
+                        name='AlcholPerDay'
+                        onChange={(e) => props.QuestionalDetailsSetValue(e)}
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
 
 
-                            <MenuItem
-                                disabled
-                                classes={{
-                                    root: classes.selectMenuItem,
-                                    selected: classes.selectMenuItemSelected
-                                }}
-                                value="1"
-                            >
-                                WEEK
-                                    </MenuItem>
-
-                        </Select>
-                    </FormControl>
                 </GridItem>
-
-            </GridContainer>}
-            {props.showAlcoholradioval &&
-                <GridContainer lg={12}>
+                
                 <GridItem xs={4}>
                     <CustomInput
                         labelText="How Long(Years)?"
-                        id="Height"
+                        value={props.LifeStyleQA.AlcholDuration}
+                        name="AlcholDuration"
+                        onChange={(e) => props.QuestionalDetailsSetValue(e)}
                         formControlProps={{
                             fullWidth: true
                         }}
@@ -538,7 +444,7 @@ const MainlifeLifeStyle = (props) => {
                 <GridItem xl={12} sm={4} md={3}>
                     <Button color="info"
                         round className={props.classes.marginRight}
-                        //onClick={props.handleLeadSave}
+                        onClick={props.AlcoholQuestionAddButton}
                         id="saveBtn" >
                         ADD
                                 </Button>
@@ -551,12 +457,12 @@ const MainlifeLifeStyle = (props) => {
                     <CardBody >
 
                         <ReactTable
-                            data={props.data1}
+                            data={props.alcoholdata}
                             filterable
                             columns={[
                                 {
                                     Header: "TYPE",
-                                    accessor: "Type",
+                                    accessor: "type",
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
                                     minWidth: 70,
@@ -564,8 +470,8 @@ const MainlifeLifeStyle = (props) => {
 
                                 },
                                 {
-                                    Header: "NUMBER",
-                                    accessor: "LeadNo",
+                                    Header: "QUANTITY",
+                                    accessor: "quantity",
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
                                     minWidth: 70,
@@ -577,7 +483,7 @@ const MainlifeLifeStyle = (props) => {
                                 {
 
                                     Header: "PER",
-                                    accessor: "LeadDate",
+                                    accessor: "per",
                                     //minWidth: 150,
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -587,7 +493,7 @@ const MainlifeLifeStyle = (props) => {
                                 {
 
                                     Header: "HOW LONG(YEARS)?",
-                                    accessor: "LeadDate",
+                                    accessor: "longYears",
                                     //minWidth: 150,
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -597,7 +503,7 @@ const MainlifeLifeStyle = (props) => {
                                 {
 
                                     Header: "DELETE",
-                                    accessor: "LeadDate",
+                                    accessor: "actions",
                                     //minWidth: 150,
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -617,13 +523,16 @@ const MainlifeLifeStyle = (props) => {
                 </GridItem>
             </GridContainer>}
 
+            <br />
+            <br />
+
             {/*Question1*/}
             <GridContainer lg={12}>
                 <GridItem xs={12}>
                   
-                    <h6>
-                        <p>1.{(props.LifeStyleQuesDTO[0] !== undefined) ? props.LifeStyleQuesDTO[0].questionText:""}</p>
-                    </h6>
+                   
+                        <p>1. {(props.LifeStyleQuesDTO[0] !== undefined) ? props.LifeStyleQuesDTO[0].questionText:""}</p>
+                    
                 </GridItem>
            
             
@@ -694,13 +603,13 @@ const MainlifeLifeStyle = (props) => {
                 </GridItem>
 
 
-
+            </GridContainer>
 
 
            
             {props.showQuestion1 &&
                 <GridContainer lg={12}>
-                <GridItem xs={12}>
+                <GridItem xs={6}>
                     
                     <CustomInput
                         labelText={(props.LifeStyleQuesDTO[4] !== undefined) ? props.LifeStyleQuesDTO[4].questionText : ""}
@@ -711,14 +620,16 @@ const MainlifeLifeStyle = (props) => {
                     />
                 </GridItem>
                     </GridContainer>}
-                </GridContainer>
+               
+            <br />
+            <br />
 
             {/*Question2*/}
             <GridContainer lg={12}>
                 <GridItem xs={24}>
-                    <h6>
-                        {<p>1.{(props.LifeStyleQuesDTO[1] !== undefined) ? props.LifeStyleQuesDTO[1].questionText : ""}</p>}
-                    </h6>
+                    
+                        {<p>2. {(props.LifeStyleQuesDTO[1] !== undefined) ? props.LifeStyleQuesDTO[1].questionText : ""}</p>}
+                    
                 </GridItem>
            
                 <GridItem xs={4} sm={6}>
@@ -786,12 +697,8 @@ const MainlifeLifeStyle = (props) => {
                         />
                     </div>
                 </GridItem>
-
-
-
-
-
             </GridContainer>
+
             {props.showQuestion2 &&
                 <GridContainer lg={12}>
                 <GridItem xs={6}>
@@ -806,12 +713,15 @@ const MainlifeLifeStyle = (props) => {
                 </GridItem>
             </GridContainer>}
 
+            <br />
+            <br />
+
             {/*Question3*/}
             <GridContainer lg={12}>
                 <GridItem xs={24}>
-                    <h6>
-                        {<p>1.{(props.LifeStyleQuesDTO[2] !== undefined) ? props.LifeStyleQuesDTO[2].questionText : ""}</p>}
-                    </h6>
+                    
+                        {<p>3. {(props.LifeStyleQuesDTO[2] !== undefined) ? props.LifeStyleQuesDTO[2].questionText : ""}</p>}
+                    
                 </GridItem>
            
             
@@ -881,14 +791,11 @@ const MainlifeLifeStyle = (props) => {
                     </div>
                 </GridItem>
 
-
-
-
-
             </GridContainer>
-            {props.showQuestion3 && <GridContainer lg={12}>
+            {props.showQuestion3 &&
+                <GridContainer lg={12}>
              
-                <GridItem xs={6}>
+                <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.LifeStyleQuesDTO[6] !== undefined) ? props.LifeStyleQuesDTO[6].questionText : ""}
                         id="Specification"

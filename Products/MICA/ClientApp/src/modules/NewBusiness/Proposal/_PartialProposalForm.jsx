@@ -62,10 +62,10 @@ const PartialProposalForm = (props) => {
             <CardBody>
                 <GridItem>
                     <h4><small>IMPORTENT</small></h4>
-                    <h6>1. Please answer all the questions accurately. </h6>
-                    <h6>2. Please do not withhold any information. </h6>
-                    <h6>3. If you are in doubt whether some information need to be disclosed, please disclose them.  </h6>
-                    <h6>4. Please make sure that you answer all the questions before placing your signature.  </h6>
+                    <p>1. Please answer all the questions accurately. </p>
+                    <p>2. Please do not withhold any information. </p>
+                    <p>3. If you are in doubt whether some information need to be disclosed, please disclose them.  </p>
+                    <p>4. Please make sure that you answer all the questions before placing your signature.  </p>
                 </GridItem>
                
            

@@ -16,6 +16,7 @@ using System.Data.SqlClient;
 using Newtonsoft.Json;
 using System.Data;
 using iNube.Services.Billing.Controllers.Billing.BillingService;
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 {
@@ -26,13 +27,15 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         private IIntegrationService _integrationService;
         private readonly IConfiguration _configuration;
         public DbHelper dbHelper;
-        public MicaBillingService(MICABIContext context, IMapper mapper, IIntegrationService integrationService, IConfiguration configuration)
+        private ILoggerManager _logger;
+        public MicaBillingService(MICABIContext context, IMapper mapper, ILoggerManager logger, IIntegrationService integrationService, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _integrationService = integrationService;
             _configuration = configuration;
-            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
+            _logger = logger;
+            dbHelper = new DbHelper(new IntegrationService(configuration, logger)); ;
         }
 
 

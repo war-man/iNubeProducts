@@ -8,8 +8,8 @@
       "name": "dev2-mica-product",
       "image": "<IMAGE1_NAME>",
 
-      "cpu": 1024,
-      "memory": 1024,
+      "cpu": 300,
+      "memory": 800,
 
       "portMappings": [
         {
@@ -27,7 +27,7 @@
   "requiresCompatibilities": [
     "EC2"
   ],
-  "cpu": "1024",
-  "memory": "1024"
+  "cpu": "300",
+  "memory": "800"
 
 }

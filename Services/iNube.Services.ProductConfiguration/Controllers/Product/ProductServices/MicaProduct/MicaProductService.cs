@@ -1947,12 +1947,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return data;
         }
 
-        //Fetching Relationship=Single datas
+        //Fetching entities Relationship=Single datas
         public async Task<List<object>> GetSingleEntitiesById(int Id, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.EntityId == Id && a.Relationship == "Single")
+            var data = _context.TblEntityDetails.Where(a => a.EntityId == Id /*&& a.Relationship == "Single"*/)
                 .Include(a => a.TblEntityAttributes)
                 .Select(a => a).ToList();
             var componentType = _context.TblmasDynamic.Select(a => a);
@@ -1980,44 +1980,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return Finalentity;
         }
 
-        public async Task<List<object>> GetEntitiesById(int Id, string relation, ApiContext apiContext)
-        {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-            var data = _context.TblEntityDetails.Where(a => a.EntityId == Id && a.Relationship == relation)
-                .Include(a => a.TblEntityAttributes)
-                .Select(a => a).ToList();
-            var componentType = _context.TblmasDynamic.Select(a => a);
-
-            var result = _mapper.Map<List<EntityDetailsDTO>>(data);
-            List<object> Finalentity = new List<object>();
-            _logger.LogRequest("TblEntityDetails", "GetEntitiesById", "Product", Guid.NewGuid().ToString(), null, apiContext);
-            foreach (var item in result)
-            {
-                List<object> attributelist = new List<object>();
-                //List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
-
-                //var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.EntityAttributes);
-                foreach (var item1 in item.EntityAttributes)
-                {
-                    item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
-                    item1.Relationship = item.Relationship;
-                }
-                //list.AddRange(attributes);
-
-                //attributelist.AddRange(list);
-                Finalentity.Add(result);
-                var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, relation, apiContext);
-            }
-            return Finalentity;
-        }
-
-        //Fetching Relationship=Multiple datas
+        //Fetching datas based on Parentid
         public async Task<List<object>> GetMultipleEntitiesById(int Id, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.ParentId == Id && a.Relationship == "Multiple")
+            var data = _context.TblEntityDetails.Where(a => a.ParentId == Id /*&& a.Relationship == "Multiple"*/)
                 .Include(a => a.TblEntityAttributes)
                 .Select(a => a).ToList();
             var componentType = _context.TblmasDynamic.Select(a => a);
@@ -2046,7 +2014,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _logger.LogRequest("TblEntityDetails", "GetChildAttributeListAsync", "Product", Guid.NewGuid().ToString(), null, apiContext);
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.ParentId == id && a.Relationship == relationship)
+            var data = _context.TblEntityDetails.Where(a => a.ParentId == id /*&& a.Relationship == relationship*/)
            .Include(a => a.TblEntityAttributes)
            .Select(a => a).ToList();
             var result = _mapper.Map<List<EntityDetailsDTO>>(data);
@@ -2068,7 +2036,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     //list.AddRange(attributes);
                     Finalentity.Add(result);
 
-                    var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, relationship, apiContext);
+                    //var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, relationship, apiContext);
                 }
                 return true;
             }

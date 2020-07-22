@@ -26,6 +26,8 @@ using iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigService.M
 using iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigService.MotorAccounting;
 using iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigService.AvoAccounting;
 using iNube.Utility.Framework.LogPrivider.LogService;
+using iNube.Utility.Framework.Extensions.DefaultSecurityHeader;
+using Microsoft.AspNetCore.Internal;
 
 namespace iNube.Services.Accounting
 {
@@ -75,11 +77,30 @@ namespace iNube.Services.Accounting
         }
 
 
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.InitializedCommonConfiguration(env, Configuration);
-            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
-            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
+            //app.InitializedCommonConfiguration(env, Configuration);
+            // global cors policy
+            // app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            app.UseCors(builder => builder.WithOrigins("http://localhost:55294"));
+            app.UseHealthChecks("/hc", new HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
+
+
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = Configuration["Swagger:Url"].ToString() + "/{documentName}/swagger.json";
+            });
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/" + Configuration["Swagger:Url"].ToString() + "/" + Configuration["Swagger:Version"].ToString() + "/swagger.json", Configuration["Swagger:Name"].ToString());
+                c.RoutePrefix = Configuration["Swagger:Url"].ToString();
+            });
+            app.ConfigureExceptionHandler(new LoggerManager(Configuration));
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -89,8 +110,14 @@ namespace iNube.Services.Accounting
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseEndpointRouting();
             app.UseAuthentication();
             app.UseHttpsRedirection();
+            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
+              .AddFrameOptionsSameOrigin()
+              .AddXssProtectionEnabled()
+              .AddContentTypeOptionsNoSniff()
+            );
             app.UseMvc();
         }
         private void ConfigureModuleService(IServiceCollection services)

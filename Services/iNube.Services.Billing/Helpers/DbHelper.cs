@@ -1,5 +1,6 @@
 ﻿using iNube.Services.Billing.Controllers.Billing.IntegrationServices;
 using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace iNube.Services.Billing.Helpers
@@ -8,15 +9,25 @@ namespace iNube.Services.Billing.Helpers
     {
         private IIntegrationService _integrationService;
         public string _TimeZone { get; set; }
+        public static ConcurrentDictionary<decimal, string> lstDbCon = new ConcurrentDictionary<decimal, string>();
+
         public DbHelper(IIntegrationService integrationService)
         {
             _integrationService = integrationService;
         }
          
         public async Task<string> GetEnvironmentConnectionAsync(string product,decimal EnvId)
-        {
-            var constring = await _integrationService.GetEnvironmentConnection(product, EnvId);
-            return constring.Dbconnection;
+        { string dbConnectionString = "";
+            if (lstDbCon.ContainsKey(EnvId))
+            {
+                dbConnectionString = lstDbCon[EnvId];
+            }
+            else
+            {
+                var constring = await _integrationService.GetEnvironmentConnection(product, EnvId);
+                dbConnectionString= constring.Dbconnection;
+            }
+            return dbConnectionString;
         }
         public DateTime ConvertUTCToZone(string utcDateTime, string userTimeZone)
         {

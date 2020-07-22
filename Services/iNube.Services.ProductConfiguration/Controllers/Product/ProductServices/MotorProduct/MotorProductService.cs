@@ -611,11 +611,6 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             throw new NotImplementedException();
         }
 
-        public async Task<List<object>> GetEntitiesById(int Id, string relation, ApiContext apiContext)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<List<object>> GetMultipleEntitiesById(int Id, ApiContext apiContext)
         {
             throw new NotImplementedException();

@@ -902,9 +902,36 @@ namespace iNube.Services.MicaExtension_EGI.Models
 
     public partial class PolicyDetailsDTOResponse : ResponseStatus
     {
-
         public dynamic PolicyDetails { get; set; }
-
     }
+
+    public partial class VehicleDetails
+    {
+        public string VehicleNumber { get; set; }
+        public bool? SwitchStatus { get; set; }
+        public bool ManualIntervension { get; set; }
+         
+    }
+
+    public partial class ActiveVehicleResponse
+    {
+        public ActiveVehicleResponse()
+        {
+            VehicleDetails = new List<VehicleDetails>();
+        }
+        public int ActivePCCount { get; set; }
+        public int ActiveTWCount { get; set; }
+        public dynamic SwitchLogsData { get; set; }
+        public List<VehicleDetails> VehicleDetails { get; set; }
+    }
+
+    public partial class ADCalculateDTO : ResponseStatus
+    {
+        public decimal AdPerDayAmount { get; set; }
+        public decimal AdPerDayFromTaxAmount { get; set; }
+        public decimal AdPerDayToTaxAmount { get; set; }
+        public decimal AdTotalAmount { get; set; }
+    }
+
 }
 
