@@ -383,5 +383,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<FinalPremiumResponse> GetPremiumCalculation(dynamic policyRequest, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

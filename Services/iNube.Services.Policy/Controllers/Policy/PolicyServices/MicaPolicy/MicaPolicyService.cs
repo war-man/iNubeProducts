@@ -286,7 +286,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 var productDetails = await _integrationService.GetProductDetailAsync(productId, apiContext);
                 if (productDetails.ProductId <= 0)
                 {
-                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductId", PropertyName = "ProductId", ErrorMessage = $"ProdcutId : {productId} Not Found" };
+                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductId", PropertyName = "ProductId", ErrorMessage = $"ProductId : {productId} Not Found" };
                     Errors.Add(errorInfo);
                     return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                 }
@@ -1943,7 +1943,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 var productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
                 if (productDetails.ProductId <= 0)
                 {
-                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductCode", PropertyName = "Product Code", ErrorMessage = $"ProdcutId : {productCode} Not Found" };
+                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductCode", PropertyName = "Product Code", ErrorMessage = $"ProductId : {productCode} Not Found" };
                     Errors.Add(errorInfo);
                     return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                 }
@@ -7593,11 +7593,50 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             AddProperty(policyDetail, "InsurableItem", insurableItems);
         }
 
+        public async Task<FinalPremiumResponse> GetPremiumCalculation(dynamic policyRequest, ApiContext apiContext)
+        {
+
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+
+            var productCode=policyRequest["Product Code"].ToString();
+            ProductDTO productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
+            if (productDetails.ProductId <= 0)
+            {
+                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductCode", PropertyName = "Product Code", ErrorMessage = $"ProductCode : {productCode} Not Found" };
+                Errors.Add(errorInfo);
+                return new FinalPremiumResponse { Status = BusinessStatus.NotFound, Errors = Errors };
+            }
+            RateResult rateResult = new RateResult();
+            rateResult.entity= "FinalPremium";
+            List<object> list = new List<object>();
+            foreach (var item in productDetails.ProductPremium)
+            {
+                if (item.RatingId > 0) {
+
+                    DispatcherEventRequest dispatcherEventRequest = new DispatcherEventRequest();
+                    dispatcherEventRequest.TxnObject = policyRequest;
+                    var Data = await _integrationService.GetDispatcherEventTask(dispatcherEventRequest, item.DispatcherId,item.MapperId, apiContext);
+                    var Obj = JsonConvert.DeserializeObject<dynamic>(Data.ToString());
+                  
+                    if (Obj["FinalPremium"] != null)
+                    {
+                        var total = Convert.ToDecimal(rateResult.eValue) + Convert.ToDecimal(Obj["FinalPremium"]);
+                        rateResult.eValue = total.ToString();
+                    }
+                }
+                else
+                {
+                    var total = Convert.ToDecimal(rateResult.eValue) + item.PremiumAmount;
+                    rateResult.eValue = total.ToString();
+                }
+            }
+
+            return new FinalPremiumResponse{Status=BusinessStatus.Ok,FinalPremium=rateResult};
+        }
 
 
-
-
-    }
+        }
 
 
 

@@ -92,6 +92,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<ResponseStatus> PolicyActivate(ApiContext apiContext);
         Task<ResponseStatus> UpdateCardDetails(UpdateCardDetails updateCardDetails, ApiContext apiContext);
         Task<PolicyResponse> LeadPolicy(LeadInfoDTO leadInfo, ApiContext apiContext);
+        Task<FinalPremiumResponse> GetPremiumCalculation(dynamic policyRequest, ApiContext apiContext);
     }
     public class PolicyService : IPolicyService
     {
@@ -820,6 +821,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<PolicyResponse> LeadPolicy(LeadInfoDTO leadInfo, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).LeadPolicy(leadInfo, apiContext);
+        }
+
+        public async Task<FinalPremiumResponse> GetPremiumCalculation(dynamic policyRequest, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetPremiumCalculation(policyRequest, apiContext);
         }
     }
 }

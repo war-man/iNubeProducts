@@ -911,6 +911,8 @@ namespace iNube.Services.ProductConfiguration.Models
         public string Description { get; set; }
         public int? RefId { get; set; }
         public decimal? RatingId { get; set; }
+        public decimal? MapperId { get; set; }
+        public decimal? DispatcherId { get; set; }
     }
 
     /// <summary>

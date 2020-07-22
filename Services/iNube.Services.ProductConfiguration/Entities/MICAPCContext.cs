@@ -68,13 +68,13 @@ namespace iNube.Services.ProductConfiguration.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<TblAvoproducts>(entity =>
             {
@@ -891,7 +891,15 @@ namespace iNube.Services.ProductConfiguration.Entities
 
                 entity.Property(e => e.CurrencyId).HasColumnName("CurrencyID");
 
+                entity.Property(e => e.DispatcherId)
+                    .HasColumnName("DispatcherID")
+                    .HasColumnType("numeric(18, 0)");
+
                 entity.Property(e => e.LevelId).HasColumnName("LevelID");
+
+                entity.Property(e => e.MapperId)
+                    .HasColumnName("MapperID")
+                    .HasColumnType("numeric(18, 0)");
 
                 entity.Property(e => e.PremiumAmount).HasColumnType("numeric(10, 2)");
 
