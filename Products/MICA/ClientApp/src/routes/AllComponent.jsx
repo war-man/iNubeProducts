@@ -158,6 +158,8 @@ const EllustrationConfig = AsyncComponent(() => { return import("modules/Rating/
 const IllustrationResult = AsyncComponent(() => { return import("modules/Rating/views/IllustrationResult.jsx"); });
 const ViewRateTable = AsyncComponent(() => { return import("modules/Rating/views/ViewRateTable.jsx"); });
 
+/*Dispatcher*/
+const DispatcherTask = AsyncComponent(() => { return import("modules/Dispatcher/views/Dispatcher.jsx"); });
 
 
 /* DMS module*/
@@ -411,6 +413,8 @@ export const ComponentsList = {
     DashboardConfiguration: DashboardConfiguration,
     ViewDashboard: ViewDashboard,
     DashboardUpdate: DashboardUpdate,
+    //Dispatcher
+    DispatcherTask: DispatcherTask
 }
 
 export default ComponentsList;
