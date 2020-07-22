@@ -50,6 +50,14 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService
         {
             return await _objectService(Context.ProductType).CreateDispatcherTask(dispatcherDto, Context);
         }
+        public async Task<object> DispatcherEventTask(dynamic DispatcherEventObject, decimal dispatcherId, decimal mapperId, ApiContext Context)
+        {
+            return await _objectService(Context.ProductType).DispatcherEventTask(DispatcherEventObject, dispatcherId, mapperId, Context);
+        }
+        public async Task<IEnumerable<DispatcherDTO>> GetDispatcherTask(ApiContext Context)
+        {
+            return await _objectService(Context.ProductType).GetDispatcherTask(Context);
+        }
 
     }
 }
