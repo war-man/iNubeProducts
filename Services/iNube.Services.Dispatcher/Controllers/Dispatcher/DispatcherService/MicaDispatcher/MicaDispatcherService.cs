@@ -154,6 +154,28 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mic
             }
             return null;
         }
+
+        public async Task<IEnumerable<DispatcherDTO>> GetDispatcherTask(ApiContext Context)
+        {
+            if (_context == null)
+            {
+                _context = (MICADTContext)(await DbManager.GetContextAsync(Context.ProductType, Context.ServerType, _configuration));
+            }
+            try
+            {
+                var dispatcher = from tblDispatcher in _context.TblDispatcher
+                                 select new DispatcherDTO
+                                 {
+                                     DispatcherTaskName = tblDispatcher.DispatcherTaskName
+                                 };
+                return dispatcher;
+            }
+            catch (Exception ex)
+            {
+            }
+            return null;
+        }
+
         public async Task<object> DispatcherEventTask(dynamic DispatcherEventObject, decimal dispatcherId, decimal mapperId, ApiContext apiContext)
         {
             _context = (MICADTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));

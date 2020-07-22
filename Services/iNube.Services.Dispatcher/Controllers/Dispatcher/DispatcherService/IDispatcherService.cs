@@ -13,5 +13,6 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService
         Task<object> DispatcherEvent(dynamic DispatcherEventObject, string EventType ,ApiContext Context);
         Task<DispatcherResponse> CreateDispatcherTask(DispatcherDTO dispatcherDto, ApiContext apiContext);
         Task<object> DispatcherEventTask(dynamic DispatcherEventObject, decimal dispatcherId, decimal mapperId, ApiContext apiContext);
+        Task<IEnumerable<DispatcherDTO>> GetDispatcherTask(ApiContext Context);
     }
 }
