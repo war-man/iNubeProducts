@@ -267,7 +267,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         public async Task<dynamic> NewRatingCalculator(SchedulerPremiumDTO dynamicData, ApiContext apiContext)
         {
-            var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/"+ ModuleConstants.EGINewRatingId;
+            var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/"+ ModuleConstants.DevEGINewRatingId;
             return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, dynamicData);
         }
 

@@ -11159,9 +11159,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         if (BatchCount == ModuleConstants.BatchCircuitBreak)
                         {
                             //Circuit Breaker Ret-Try Cannot Be More than 3 Times
-                            Response.ResponseMessage = "MANUAL CHECK NEEDED - " + "BatchName -" + BatchName + "Batch Mode - " + BatchMode
-                                                      + "Batch Circuit Breaker Ret-Try Cannot Be EXECUTED More than 3 Times"
-                                                      + "Failed Policys -" + string.Join(",", PolicyNumberList);
+                            Response.ResponseMessage = "MANUAL CHECK NEEDED - " + "BatchName -" + BatchName + " Batch Mode - " + BatchMode
+                                                      + " Batch Circuit Breaker Ret-Try Cannot Be EXECUTED More than 3 Times"
+                                                      + " Failed Policys -" + string.Join(",", PolicyNumberList);
                             return Response;
                         }
 
@@ -11536,19 +11536,19 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     Response.ResponseMessage = "Batch Name - " + BatchName + 
                                                "Batch Mode - " + BatchMode + 
                                                "Date - " + IndianTime +
-                                               "Success Count - " + BatchJobLog.SuccessCount +
-                                               "Fail Count - " + BatchJobLog.FailCount +
-                                               "Failed Policy's - " + string.Join(",", FailedPolicyLst) +
-                                               "Internal Exception's - " + InternalExceptionMsg;
+                                               " Success Count - " + BatchJobLog.SuccessCount +
+                                               " Fail Count - " + BatchJobLog.FailCount +
+                                               " Failed Policy's - " + string.Join(",", FailedPolicyLst) +
+                                               " Internal Exception's - " + InternalExceptionMsg;
                 }
                 else
                 {
                     Response.ResponseMessage = "Batch Name - " + BatchName +
                                                "Batch Mode - " + BatchMode +
                                                "Date - " + IndianTime +
-                                               "Success Count - " + BatchJobLog.SuccessCount +
-                                               "Fail Count - " + BatchJobLog.FailCount +
-                                               "Internal Exception's - " + InternalExceptionMsg;
+                                               " Success Count - " + BatchJobLog.SuccessCount +
+                                               " Fail Count - " + BatchJobLog.FailCount +
+                                               " Internal Exception's - " + InternalExceptionMsg;
                 }
             }
             catch (Exception Ex)
