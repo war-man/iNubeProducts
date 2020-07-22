@@ -527,8 +527,12 @@ class ClaimProcess extends React.Component {
                             'Authorization': 'Bearer ' + localStorage.getItem('userToken')
                         },
                         body: JSON.stringify(field)
-                    }).then(response => response.json())
-                        .then(data => {
+                    }).then(response => {
+                        if (response.statusCode != 200) {
+                            this.setState({ responseflag: false });
+                        };
+                        return Promise.all([response.statusCode, response.json()]);
+                    }).then(data => {
                             console.log("response: ", data)
                             //      if (data.status == 200) {
                             //  this.state.claimId = data.claimId;

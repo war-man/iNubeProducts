@@ -505,7 +505,12 @@ class InboxClaimProcess extends React.Component {
                             'Authorization': 'Bearer ' + localStorage.getItem('userToken')
                         },
                         body: JSON.stringify(field)
-                    }).then(response => response.json())
+                    }).then(response => {
+                        if (response.statusCode != 200)
+                        {
+                            this.setState({ responseflag: false });
+                        };
+                        return Promise.all([response.statusCode, response.json()]);})
                         .then(data => {
                           
                             //this.setState({ responseflag:false});

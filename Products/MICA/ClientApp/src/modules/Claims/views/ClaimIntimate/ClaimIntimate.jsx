@@ -127,7 +127,7 @@ class ClaimIntimate extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            response:false,
+            responseflag:false,
             benAmtFlag: true,
             riskFlag: false,
             policyflag: false,
@@ -392,7 +392,7 @@ class ClaimIntimate extends React.Component {
     onFormSubmit = (evt) => {
         this.state.validateUI = false;
         this.state.ValidationUI = true;
-        this.state.response = true;
+        this.state.responseflag = true;
         this.state.datevalidationflag = false;
         evt.preventDefault();
         this.UIValidation();
@@ -436,7 +436,10 @@ class ClaimIntimate extends React.Component {
                             'Authorization': 'Bearer ' + localStorage.getItem('userToken')
                         },
                         body: JSON.stringify(detailsdto)
-                    }).then(response => response.json())
+                    }).then(response => {
+                        if (response.statusCode != 200) { this.setState({ responseflag: false });};
+                        return Promise.all([response.statusCode, response.json()]);
+                    })
                         .then(data => {
                             console.log("responseData", data);
                          
@@ -449,13 +452,13 @@ class ClaimIntimate extends React.Component {
                                     buttons: [false, "OK"],
                                 }).then((willDelete) => {
                                     if (willDelete) {
-                                        this.setState({ redirect: true, response: false });
+                                        this.setState({ redirect: true, responseflag: false });
                                         this.renderRedirect();
                                     }
                                 });
                                 // this.setState({ redirect: true });
                             } else if (data.status == 7) {
-                                this.setState({ response: false });
+                                this.setState({ responseflag: false });
                                 if (data.errors.length > 0) {
                                     swal({
 
@@ -474,7 +477,7 @@ class ClaimIntimate extends React.Component {
 
                 }
                 else {
-                    this.setState({ response: false});
+                    this.setState({ responseflag: false});
                     if (this.state.DetailsDTO.lossDateTime == null) {
                         this.setState({ errormessage: true });
                         this.setState({ lossdateflag: true });
@@ -526,13 +529,13 @@ class ClaimIntimate extends React.Component {
                 this.setState({ errorifsccode: true });
                 this.setState({ errorbankName: true });
                 this.setState({ erroraccName: true });
-                this.setState({ errorlossloc: true, response: false });
+                this.setState({ errorlossloc: true, responseflag: false });
                 //this.setState({ erroraccno: true });
 
             }
         } else {
             //this.setState({ errordate: true });
-            this.setState({ response: false });
+            this.setState({ responseflag: false });
             swal("", "Loss date time must be within Policy Tenure", "error");
         }
 
@@ -736,7 +739,7 @@ class ClaimIntimate extends React.Component {
     }
 
     componentDidMount() {
-        this.setState({ response: false });
+        this.setState({ responseflag: false });
         //this.state.DataModel = Model;
         //this.setState({});
         let masterlist = "Claim Intimated By";
@@ -1653,7 +1656,7 @@ class ClaimIntimate extends React.Component {
                                 <br />
                                 <GridContainer justify="center">
                                     <GridItem xs={5} sm={3} md={3} lg={2}>
-                                        <Button color="info" round className={classes.marginRight} disabled={this.state.response} onClick={(e) => this.onFormSubmit(e)}><TranslationContainer translationKey="IntimateClaim" /></Button>
+                                        <Button color="info" round className={classes.marginRight} disabled={this.state.responseflag} onClick={(e) => this.onFormSubmit(e)}><TranslationContainer translationKey="IntimateClaim" /></Button>
                                     </GridItem>
                                     {this.renderRedirect()}
                                     <br />
