@@ -160,6 +160,7 @@ const ViewRateTable = AsyncComponent(() => { return import("modules/Rating/views
 
 /*Dispatcher*/
 const DispatcherTask = AsyncComponent(() => { return import("modules/Dispatcher/views/Dispatcher.jsx"); });
+const DispatcherExecution = AsyncComponent(() => { return import("modules/Dispatcher/views/DispatcherExecution.jsx"); });
 
 
 /* DMS module*/
@@ -414,7 +415,8 @@ export const ComponentsList = {
     ViewDashboard: ViewDashboard,
     DashboardUpdate: DashboardUpdate,
     //Dispatcher
-    DispatcherTask: DispatcherTask
+    DispatcherTask: DispatcherTask,
+    DispatcherExecution: DispatcherExecution
 }
 
 export default ComponentsList;
