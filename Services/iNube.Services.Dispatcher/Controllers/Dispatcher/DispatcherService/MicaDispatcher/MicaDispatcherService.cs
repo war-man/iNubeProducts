@@ -72,6 +72,11 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mic
                 OutputObject = item.OutputObject;
                 foreach (var it in item.TblDispatcherTask)
                 {
+                    //var selectedTask = DispatcherTask.FirstOrDefault(s => s.TaskId == it.DispatcherTaskId);
+                    //if (selectedTask != null)
+                    //{
+                    //    it.Api = it.Api + selectedTask.Value;
+                    //}
                     if (it.InputObject == item.InputObject)
                     {
                         var apiCall = await _integrationService.DipatcherApiCall(DispatcherEventObject.TxnObject, it.Api, apiContext);
@@ -149,6 +154,13 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mic
             }
             return null;
         }
-        
+        public async Task<object> DispatcherEventTask(dynamic DispatcherEventObject, decimal dispatcherId, decimal mapperId, ApiContext apiContext)
+        {
+            _context = (MICADTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            List<DispatcherDetails> DispatcherTask = new List<DispatcherDetails>();
+            var EventType = _context.TblDispatcher.FirstOrDefault(s => s.DispatcherId == dispatcherId);
+            var result = await DispatcherEvent(DispatcherEventObject, EventType.DispatcherTaskName, apiContext);
+            return result;
+        }
     }
 }

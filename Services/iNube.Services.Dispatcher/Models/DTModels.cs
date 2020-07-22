@@ -118,4 +118,9 @@ namespace iNube.Services.Dispatcher.Models
         public string ObjMapTargetPath { get; set; }
 
     }
+    public partial class DispatcherDetails
+    {
+        public decimal TaskId { get; set; }
+        public string Value { get; set; }
+    }
 }
