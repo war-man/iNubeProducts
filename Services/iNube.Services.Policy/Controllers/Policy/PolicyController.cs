@@ -754,5 +754,13 @@ namespace iNube.Services.Policy.Controllers.Policy
             var response = await _policyService.LeadPolicy(policyDTO, Context);
             return ServiceResponse(response);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> GetPremiumCalculation([FromBody]dynamic policyRequest)
+        {
+           
+            var response = await _policyService.GetPremiumCalculation(policyRequest, Context);
+            return Ok(response);
+        }
     }
 }

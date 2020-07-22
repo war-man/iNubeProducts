@@ -22,5 +22,10 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Avo
         {
             throw new NotImplementedException();
         }
+
+        public Task<object> DispatcherEventTask(dynamic DispatcherEventObject, decimal dispatcherId, decimal mapperId, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

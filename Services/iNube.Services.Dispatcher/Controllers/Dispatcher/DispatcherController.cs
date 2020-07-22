@@ -69,7 +69,13 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher
                     return Forbid();
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> DispatcherEventTask(dynamic DispatcherEventObject, decimal dispatcherId, decimal mapperId)
+        {
 
+            var response = await _dispatcherService.DispatcherEventTask(DispatcherEventObject, dispatcherId, mapperId, Context);
+            return Ok(response);
+        }
         [HttpGet]
         [AllowAnonymous]
         public IActionResult HC()

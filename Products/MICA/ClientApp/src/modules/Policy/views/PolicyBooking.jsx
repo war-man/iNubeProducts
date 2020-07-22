@@ -459,66 +459,55 @@ class PolicyBooking extends React.Component {
 
     getPremiumCalculation = () => {
 
-        if (this.state.fields["Policy Tenure"] != undefined) {
-            this.state.RatingJson.dictionary_rate.Tenure = this.state.fields["Policy Tenure"];
-            this.state.FloterJson.dictionary_rate.CSPFloaterRate1_Tenure = this.state.fields["Policy Tenure"];
-            this.state.IndividualJson.dictionary_rate.IndividualRateTable_Tenure1 = this.state.fields["Policy Tenure"];
-        }
-        if (this.state.fields["Sum Insured"] != undefined) {
-            this.state.RatingJson.dictionary_rate.SumInsured = this.state.fields["Sum Insured"];
-            this.state.FloterJson.dictionary_rate.CSPFloaterRate1_SumInsured = this.state.fields["Sum Insured"];
-            this.state.IndividualJson.dictionary_rate.IndividualRateTable_SumInsured1 = this.state.fields["Sum Insured"];
-            this.state.IndividualJson.dictionary_rule.SumInsured = this.state.fields["Sum Insured"];
-            this.state.FloterJson.dictionary_rule.SumInsured = this.state.fields["Sum Insured"];
-        }
-        if (this.state.fields["Risky Type"] != undefined) {
-            this.state.IndividualJson.dictionary_rule.RiskType = this.state.fields["Risky Type"];
-            this.state.FloterJson.dictionary_rule.RiskType = this.state.fields["Risky Type"];
-        }
-        if (this.state.fields["Hospital Daily Cash"] != undefined) {
-            this.state.IndividualJson.dictionary_rule.HospitalDailyCash = this.state.fields["Hospital Daily Cash"];
-            this.state.FloterJson.dictionary_rule.HospitalDailyCash = this.state.fields["Hospital Daily Cash"];
-        }
-        let data = {};
-        if (this.state.RatingId == 82) {
-            data = this.state.FloterJson;
-        } else if (this.state.RatingId == 85) {
-            data = this.state.IndividualJson;
-        } else {
-            data = this.state.RatingJson;
-        }
+        //if (this.state.fields["Policy Tenure"] != undefined) {
+        //    this.state.RatingJson.dictionary_rate.Tenure = this.state.fields["Policy Tenure"];
+        //    this.state.FloterJson.dictionary_rate.CSPFloaterRate1_Tenure = this.state.fields["Policy Tenure"];
+        //    this.state.IndividualJson.dictionary_rate.IndividualRateTable_Tenure1 = this.state.fields["Policy Tenure"];
+        //}
+        //if (this.state.fields["Sum Insured"] != undefined) {
+        //    this.state.RatingJson.dictionary_rate.SumInsured = this.state.fields["Sum Insured"];
+        //    this.state.FloterJson.dictionary_rate.CSPFloaterRate1_SumInsured = this.state.fields["Sum Insured"];
+        //    this.state.IndividualJson.dictionary_rate.IndividualRateTable_SumInsured1 = this.state.fields["Sum Insured"];
+        //    this.state.IndividualJson.dictionary_rule.SumInsured = this.state.fields["Sum Insured"];
+        //    this.state.FloterJson.dictionary_rule.SumInsured = this.state.fields["Sum Insured"];
+        //}
+        //if (this.state.fields["Risky Type"] != undefined) {
+        //    this.state.IndividualJson.dictionary_rule.RiskType = this.state.fields["Risky Type"];
+        //    this.state.FloterJson.dictionary_rule.RiskType = this.state.fields["Risky Type"];
+        //}
+        //if (this.state.fields["Hospital Daily Cash"] != undefined) {
+        //    this.state.IndividualJson.dictionary_rule.HospitalDailyCash = this.state.fields["Hospital Daily Cash"];
+        //    this.state.FloterJson.dictionary_rule.HospitalDailyCash = this.state.fields["Hospital Daily Cash"];
+        //}
+        //let data = {};
+        //if (this.state.RatingId == 82) {
+        //    data = this.state.FloterJson;
+        //} else if (this.state.RatingId == 85) {
+        //    data = this.state.IndividualJson;
+        //} else {
+        //    data = this.state.RatingJson;
+        //}
 
-        fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/` + this.state.RatingId, {
+        fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/GetPremiumCalculation`, {
             method: 'post',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(this.state.fields)
         }).then(response => response.json())
             .then(data => {
-                if (data.length > 0) {
+                if (data.status==1) {
 
                     this.setState({ result: data });
                     this.setState({ loader: false });
-                    // this.tabledata();
-                    let finalpremium = data.filter(s => s.entity == "FinalPremium");
-                    if (finalpremium.length > 0) {
-                        let fields = this.state.fields;
-                        fields["permiumamount"] = finalpremium[0].eValue;
-                        this.setState({ fields });
+                    let fields = this.state.fields;
+                    fields["permiumamount"] = data.eValue;
+                    this.setState({ fields });
 
-                        this.setState({ RatingDetails: finalpremium[0], finalPremiumFlag: true, Generateflag: true });
-
-                    }
-
-                    //swal({
-                    //    text: "Rate:" + data.responseMessage,
-                    //    icon: "success"
-                    //});
-
-                    //  this.reset();
+                    this.setState({ RatingDetails: data, finalPremiumFlag: true, Generateflag: true });
+                  
                 }
                 else {
                     this.setState({ loader: false, searchTableSec: false, nodata: false });

@@ -69,6 +69,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<ResponseStatus> SendEmailAsync(EmailRequest EmailRequest, ApiContext apiContext);
         //Adjustment Amount
         Task<IEnumerable<CustomerSettingsDTO>> GetAdjustmentCustomerSettings(string Type, ApiContext apiContext);
+        Task<object> GetDispatcherEventTask(DispatcherEventRequest SourceRequest, decimal DispatcherId, decimal MapperId, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -429,6 +430,14 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         {
             var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerTypeSettings?customerid=" + apiContext.OrgId + "&type=" + Type + "&envid=" + apiContext.ServerType;
             return await GetListApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+        }
+        public async Task<object> GetDispatcherEventTask(DispatcherEventRequest SourceRequest,decimal DispatcherId,decimal MapperId, ApiContext apiContext)
+        {
+            var DispatcherURL = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com";
+            var uri = DispatcherURL + "/api/Dispatcher/DispatcherEventTask?dispatcherId="+ DispatcherId + "&mapperId="+ MapperId;
+
+            return await PostApiInvoke<DispatcherEventRequest, object>(uri, apiContext, SourceRequest);
+
         }
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
