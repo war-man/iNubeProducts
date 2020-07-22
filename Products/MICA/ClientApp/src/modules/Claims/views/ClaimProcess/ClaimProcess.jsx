@@ -1634,10 +1634,7 @@ class ClaimProcess extends React.Component {
                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                         <Button color="warning" onClick={this.tableshow} id="claims" round>
                                             <TranslationContainer translationKey="Search" />
-                                            </Button>
-                                            <Button color="warning"  id="claims" round>
-                                                <TranslationContainer translationKey="OK" />
-                                            </Button>
+                                        </Button>
                                     </Animated>
 
                                 </GridItem>
