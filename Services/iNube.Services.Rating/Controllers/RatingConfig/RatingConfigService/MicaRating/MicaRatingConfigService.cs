@@ -499,11 +499,11 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     {
                         if (checkCount < count - 1)
                         {
-                            paramvalue = itemdict.Value + " " + "between" + " " + "CONVERT(numeric," + itemdict.Key + "From" + ")" + " " + "and" + " " + "CONVERT(numeric," + itemdict.Key + "To" + ")" + " " + "and" + " ";
+                            paramvalue = itemdict.Value + " " + "between" + " " + "CONVERT(numeric(10,2)," + itemdict.Key + "From" + ")" + " " + "and" + " " + "CONVERT(numeric," + itemdict.Key + "To" + ")" + " " + "and" + " ";
                         }
                         else
                         {
-                            paramvalue = itemdict.Value + " " + "between" + " " + "CONVERT(numeric," + itemdict.Key + "From" + ")" + " " + "and" + " " + "CONVERT(numeric," + itemdict.Key + "To" + ")" + " ";
+                            paramvalue = itemdict.Value + " " + "between" + " " + "CONVERT(numeric(10,2)," + itemdict.Key + "From" + ")" + " " + "and" + " " + "CONVERT(numeric," + itemdict.Key + "To" + ")" + " ";
                         }
                         checkCount = checkCount + 1;
                         condition = String.Concat(condition, paramvalue);
