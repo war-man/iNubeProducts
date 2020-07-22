@@ -17,6 +17,7 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService
         Task<IEnumerable<DispatcherParamListDTO>> GetParameterByEvent(string DisptcherName, string Object, string Event, ApiContext Context);
         Task<object> DispatcherEvent(dynamic DispatcherEventObject, string EventType, ApiContext Context);
         Task<DispatcherResponse> CreateDispatcherTask(DispatcherDTO dispatcherDto, ApiContext apiContext);
+        Task<IEnumerable<DispatcherDTO>> GetDispatcherTask(ApiContext Context);
     }
 
     public class DispatcherService : IDTDispatcherService
@@ -47,6 +48,10 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService
         public async Task<DispatcherResponse> CreateDispatcherTask(DispatcherDTO dispatcherDto, ApiContext Context)
         {
             return await _objectService(Context.ProductType).CreateDispatcherTask(dispatcherDto, Context);
+        }
+        public async Task<IEnumerable<DispatcherDTO>> GetDispatcherTask(ApiContext Context)
+        {
+            return await _objectService(Context.ProductType).GetDispatcherTask(Context);
         }
 
     }

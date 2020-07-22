@@ -71,6 +71,12 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetDispatcherTask()
+        {
+            var response = await _dispatcherService.GetDispatcherTask(Context);
+            return Ok(response);
+        }
+        [HttpGet]
         [AllowAnonymous]
         public IActionResult HC()
         {

@@ -12,5 +12,6 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService
         Task<IEnumerable<DispatcherParamListDTO>> GetParameterByEvent(string DisptcherName, string Object, string Event, ApiContext Context);
         Task<object> DispatcherEvent(dynamic DispatcherEventObject, string EventType ,ApiContext Context);
         Task<DispatcherResponse> CreateDispatcherTask(DispatcherDTO dispatcherDto, ApiContext apiContext);
+        Task<IEnumerable<DispatcherDTO>> GetDispatcherTask(ApiContext Context);
     }
 }
