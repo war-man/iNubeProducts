@@ -440,8 +440,10 @@ class Questionnaries extends React.Component {
                     <QuestioneriesWizard
                         LifeStyleQA={this.props.LifeStyleQA}
                         QuestionalDetailsSetValue={this.props.QuestionalDetailsSetValue}
-                        QuestionAddButton={this.props.QuestionAddButton}
+                        TobaccoQuestionAddButton={this.props.TobaccoQuestionAddButton}
                         tobaccodata={this.props.tobaccodata}
+                        AlcoholQuestionAddButton={this.props.AlcoholQuestionAddButton}
+                        alcoholdata={this.props.alcoholdata}
                         MasterDataDto={this.state.MasterDataDto}
                         LifeStyleQuesDTO={this.state.LifeStyleQuesDTO}
                         MedHistQuesDTO={this.state.MedHistQuesDTO}

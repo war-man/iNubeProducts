@@ -226,7 +226,6 @@ const MainlifeLifeStyle = (props) => {
                     <CustomInput
                         labelText="How Long(Years)?"
                         id="SmokeDuration"
-                        name="SmokeDuration"
                         value={props.LifeStyleQA.SmokeDuration}
                         name="SmokeDuration"
                         onChange={(e) => props.QuestionalDetailsSetValue(e)}
@@ -387,134 +386,56 @@ const MainlifeLifeStyle = (props) => {
             {props.showAlcoholradioval &&
                 <GridContainer lg={12}>
 
-                <GridItem xs={4}>
-                    <FormControl fullWidth className={classes.selectFormControl}>
-                        <InputLabel
-                            htmlFor="ddlval"
-                            className={classes.selectLabel}
-                        >
-                            Type
-                        </InputLabel>
-                        <Select
-                            MenuProps={{
-                                className: classes.selectMenu
-                            }}
-                            classes={{
-                                select: classes.select
-                            }}
-                            value={props.showMLLS}
-                            onChange={(e) => props.handleSimple(e)}
-                            inputProps={{
-                                name: "ddlval",
-                                id: "ddlval"
-                            }}
-                        >
+                <GridItem xl={12} sm={4} md={4}>
+                    <MasterDropdown
+                        labelText="Type"
+                        value={props.LifeStyleQA.AlcholType}
+                        lstObject={props.MasterDataDto}
+                        filterName='AlcoholTypes'
+                        name='AlcholType'
+                        onChange={(e) => props.QuestionalDetailsSetValue(e)}
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
 
 
-                            <MenuItem
-                                disabled
-                                classes={{
-                                    root: classes.selectMenuItem,
-                                    selected: classes.selectMenuItemSelected
-                                }}
-
-                            >
-                                SELECT
-                                    </MenuItem>
-                            <MenuItem
-                                disabled
-                                classes={{
-                                    root: classes.selectMenuItem,
-                                    selected: classes.selectMenuItemSelected
-                                }}
-                                value="1"
-                            >
-
-                                HARD LIQUOR
-                                    </MenuItem>
-                            <MenuItem
-                                disabled
-                                classes={{
-                                    root: classes.selectMenuItem,
-                                    selected: classes.selectMenuItemSelected
-                                }}
-                                value="2"
-                            >
-
-                                BEER
-                                    </MenuItem>
-
-                            <MenuItem
-                                disabled
-                                classes={{
-                                    root: classes.selectMenuItem,
-                                    selected: classes.selectMenuItemSelected
-                                }}
-                                value="3"
-                            >
-
-                                WINE
-                                    </MenuItem>
-
-                        </Select>
-                    </FormControl>
                 </GridItem>
 
-                <GridItem xs={4}>
+                <GridItem xl={12} sm={4} md={4}>
                     <CustomInput
                         labelText="Quantity(ml)"
-                        id="Weight"
+                        value={props.LifeStyleQA.AlcholQuantity}
+                        name="AlcholQuantity"
+                        onChange={(e) => props.QuestionalDetailsSetValue(e)}
                         formControlProps={{
                             fullWidth: true
                         }}
                     />
                 </GridItem>
-                <GridItem xs={4}>
-                    <FormControl fullWidth className={classes.selectFormControl}>
-                        <InputLabel
-                            htmlFor="time-interval"
-                            className={classes.selectLabel}
-                        >
-                            Per
-                        </InputLabel>
-                        <Select
-                            MenuProps={{
-                                className: classes.selectMenu
-                            }}
-                            classes={{
-                                select: classes.select
-                            }}
-                            value={props.showMLLS}
-                            onChange={(e) => props.handleSimple(e)}
-                            inputProps={{
-                                name: "ddlval",
-                                id: "ddlval"
-                            }}
-                        >
+
+                <GridItem xl={12} sm={4} md={4}>
+                    <MasterDropdown
+                        labelText="Per"
+                        value={props.LifeStyleQA.AlcholPerDay}
+                        lstObject={props.MasterDataDto}
+                        filterName="Smoke&AlcoholPer"
+                        name='AlcholPerDay'
+                        onChange={(e) => props.QuestionalDetailsSetValue(e)}
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
 
 
-                            <MenuItem
-                                disabled
-                                classes={{
-                                    root: classes.selectMenuItem,
-                                    selected: classes.selectMenuItemSelected
-                                }}
-                                value="1"
-                            >
-                                WEEK
-                                    </MenuItem>
-
-                        </Select>
-                    </FormControl>
                 </GridItem>
-
-            </GridContainer>}
-            {props.showAlcoholradioval &&
-                <GridContainer lg={12}>
+                
                 <GridItem xs={4}>
                     <CustomInput
                         labelText="How Long(Years)?"
-                        id="Height"
+                        value={props.LifeStyleQA.AlcholDuration}
+                        name="AlcholDuration"
+                        onChange={(e) => props.QuestionalDetailsSetValue(e)}
                         formControlProps={{
                             fullWidth: true
                         }}
@@ -523,7 +444,7 @@ const MainlifeLifeStyle = (props) => {
                 <GridItem xl={12} sm={4} md={3}>
                     <Button color="info"
                         round className={props.classes.marginRight}
-                        //onClick={props.handleLeadSave}
+                        onClick={props.AlcoholQuestionAddButton}
                         id="saveBtn" >
                         ADD
                                 </Button>
@@ -536,12 +457,12 @@ const MainlifeLifeStyle = (props) => {
                     <CardBody >
 
                         <ReactTable
-                            data={props.data1}
+                            data={props.alcoholdata}
                             filterable
                             columns={[
                                 {
                                     Header: "TYPE",
-                                    accessor: "Type",
+                                    accessor: "type",
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
                                     minWidth: 70,
@@ -549,8 +470,8 @@ const MainlifeLifeStyle = (props) => {
 
                                 },
                                 {
-                                    Header: "NUMBER",
-                                    accessor: "LeadNo",
+                                    Header: "QUANTITY",
+                                    accessor: "quantity",
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
                                     minWidth: 70,
@@ -562,7 +483,7 @@ const MainlifeLifeStyle = (props) => {
                                 {
 
                                     Header: "PER",
-                                    accessor: "LeadDate",
+                                    accessor: "per",
                                     //minWidth: 150,
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -572,7 +493,7 @@ const MainlifeLifeStyle = (props) => {
                                 {
 
                                     Header: "HOW LONG(YEARS)?",
-                                    accessor: "LeadDate",
+                                    accessor: "longYears",
                                     //minWidth: 150,
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -582,7 +503,7 @@ const MainlifeLifeStyle = (props) => {
                                 {
 
                                     Header: "DELETE",
-                                    accessor: "LeadDate",
+                                    accessor: "actions",
                                     //minWidth: 150,
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
