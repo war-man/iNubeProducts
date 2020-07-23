@@ -273,6 +273,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             return Ok(response);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> NewCreateUpdateSchedule(ScheduleDTO scheduleDTO)
+        {
+            var reponse = await _quotationService.NewCreateSchedule(scheduleDTO, Context);
+            return ServiceResponse(reponse);
+        }
+
         [HttpGet]
         public async Task<IActionResult> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo)
         {
