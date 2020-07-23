@@ -162,10 +162,10 @@ class DynamicForm extends React.Component {
                 Parent: [],
                 Child: [],
             },
-            Accordion: [],
             tabvalue: "",
             multipleobject: [],
-            Accordian: [],
+            AddAccordion: [],
+            CoverAccordion: [],
             MasterDTO: {
                 LOB: [],
                 COB: [],
@@ -184,6 +184,7 @@ class DynamicForm extends React.Component {
             dynamicobject: [],
             showComponents: false,
             entityname: "",
+            tableArray: [],
             fields: {
                 selectedFields: [],
             },
@@ -204,7 +205,8 @@ class DynamicForm extends React.Component {
     };
 
     SetValue = (e, entity) => {
-        let data = this.state.Dynamicdata;
+        debugger
+        let fobj = this.state.Dynamicdata;
         let name = e.target.name;
         let value = e.target.value;
 
@@ -228,10 +230,10 @@ class DynamicForm extends React.Component {
         //    ;
         //screendata.value = value;
 
-        data[name] = value;
+        fobj[name] = value;
 
-        this.setState({ data });
-        console.log("selected: ", data);
+        this.setState({ fobj });
+        console.log("selected: ", fobj);
         console.log("selected: ", this.state.dynamicobject);
     }
 
@@ -415,9 +417,9 @@ class DynamicForm extends React.Component {
                     control={
                         <Radio
                             checked={this.state.radiovalue == prop.value}
+                            name={prop.name}
                             onChange={(e) => this.handleRadioChange(prop.name, e, prop.entityLevel)}
                             value={prop.value}
-                            name={prop.name}
                             aria-label="B"
                             icon={
                                 <FiberManualRecord
@@ -457,7 +459,7 @@ class DynamicForm extends React.Component {
         }
         if (prop.componentType == "Button") {
             return (
-                <Button color='primary' round onClick={() => this.handlesubmit(prop.name)} >{prop.labelText}</Button>
+                <Button color='primary' round onClick={() => this.handlesubmit(prop.name, prop.entityId)} >{prop.labelText}</Button>
             )
         }
         if (prop.componentType == "Accordion") {
@@ -517,6 +519,7 @@ class DynamicForm extends React.Component {
 
     SearchEntities = (id) => {
         fetch(`${productConfig.productConfigUrl}/api/Product/GetSingleEntitiesById?Id=` + id + ``,
+            //fetch(`http://localhost:59968/api/Product/GetSingleEntitiesById?Id=` + id + ``,
             {
                 method: 'Get',
                 //body: JSON.stringify(this.state.searchOrg),
@@ -529,7 +532,7 @@ class DynamicForm extends React.Component {
         ).then(response => response.json())
             .then(data => {
                 const lData = data;
-                console.log("dataCheck: ", data);
+                console.log("response: ", data);
                 this.setState({ dynamicobject: data })
 
                 //let screenDTO = this.state.screendata;
@@ -539,7 +542,7 @@ class DynamicForm extends React.Component {
                 //this.setState({ screenDTO });
 
                 console.log("dataCheck: ", data);
-                console.log("dataCheck: ", this.state.dynamicobject);
+                console.log("response: ", this.state.dynamicobject);
 
                 if (data.length == 0) {
                     this.setState({ showComponents: true });
@@ -568,19 +571,28 @@ class DynamicForm extends React.Component {
 
     };
 
-    handlesubmit = (name) => {
+    handlesubmit = (name, id) => {
         //console.log("selected: ", this.state.Dynamicdata)
         //if (this.state.Dynamicdata != {}) {
         //    this.state.emptyarray.push(this.state.Dynamicdata);
         //    //this.tabledata();
         //}
         if (name == "Add") {
-            //swal({
-            //    text: "This is Add button event",
-            //    icon: "success"
-            //})
+
+            //var array = this.state.dynamicobject.filter(e => e.filter(a => a.entityId == id)[0])[0] === undefined
+            //    ? [] :
+            //    this.state.dynamicobject.filter(e => e.filter(a => a.entityId == id)[0])[0];
+
+            //console.log("response: ", array);
+            //var pid = array.filter(a => a.entityId == id)[0].parentId === undefined
+            //    ? [] :
+            //    array.filter(a => a.entityId == id)[0].parentId;
+
+            //console.log("response: ", pid);
+
             if (this.state.multipleflag == false) {
-                fetch(`${productConfig.productConfigUrl}/api/Product/GetMultipleEntitiesById?Id=` + this.state.parent + ``,
+                fetch(`${productConfig.productConfigUrl}/api/Product/GetMultipleEntitiesById?Id=` + id + ``,
+                    //fetch(`http://localhost:59968/api/Product/GetMultipleEntitiesById?Id=` + id + ``,
                     {
                         method: 'Get',
                         //body: JSON.stringify(this.state.searchOrg),
@@ -593,9 +605,9 @@ class DynamicForm extends React.Component {
                 ).then(response => response.json())
                     .then(data => {
                         const lData = data;
-                        console.log("Response ", data);
+                        console.log("response: ", data);
                         this.setState({ multipleobject: data })
-                        this.state.Accordion.push(data);
+                        this.state.AddAccordion.push(data);
 
                         //this.dynamicAccordion(data);
                         //for (let i = 0; i < data.length; i++) {
@@ -606,7 +618,6 @@ class DynamicForm extends React.Component {
                         //        //this.state.multipleobject = this.state.multipleobject.concat(array);
                         //    }
                         //}
-
                         //var array1 = data[0];
                         //var array2 = array1[0];
 
@@ -614,24 +625,59 @@ class DynamicForm extends React.Component {
 
                         //console.log("response: ", array2.entityAttributes);
                         console.log("response: ", this.state.multipleobject);
+                        //this.state.AddAccordion.push(data);
+                        console.log("response: ", this.state.AddAccordion)
                         this.setState({ multipleflag: true });
                     });
-                //this.state.Accordion = Object.assign([], arraydata);
-                console.log("selected: ", this.state.Accordion)
+                //this.state.AddAccordion = Object.assign([], arraydata);
+                console.log("selected: ", this.state.AddAccordion);
             }
             if (this.state.multipleflag == true) {
-                this.state.Accordion.push(this.state.multipleobject);
+                fetch(`${productConfig.productConfigUrl}/api/Product/GetMultipleEntitiesById?Id=` + id + ``,
+                    //fetch(`http://localhost:59968/api/Product/GetMultipleEntitiesById?Id=` + id + ``,
+                    {
+                        method: 'Get',
+                        //body: JSON.stringify(this.state.searchOrg),
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                        },
+                    }
+                ).then(response => response.json())
+                    .then(data => {
+                        const lData = data;
+                        console.log("response: ", data);
+                        this.setState({ multipleobject: data })
+                        this.state.AddAccordion.push(data);
+                        console.log("response: ", this.state.multipleobject);
+                        this.setState({ multipleflag: true });
+                    });
+                //this.state.AddAccordion.push(this.state.multipleobject);
                 //this.dynamicAccordion();
-                console.log("selected: ", this.state.Accordion)
+                console.log("selected: ", this.state.AddAccordion)
                 this.setState({})
             }
         }
         if (name == "AddCover") {
+            fetch(`${productConfig.productConfigUrl}/api/Product/GetMultipleEntitiesById?Id=` + id + ``,
+                //fetch(`http://localhost:59968/api/Product/GetMultipleEntitiesById?Id=` + id + ``,
+                {
+                    method: 'Get',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                    },
+                }
+            ).then(response => response.json())
+                .then(data => {
+                    const lData = data;
+                    console.log("response: ", data);
+                    this.state.CoverAccordion.push(data);
+                    this.setState({ multipleflag: true });
+                });
             this.setState({ addcover: true })
-            //swal({
-            //    text: "This is button event",
-            //    icon: "success"
-            //})
         }
 
         //let objdata = this.state.dynamicobject
@@ -659,12 +705,11 @@ class DynamicForm extends React.Component {
         console.log("Select ", this.state.Dynamicdata);
     }
 
-    dynamicAccordion = () => {
-        console.log('selected: ', this.state.Accordion)
-
+    dynamicAccordion = (data) => {
+        console.log('selected: ', this.state.AddAccordion)
         return (
             <GridItem md={12}>
-                {this.state.Accordion.map(item => {
+                {data.map(item => {
                     return (
                         <Accordion
                             collapses={
@@ -691,7 +736,7 @@ class DynamicForm extends React.Component {
     //                                <Accordion
     //                                    collapses={
     //                                        [{
-    //                                            title: item1.enitityName,
+    //                                            title: item1.entityName,
     //                                            content: <CardBody>
     //                                                <GridContainer lg={12}>
     //                                                    {item1.entityAttributes.map(item2 => {
@@ -713,7 +758,7 @@ class DynamicForm extends React.Component {
     //                                <Accordion
     //                                    collapses={
     //                                        [{
-    //                                            title: item1.enitityName,
+    //                                            title: item1.entityName,
     //                                            content: <CardBody>
     //                                                <GridContainer>
     //                                                    {item1.entityAttributes.map(item2 => {
@@ -743,12 +788,42 @@ class DynamicForm extends React.Component {
                 <GridContainer>
                     <GridItem md={12}>
                         {data.map((item1, key) => {
-                            if (key == 0) {
+                            if (key == 0 || key != 1) {
                                 return (
                                     //<Accordion
                                     //    collapses={
                                     //        [{
-                                    //            title: item1.enitityName,
+                                    //            title: item1.entityName,
+                                    //            content:
+                                    <GridContainer>
+                                        <GridItem>
+                                            <h4> {item1.entityName}</h4>
+                                        </GridItem>
+                                        <GridItem xs={12}>
+                                            <CardBody>
+                                                <GridContainer lg={12}>
+                                                    {item1.entityAttributes.map(item2 => {
+                                                        return (
+                                                            <GridItem xs={12} sm={4} >
+                                                                {this.handleRenderScreen(item2)}
+                                                            </GridItem>
+                                                        );
+                                                    })}
+                                                </GridContainer>
+                                            </CardBody>
+                                        </GridItem>
+                                    </GridContainer>
+                                    //        }]
+                                    //    }
+                                    ///>
+                                );
+                            }
+                            if (key == 1) {
+                                return (
+                                    //<Accordion
+                                    //    collapses={
+                                    //        [{
+                                    //            title: item1.entityName,
                                     //            content:
                                     <GridContainer>
                                         <GridItem>
@@ -768,57 +843,12 @@ class DynamicForm extends React.Component {
                                             </CardBody>
                                         </GridItem>
                                         {this.state.addcover ?
-                                            <GridItem md={12}>
-                                                <Accordion
-                                                    collapses={
-                                                        [{
-                                                            title: item1.entityName,
-                                                            content: <CardBody>
-                                                                <GridContainer lg={12}>
-                                                                    {item1.entityAttributes.map(item2 => {
-                                                                        return (
-                                                                            <GridItem xs={12} sm={4} >
-                                                                                {this.handleRenderScreen(item2)}
-                                                                            </GridItem>
-                                                                        );
-                                                                    })}
-                                                                </GridContainer>
-                                                            </CardBody>
-                                                        }]
-                                                    }
-                                                />
-                                            </GridItem>
+                                            <GridContainer>
+                                                <GridItem md={12}>
+                                                    {this.CoversAccordion()}
+                                                </GridItem>
+                                            </GridContainer>
                                             : null}
-                                    </GridContainer>
-                                    //        }]
-                                    //    }
-                                    ///>
-                                );
-                            }
-                            if (key != 0) {
-                                return (
-                                    //<Accordion
-                                    //    collapses={
-                                    //        [{
-                                    //            title: item1.enitityName,
-                                    //            content:
-                                    <GridContainer>
-                                        <GridItem>
-                                            <h4> {item1.enitityName}</h4>
-                                        </GridItem>
-                                        <GridItem xs={12}>
-                                            <CardBody>
-                                                <GridContainer lg={12}>
-                                                    {item1.entityAttributes.map(item2 => {
-                                                        return (
-                                                            <GridItem xs={12} sm={4} >
-                                                                {this.handleRenderScreen(item2)}
-                                                            </GridItem>
-                                                        );
-                                                    })}
-                                                </GridContainer>
-                                            </CardBody>
-                                        </GridItem>
                                     </GridContainer>
                                     //        }]
                                     //    }
@@ -832,42 +862,111 @@ class DynamicForm extends React.Component {
         );
     }
 
-    RenderAccordion = () => {
+    CoversAccordion = () => {
+        console.log("response: ", this.state.CoverAccordion);
         return (
-            <GridItem xs={12}>
-                <Accordion
-                    collapses={
-                        [{
-                            title: "Coverages",
-                            content: this.state.multipleobject.map((item, key) => {
-                                return (
-                                    <CardBody>
-                                        <GridContainer lg={12}>
-                                            {item.entityAttributes.map(item1 => {
-                                                return (
-                                                    <GridItem xs={12} sm={4} md={3}>
-                                                        {this.handleRenderScreen(item1)}
-                                                    </GridItem>
-                                                );
-                                            })}
-                                        </GridContainer>
-                                    </CardBody>
-                                );
-                            })
+            <GridItem md={12}>
+                {this.state.CoverAccordion.map(item => {
+                    return (
+                        <Accordion
+                            collapses={
+                                [{
+                                    title: "Covers",
+                                    content: this.CoverChildAccordion(item)
 
-                        }]
-                    }
-                />
+                                }]
+                            }
+                        />
+                    );
+                })}
             </GridItem>
         );
         {/*<DynamicAccordion multipleobject={this.state.multipleobject} MasterDTO={this.state.MasterDTO} />,*/ }
+    }
+
+    CoverChildAccordion = (data) => {
+        return (
+            <CardBody>
+                <GridContainer>
+                    <GridItem md={12}>
+                        {data.map((item1, key) => {
+                            return (
+                                <GridContainer>
+                                    <GridItem>
+                                        <h4> {item1.entityName}</h4>
+                                    </GridItem>
+                                    <GridItem xs={12}>
+                                        <CardBody>
+                                            <GridContainer lg={12}>
+                                                {item1.entityAttributes.map(item2 => {
+                                                    return (
+                                                        <GridItem xs={12} sm={4} >
+                                                            {this.handleRenderScreen(item2)}
+                                                        </GridItem>
+                                                    );
+                                                })}
+                                            </GridContainer>
+                                        </CardBody>
+                                    </GridItem>
+                                </GridContainer>
+                                //        }]
+                                //    }
+                                ///>
+                            );
+                        })}
+                    </GridItem>
+                </GridContainer>
+            </CardBody>
+        );
+    }
+
+    handleGrid = () => {
+        debugger;
+        console.log("object: ", this.state.Dynamicdata)
+        if (this.state.Dynamicdata != {}) {
+            this.state.emptyarray.push(this.state.Dynamicdata);
+            this.state.tableArray.push(this.state.Dynamicdata);
+            this.tabledata();
+        }
+        let objdata = this.state.dynamicobject
+        for (let i = 0; i < objdata.length; i++) {
+            let array = objdata[i];
+            for (let j = 0; j < array.length; j++) {
+                let array1 = array[j];
+                let attributes = array1.entityAttributes;
+                for (let k = 0; k < attributes.length; k++) {
+                    if (attributes[k].componentType != "Radio") {
+                        attributes[k].value = "";
+                    }
+                }
+            }
+        }
+        this.setState({ radiovalue: "" });
+        this.setState({ objdata });
+
+        this.state.Dynamicdata = {};
+
+        console.log("object: ", this.state.Dynamicdata);
+        console.log("object: ", objdata);
+        console.log("object: ", this.state.tableArray);
+        //Object.assign(this.state.Dynamicdata, {});
+
+
+        //for (let i = 0; i < this.state.screendata.length; i++) {
+        //    let screendata = this.state.screendata;
+        //    if (screendata[i].componentType != "Radio") {
+        //        screendata[i].value = "";
+        //    }
+        //    this.setState({ radiovalue: "" });
+        //}
+
     }
 
     tabledata = () => {
         this.setState({ showtable: true });
 
         this.setState({
-            data: Object.keys(this.state.emptyarray[0]).map((prop) => {
+            data: Object.keys(this.state.tableArray[0]).map((prop) => {
                 return {
                     Header: prop.charAt(0).toUpperCase() + prop.slice(1),
                     accessor: prop,
@@ -875,8 +974,8 @@ class DynamicForm extends React.Component {
                 this.setState({});
             })
         });
-        console.log("Selected: ", this.state.data)
-        console.log("Select ", this.state.Dynamicdata);
+        console.log("Grid: ", this.state.data)
+        console.log("Grid: ", this.state.Dynamicdata);
     }
 
     resetobject = () => {
@@ -1046,6 +1145,11 @@ class DynamicForm extends React.Component {
                                         <Button color="primary" round onClick={() => this.addFields()}>Add Fields</Button>
                                     </GridItem>
                                 </GridContainer>
+                                <GridContainer>
+                                    <GridItem >
+                                        <Button color="primary" round onClick={() => this.handleGrid()}>Submit</Button>
+                                    </GridItem>
+                                </GridContainer>
 
                             </CardBody>
                         </Card>
@@ -1084,7 +1188,7 @@ class DynamicForm extends React.Component {
                                                         {this.state.multipleflag ?
                                                             <GridContainer>
                                                                 <GridItem xs={12}>
-                                                                    {this.dynamicAccordion()}
+                                                                    {this.dynamicAccordion(this.state.AddAccordion)}
                                                                 </GridItem>
                                                             </GridContainer>
                                                             : null}
@@ -1099,7 +1203,7 @@ class DynamicForm extends React.Component {
 
                         {/*{this.state.multipleflag ?
                             <GridContainer>
-                                {this.RenderAccordion()}
+                                {this.CoversAccordion()}
                             </GridContainer>
                             : null}
 
@@ -1170,7 +1274,7 @@ class DynamicForm extends React.Component {
                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                         <ReactTable
                                             //title={"Users"}
-                                            data={this.state.emptyarray}
+                                            data={this.state.tableArray}
                                             filterable
                                             columns={this.state.data}
                                             defaultPageSize={5}
