@@ -38,6 +38,7 @@ import Accordion from "components/Accordion/Accordion.jsx";
 import NeedAnalysis from "modules/NewBusiness/Prospect/NeedAnalysis.jsx";
 import LeadInformation from "modules/NewBusiness/Lead/LeadInformation.jsx";
 
+import NeedAnalysisCompleted from "modules/NewBusiness/Prospect/NeedAnalysisCompleted.jsx";
 
 
 const searchClose = {
@@ -927,7 +928,7 @@ class CommonModify extends React.Component {
                                         },
                                         {
                                             title: "Need Analysis",
-                                            content: <NeedAnalysis />
+                                            content: <NeedAnalysisCompleted/>
                                         }
 
                                     ]}

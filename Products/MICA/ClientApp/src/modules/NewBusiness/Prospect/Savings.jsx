@@ -11,7 +11,7 @@ import GridItem from "components/Grid/GridItem.jsx";
 import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
 import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/customCheckboxRadioSwitch.jsx";
 import Button from "components/CustomButtons/Button.jsx";
-import ReactTable from "react-table";
+import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import CardBody from "components/Card/CardBody.jsx";
 import Delete from "@material-ui/icons/Delete";
 

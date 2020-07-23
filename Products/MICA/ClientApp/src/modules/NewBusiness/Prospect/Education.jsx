@@ -38,7 +38,7 @@ import ArrowForward from '@material-ui/icons/ArrowForward';
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 //import Health from "./Health.jsx";
 import { Redirect } from 'react-router-dom';
-import ReactTable from "react-table";
+import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import Calculator from "./Calculator.jsx";
 
 

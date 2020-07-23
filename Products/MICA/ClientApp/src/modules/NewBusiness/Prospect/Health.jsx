@@ -18,7 +18,7 @@ import CardHeader from "components/Card/CardHeader.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
 import FilterNone from "@material-ui/icons/FilterNone";
 import CardMedia from '@material-ui/core/CardMedia';
-import ReactTable from "react-table";
+import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import Edit from "@material-ui/icons/Edit";
 import data from "views/Test/data.json";
 import GridContainer from "components/Grid/GridContainer.jsx";

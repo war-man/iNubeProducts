@@ -40,10 +40,6 @@ const ProsptInformation = (props) => {
 
     return (
         <div>
-            <Card className="assignCard">
-               
-
-                <CardBody>
 
                     <GridContainer>
                         <GridItem xs={12} sm={12} md={4}>
@@ -317,8 +313,8 @@ const ProsptInformation = (props) => {
                             />
                         </GridItem>
                     </GridContainer>
-                </CardBody >
-                <CardHeader color="rose" icon>
+                
+                    <CardHeader color="rose" icon>
                    
                     {
                         <h4 >
@@ -326,7 +322,7 @@ const ProsptInformation = (props) => {
                         </h4>
                     }
                 </CardHeader>
-                <CardBody>
+               
                     <GridContainer>
                         <GridItem xs={12} sm={12} md={4}>
                             <CustomInput
@@ -422,9 +418,7 @@ const ProsptInformation = (props) => {
                     <div>
                         <Button color="info" round className="edit" onClick={props.handleClose}>Save</Button>
                     </div>
-                </CardBody>
-
-            </Card>
+               
         </div>
 
            ) }

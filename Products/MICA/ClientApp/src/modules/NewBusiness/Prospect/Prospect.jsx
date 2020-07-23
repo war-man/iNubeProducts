@@ -218,9 +218,7 @@ class Prospect extends React.Component {
 
                 {this.state.PSflag &&
                     <NeedAnalysCompleted />
-
                 }
-
             </div>
         );
     }

@@ -1,8 +1,8 @@
 //let env = "EdelweissProd";
 //let env = "Production";
-let env = "Dev"; 
-//let env = "Local";                      
-//let env = "UAT";   
+let env = "Dev";
+//let env = "Local";                       
+//let env = "UAT";    
 
 let Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
 let partnerconfigUrl = Baseurl;
@@ -13,7 +13,7 @@ let accountConfigUrl = Baseurl;
 let BillingConfigUrl = Baseurl;
 let policyconfigUrl = Baseurl;
 let claimConfigUrl = Baseurl;
-let rateConfigUrl = Baseurl; 
+let rateConfigUrl = Baseurl;
 let ReportConfigUrl = Baseurl;
 let DashboardConfigUrl = Baseurl;
 let dynamicPagesConfigUrl = Baseurl;
@@ -21,8 +21,6 @@ let RDLCConfigUrl = Baseurl;
 let ReinsuranceConfigUrl = Baseurl;
 let ExtensionUrl = Baseurl;
 let NotificationUrl = Baseurl;
-let dispactherConfigUrl = Baseurl;
-
 
 if (env === "EdelweissProd") {
     Baseurl = 'https://egiswitchapi.edelweissinsurance.com';
@@ -42,7 +40,6 @@ if (env === "EdelweissProd") {
     ReinsuranceConfigUrl = Baseurl;
     ExtensionUrl = Baseurl;
     NotificationUrl = Baseurl;
-    dispactherConfigUrl = Baseurl;
 }
 if (env === "Local") {
     partnerconfigUrl = 'https://localhost:44315';
@@ -60,7 +57,6 @@ if (env === "Local") {
     ReinsuranceConfigUrl = 'http://localhost:5000';
     ExtensionUrl = "http://localhost:63630";
     NotificationUrl = "http://localhost:53000";
-    dispactherConfigUrl = "http://localhost:58593";
 }
 if (env === "Dev") {
     Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
@@ -80,7 +76,6 @@ if (env === "Dev") {
     ReinsuranceConfigUrl = Baseurl;
     ExtensionUrl = Baseurl;
     NotificationUrl = Baseurl;
-    dispactherConfigUrl = Baseurl;
 }
 if (env === "Production") {
     Baseurl = 'https://localhost:44315';
@@ -100,7 +95,6 @@ if (env === "Production") {
     ReinsuranceConfigUrl = Baseurl;
     ExtensionUrl = Baseurl;
     NotificationUrl = Baseurl;
-    dispactherConfigUrl = Baseurl;
 }
 if (env === "UAT") {
     Baseurl = 'https://egiswitchapi.edelweisscustomeruat.com';
@@ -120,7 +114,6 @@ if (env === "UAT") {
     ReinsuranceConfigUrl = Baseurl;
     ExtensionUrl = Baseurl;
     NotificationUrl = Baseurl;
-    dispactherConfigUrl = Baseurl;
 }
 export const config = {
     env: env,
@@ -143,7 +136,6 @@ export const config = {
     DashboardConfigUrl: DashboardConfigUrl,
     ExtensionUrl: ExtensionUrl,
     NotificationUrl: NotificationUrl,
-    dispactherConfigUrl : Baseurl,
 
     apiUrl: '',
     localUrl: '',

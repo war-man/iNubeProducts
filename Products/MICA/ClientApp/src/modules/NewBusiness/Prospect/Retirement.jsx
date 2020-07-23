@@ -38,7 +38,7 @@ import ArrowForward from '@material-ui/icons/ArrowForward';
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 //import Health from "./Health.jsx";
 import { Redirect } from 'react-router-dom'; 
-import ReactTable from "react-table";
+import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import FundBalance from "./FundBalance.jsx";
 import AnnualIncomeSurplus from "./AnnualIncomeSurplus.jsx";
 //import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes'; 
@@ -77,7 +77,7 @@ const validateBtn = {
 }
 const Retirement = (props) => {
     console.log("NeedAnalysis Retirement: ", props);
-   
+    debugger;
     const retcalData = props.RetirementCalculatorDTO;
     console.log("rdata", retcalData)
         const { classes } = props;
@@ -109,7 +109,7 @@ const Retirement = (props) => {
 
                         <GridItem xs={12} sm={12} md={3}>
                             <CustomInput
-                                labelText="Inflation Rate(%)"
+                                labelText="Inflation R ate(%)"
                             id="InflationRate"
                             onChange={(e) => props.RetCalSetValue(e)}
                             name='inflationRate'

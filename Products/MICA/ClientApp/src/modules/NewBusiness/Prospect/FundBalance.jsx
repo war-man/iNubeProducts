@@ -103,7 +103,7 @@ const FundBalance = (props) => {
                     <GridItem xs={12} sm={6} className="dropdowntree">
                      <div>
                                <CustomDropDownTree
-                                    data={props.componentData.FinancilaObligationsData[0].mdata}
+                                    //data={props.componentData.FinancilaObligationsData[0].mdata}
                                     onChange={props.componentData.handleddtChange}
                                 />
                                 {/* <Multiselect options={props.componentData.FinancilaObligationsData[0].mdata} onSelectOptions={props.componentData.handleddtChange} />*/}

@@ -53,7 +53,7 @@ class NeedAnalysCompleted extends React.Component {
         super(props);
         this.state = {
             dataRows: [],
-            isShowLeadPoolHeadr: false,
+
             editModal: false,
             btnvisibility: false,
             disabled: false,
@@ -73,34 +73,30 @@ class NeedAnalysCompleted extends React.Component {
         const { classes } = this.props;
 
         return (
-            <GridContainer xl={12}>
-                <GridItem lg={12}>
-            <Card className="assignCard">
-                <CardHeader color="rose" icon>
-                    <CardIcon color="rose">
-                        <Icon><img id="icon" src={user} /></Icon>
-                    </CardIcon>
-                    {
-                        <h4 >
-                            <small> Need Analysis Completed </small>
-                        </h4>
-                    }
-                </CardHeader>
+            <GridContainer>
+                <GridItem xs={12} sm={12} md={12}>
+                    <Card className="assignCard">
+                        <CardHeader color="rose" icon>
+                            <CardIcon color="rose">
+                                <Icon><img id="icon" src={user} /></Icon>
+                            </CardIcon>
+                            {
+                                <h4 >
+                                    <small> Need Analysis Completed </small>
+                                </h4>
+                            }
+                        </CardHeader>
 
-                        </Card>
+                    </Card>
                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-
                         <CommonModify isShowGrid={true} type={this.state.type}
-                            isShowLeadPoolHeadr={false}
                             isShowCreateLead={this.state.isShowCreateLead} />
-
-
                     </Animated>
-                  
-           
+
+
                 </GridItem >
-              
-                </GridContainer >
+
+            </GridContainer >
         );
     }
 

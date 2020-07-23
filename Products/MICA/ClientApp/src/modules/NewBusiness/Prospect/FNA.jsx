@@ -19,7 +19,7 @@ import CustomDropDownTree from "components/CustomDropdownTree/CustomDropDownTree
 import withStyles from "@material-ui/core/styles/withStyles";
 import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
 import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/customCheckboxRadioSwitch.jsx";
-import ReactTable from "react-table";
+import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import Button from "components/CustomButtons/Button.jsx";
 import { type } from "os";
 

@@ -30,6 +30,13 @@ import NewBusinessConfig from 'modules/NewBusiness/NewBusinessConfig.js';
 import RegularForms from 'modules/NewBusiness/Prospect/NeedAnalysisCompleted.jsx';
 import { Redirect } from 'react-router-dom';
 import Quotation from '../Quotation/Quotation.jsx';
+import { Animated } from "react-animated-css";
+import Calculator from "./Calculator.jsx";
+import Retirement from "./Retirement.jsx";
+import Health from "./Health.jsx";
+import Education from "./Education.jsx";
+import HumanValue from "./HumanValues.jsx";
+import Savings from "./Savings.jsx";
 
 //const dataTable = {
 //    headerRow: ["Type", "Lead Number", "Lead Date", "Proposer Name", "dob", "Place", "Actions"],
@@ -102,38 +109,7 @@ class NeedAnalysisCompleted extends React.Component {
                 data3: [],
                 tabledata: [],
             },
-            dataRows3: [
-
-
-                //["FOOD"],
-
-                //["WATER / ELECTRICITY / TELEPHONE "],
-
-                //["MONTHLY ALLOCATION - 20% FROM SALARY"],
-
-                //["RENT"],
-
-
-                //["LEASE & INSTALLMENT"],
-
-
-                //["TRANSPORT & FUEL"],
-
-                //["MEDICINE"],
-
-                //["EDUCATION / HIGHER EDUCATION"], 
-
-                //["CLOTHES"],
-
-                //["ENTERTAINMENT"],
-
-                //["CHARITY / DONATION"],
-
-                //["OTHER"],
-
-
-            ],
-
+         
 
 
             Checked: false,
@@ -332,10 +308,6 @@ class NeedAnalysisCompleted extends React.Component {
 
     handleddtChange = (currentNode, selectedNodes) => {
         this.state.FinancialObligations.push(selectedNodes);
-        //let array = this.state.FOSelected;
-        //array.push(selectedNodes);
-        //this.setState({ array });
-        //console.log("Array: ", array);
         console.log("FOPushedVals", this.state.FinancialObligations);
     }
 
@@ -624,11 +596,11 @@ class NeedAnalysisCompleted extends React.Component {
                 console.log("dataaa", data);
                 let rowdata = this.state.dataRows3;
 
-                for (let i = 0; i < data[0].mdata.length; i++) {
-                    rowdata.push(data[0].mdata[i].mValue);
-                }
-                this.setState({ rowdata });
-                console.log(" dtrowsmas", rowdata);
+                //for (let i = 0; i < data[0].mdata.length; i++) {
+                //    rowdata.push(data[0].mdata[i].mValue);
+                //}
+                //this.setState({ rowdata });
+                //console.log(" dtrowsmas", rowdata);
 
                 //this.datatable(data);
             });
@@ -747,131 +719,36 @@ class NeedAnalysisCompleted extends React.Component {
         const { classes } = this.props;
 
         return (
-            <div>
-               <Card className="assignCard">
-                <CardHeader color="rose" icon>
-                    <CardIcon color="rose">
-                        <Icon><img id="icon" src={user} /></Icon>
-                    </CardIcon>
-                    {
-                        <h4 >
-                            <small> Need Analysis Completed </small>
-                        </h4>
-                    }
-                </CardHeader>
-                </Card>
-                <div>
-
-                <GridContainer xl={12}>
-                  <CardBody>
-
-                                    <ReactTable
-                                        data={this.state.newdata}
-
-                                        filterable
-                                        columns={[
-                                            {
-                                                Header: "",
-                                                accessor: "radio",
-                                                style: { textAlign: "center" },
-                                                headerClassName: 'react-table-center',
-                                                minWidth: 70,
-                                                resizable: false,
-
-                                            },
-                                            {
-                                                Header: "TYPE",
-                                                accessor: "Type",
-                                                style: { textAlign: "center" },
-                                                headerClassName: 'react-table-center',
-                                                minWidth: 70,
-                                                resizable: false,
-
-                                            },
-
-                                            {
-                                                Header: "LEAD NO",
-                                                accessor: "LeadNo",
-                                                style: { textAlign: "center" },
-                                                headerClassName: 'react-table-center',
-                                                minWidth: 70,
-                                                resizable: false,
-                                                minWidth: 70,
-                                                /*   style: { textAlign: "center" },
-                                                 headerClassName: 'react-table-center'*/
-                                            },
-                                            {
-
-                                                Header: "LEADDATE",
-                                                accessor: "LeadDate",
-                                                //minWidth: 150,
-                                                style: { textAlign: "center" },
-                                                headerClassName: 'react-table-center',
-                                                minWidth: 70,
-                                                resizable: false,
-                                            },
-                                            {
-                                                Header: "PROPOSER NAME",
-                                                accessor: "ProposerName",
-                                                //minWidth: 150,
-                                                //style: { textAlign: "center" },
-                                                //headerClassName: 'react-table-center'
-                                                style: { textAlign: "center" },
-                                                headerClassName: 'react-table-center',
-                                                minWidth: 100,
-                                                resizable: false,
-                                            },
-
-                                            {
-                                                Header: "DOB",
-                                                accessor: "Dob",
-                                                style: { textAlign: "center" },
-                                                headerClassName: 'react-table-center',
-                                                minWidth: 70,
-                                                resizable: false,
-                                                //minWidth: 150,
-                                                //style: { textAlign: "center" },
-                                                //headerClassName: 'react-table-center'
-                                            },
-                                            {
-                                                Header: "PLACE",
-                                                accessor: "Place",
-                                                style: { textAlign: "center" },
-                                                headerClassName: 'react-table-center',
-                                                minWidth: 70,
-                                                resizable: false,
-                                                //minWidth: 150,
-                                                //style: { textAlign: "center" },
-                                                //headerClassName: 'react-table-center'
-                                            },
-                                            {
-                                                Header: "Modify",
-                                                accessor: "actions",
-                                                style: { textAlign: "center" },
-                                                headerClassName: 'react-table-center',
-                                                minWidth: 40,
-                                                resizable: false,
-                                            }
-                                        ]}
-                                        defaultPageSize={5}
-                                        showPaginationTop={false}
-                                        // pageSize={([this.state.Policydetailsdata.length + 1] < 5) ? [this.state.Policydetailsdata.length + 1] : 5}
-                                        showPaginationBottom
-                                        className="-striped -highlight"
-                                    />
-
-                               
-                                <Button color="info" round className={classes.marginRight}  onClick={this.CreateQuoteFun}> CreateQuote </Button>
-                   {this.renderRedirect()}
-                </CardBody>
+            <GridContainer xl={12}>
                 
-                    </GridContainer> 
-                    </div>
-              </div>
-           
+                    <GridItem lg={12}>
+
+                        <CardBody>
+                            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+
+                            <NeedAnalysis data2={this.state.calcObj.data2} data3={this.state.calcObj.data3}
+                                calcObj={this.state.calcObj} classes={this.classes}
+                                handleChange={this.handleChange}
+
+                                display={this.state.display}
+                                RetirementCalculatorDTO={this.state.RetirementCalculatorDTO}
+                                RetCalSetValue={this.RetCalSetValue} checked={this.state.checked} handleChangeCalc={this.handleChangeCalc}
+                                Checked={this.state.Checked} display={this.state.display} FinancilaObligationsData={this.state.FinancilaObligationsData}
+                                handleddtChange={this.handleddtChange} showRetirement={this.showRetirement} showHealth={this.showHealth}
+                                showEducation={this.showEducation} showSavings={this.showSavings} showHumanValue={this.showHumanValue}
+                                healthAdversitiesData={this.state.healthAdversitiesData} HealthMasddlDTO={this.state.HealthMasddlDTO}
+                                masterList={this.state.masterList} openCal={this.state.openCal} showCalc={this.state.showCalc}
+                                showFNA={this.state.showFNA} caledit={this.caledit} handleClose={this.handleClose} FNAedit={this.FNAedit}
+                            />
+
+                            </Animated>
+                        </CardBody>
 
 
-          
+
+                    </GridItem>
+             
+            </GridContainer >
         );
 
 
