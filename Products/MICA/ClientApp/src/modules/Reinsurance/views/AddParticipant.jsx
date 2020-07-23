@@ -203,7 +203,7 @@ const AddParticipant = (props) => {
                         {allocdto.Brokerageflag &&
                             <GridItem xs={12} sm={12} md={4}>
                                 <CustomInput
-                                    labelText="Brokerage"
+                                    labelText="Brokerage(%)"
                                     id="remarks"
                                     value={treatyDto.brokeragePercentage}
                                     name='brokeragePercentage'
