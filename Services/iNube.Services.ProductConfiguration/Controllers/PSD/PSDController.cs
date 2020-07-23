@@ -1,4 +1,6 @@
 ﻿using iNube.Services.ProductConfiguration.Controllers.PSD.PSD_Service;
+using iNube.Utility.Framework;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.PSD
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class PSDController : ControllerBase
+    public class PSDController : BaseApiController
     {
         public IPSDService _psdService;
 

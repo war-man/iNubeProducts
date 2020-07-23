@@ -81,6 +81,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<bool> BalanceAlertScheduler(ApiContext context);
         Task<int> TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate, ApiContext apiContext);
         Task<bool> RetryPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context);
+        Task<ScheduleResponseDTO> NewCreateSchedule(ScheduleDTO scheduleDTO, ApiContext context);
         Task<dynamic> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo, string CallType,ApiContext context);
         Task<SwitchOnOffResponse> NewSwitchOnOff(SwitchOnOffDTO switchOnOff, ApiContext context);
         Task<ResponseStatus> NewPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context);
@@ -9835,7 +9836,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 {
                     //Sending Policy Data - This Will Be Used in SwitchOnOff Method
                     response.PolicyData = GetPolicyData.Data;
-                }               
+                }
+
+
+                //This Check is their bcz PBS Will Run after 9AM 
+                //the if any vehicle deleted before 9AM then we have to block it so its used here
+                ResponseStatus VehicleCheck = NewPolicyVehicleCheck(GetPolicyData.Data,ScheduleData.VehicleRegistrationNo,ScheduleData.VehicleType);
+                
+                if(VehicleCheck.Status != BusinessStatus.Ok)
+                {
+                    response.Status = BusinessStatus.Error;
+                    response.ResponseMessage = VehicleCheck.ResponseMessage;
+                    response.Errors = VehicleCheck.Errors;
+                    return response;
+                }
+
 
                 string CDAccountNumber = response.PolicyData["CDAccountNumber"].ToString();
 
@@ -10401,7 +10416,141 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             return true;
         }
-        
+
+        public async Task<ScheduleResponseDTO> NewCreateSchedule(ScheduleDTO scheduleDTO, ApiContext context)
+        {
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            ScheduleResponseDTO response = new ScheduleResponseDTO();
+
+            try
+            {
+                _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));               
+
+                if (String.IsNullOrEmpty(scheduleDTO.PolicyNo))
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+                    response.ResponseMessage = "Null/Empty Inputs";
+                    response.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "PolicyNumber is Empty";
+                    errorInfo.ErrorCode = "GEN001";
+                    errorInfo.PropertyName = "MandatoryfieldsMissing";
+                    response.Errors.Add(errorInfo);
+                    return response;
+
+                }
+                else if (String.IsNullOrEmpty(scheduleDTO.VehicleRegistrationNo))
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+                    response.ResponseMessage = "Null/Empty Inputs";
+                    response.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Vehicle Number is Empty";
+                    errorInfo.ErrorCode = "GEN001";
+                    errorInfo.PropertyName = "MandatoryfieldsMissing";
+                    response.Errors.Add(errorInfo);
+                    return response;
+                }
+
+
+                var PolicyVerify = await GetPolicyDetails(scheduleDTO.PolicyNo, context);
+
+                if (PolicyVerify.Status != BusinessStatus.Ok)
+                {
+                    response.ResponseMessage = PolicyVerify.ResponseMessage;
+                    response.Errors = PolicyVerify.Errors;
+                    response.Status = BusinessStatus.Ok;
+                    return response;
+                }
+
+
+
+                if (scheduleDTO.VehicleType == "PC" || scheduleDTO.VehicleType == "TW")
+                {
+                    var mapData = _mapper.Map<TblSchedule>(scheduleDTO);
+
+                    var carCheck = _context.TblSchedule.Any(x => x.VehicleRegistrationNo == mapData.VehicleRegistrationNo && x.PolicyNo == mapData.PolicyNo);
+
+                    if (carCheck == false)
+                    {
+                        var validation = NewPolicyVehicleCheck(PolicyVerify.Data, scheduleDTO.VehicleRegistrationNo, scheduleDTO.VehicleType);
+
+                        if (validation.Status != BusinessStatus.Ok)
+                        {
+                            response.ResponseMessage = validation.ResponseMessage;
+                            response.Status = BusinessStatus.Ok;
+                            response.Errors = validation.Errors;
+                            return response;
+                        }
+
+                        mapData.CreatedDate = IndianTime;
+                        mapData.ModifyCount = 0;
+                        mapData.IsActive = true;
+
+                        _context.TblSchedule.Add(mapData);
+
+                        TblSwitchLog tblSwitchLog = new TblSwitchLog();
+
+                        tblSwitchLog.PolicyNo = mapData.PolicyNo;
+                        tblSwitchLog.VehicleNumber = mapData.VehicleRegistrationNo;
+                        tblSwitchLog.SwitchStatus = false;
+                        tblSwitchLog.CreatedDate = IndianTime;
+                        tblSwitchLog.SwitchType = "Auto";
+
+                        _context.TblSwitchLog.Add(tblSwitchLog);
+                        response.ResponseMessage = "Schedule Created Successfully";
+                        response.Status = BusinessStatus.Created;
+                    }
+                    else
+                    {
+                        var tblschedule = _context.TblSchedule.SingleOrDefault(x => x.VehicleRegistrationNo == mapData.VehicleRegistrationNo && x.PolicyNo == mapData.PolicyNo);
+
+                        tblschedule.Mon = mapData.Mon;
+                        tblschedule.Tue = mapData.Tue;
+                        tblschedule.Wed = mapData.Wed;
+                        tblschedule.Thu = mapData.Thu;
+                        tblschedule.Fri = mapData.Fri;
+                        tblschedule.Sat = mapData.Sat;
+                        tblschedule.Sun = mapData.Sun;
+
+                        tblschedule.ModifyCount += 1;
+                        tblschedule.ModifiedDate = IndianTime;
+                        _context.TblSchedule.Update(tblschedule);
+
+
+                        response.ResponseMessage = "Schedule Updated Successfully";
+                        response.Status = BusinessStatus.Updated;
+                    }
+                    _context.SaveChanges();
+
+                    response.ScheduleDTO = scheduleDTO;
+                    return response;
+                }
+                else
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Null/Empty Inputs";
+                    response.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Vehicle Type Should be either PC [Private Car] or TW [Two Wheeler]";
+                    errorInfo.ErrorCode = "ExtCUS001";
+                    errorInfo.PropertyName = "MandatoryfieldsMissing";
+                    response.Errors.Add(errorInfo);
+                    return response;
+                }
+            }
+            catch(Exception Ex)
+            {
+                ErrorInfo errorInfo = new ErrorInfo();
+
+                response.ResponseMessage = "Null/Empty Inputs";
+                response.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "Vehicle Type Should be either PC [Private Car] or TW [Two Wheeler]";
+                errorInfo.ErrorCode = "ExtCUS001";
+                errorInfo.PropertyName = "MandatoryfieldsMissing";
+                response.Errors.Add(errorInfo);
+                return response;
+            }
+        }
+
         public async Task<dynamic> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo,string CallType,ApiContext context)
         {
             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
@@ -10720,6 +10869,55 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
             return response;
+        }
+
+        private ResponseStatus NewPolicyVehicleCheck(dynamic PolicyData, string VehicleNumber, string VehicleType)
+        {
+            ResponseStatus response = new ResponseStatus();
+            ErrorInfo errorInfo = new ErrorInfo();
+
+            try
+            {
+                    var VehicleRiskItem = PolicyData["InsurableItem"][1]["RiskItems"];
+
+                    Dictionary<string, string> PolicyVehicleLst = new Dictionary<string, string>();
+
+                    foreach (var item in VehicleRiskItem)
+                    {
+                        string PolicyVehicle = item["Vehicle Number"].ToString();
+                        string PolicyVehicleType = item["Vehicle Type"].ToString();
+
+                        PolicyVehicleLst.Add(PolicyVehicle, PolicyVehicleType);
+                    }
+
+                    var CheckVehicle = PolicyVehicleLst.Contains(new KeyValuePair<string, string>(VehicleNumber, VehicleType));
+
+                    if (CheckVehicle == true)
+                    {
+                        response.Status = BusinessStatus.Ok;
+                    }
+                    else
+                    {
+                        response.ResponseMessage = "Provided vehicle number & vehicle type doesn’t exist in the policy.";
+                        response.Status = BusinessStatus.PreConditionFailed;
+                        errorInfo.ErrorMessage = "Provided vehicle number  & vehicle type doesn’t exist in the policy.";
+                        errorInfo.ErrorCode = "EXTCUS003";
+                        errorInfo.PropertyName = "VehicleNumber";
+                        response.Errors.Add(errorInfo);
+                    }               
+            }
+            catch (Exception ex)
+            {
+                response.ResponseMessage = "Some Exception While Verifying Vehicle Number";
+                response.Status = BusinessStatus.Error;
+                errorInfo.ErrorMessage = ex.Message;
+                errorInfo.ErrorCode = "EXTCUS002";
+                errorInfo.PropertyName = "PolicyNumber";
+                response.Errors.Add(errorInfo);
+            }
+
+            return response;
+
         }
 
         public async Task<SwitchOnOffResponse> NewSwitchOnOff(SwitchOnOffDTO switchOnOff, ApiContext context)
@@ -11507,7 +11705,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         {
                             BatchJobLog.SuccessCount += 1;
                             _context.TblBatchJobLog.Update(BatchJobLog);
-                            
+
+                            BatchJobDetailsLog.TxnDescription = BatchSteps;
                             BatchJobDetailsLog.TxnStatus = true;
                             BatchJobDetailsLog.TxnEndDateTime = IndianTime;
                             _context.TblBatchJobDetailsLog.Add(BatchJobDetailsLog);
