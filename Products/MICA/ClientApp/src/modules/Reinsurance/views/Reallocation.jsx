@@ -1273,7 +1273,7 @@ class Reallocation extends React.Component {
                                         />
                                         </GridItem>
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                            labelText="Treaty Share"
+                                            labelText="Treaty Share %"
                                             name="limit2"
                                             value={item.Percentage}
                                             disabled={true}
@@ -1468,7 +1468,7 @@ class Reallocation extends React.Component {
                                         />
                                         </GridItem>
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                            labelText="Treaty Share"
+                                            labelText="Treaty Share %"
                                             name="TreatyShare"
                                             disabled={true}
                                             value={item.Percentage}
