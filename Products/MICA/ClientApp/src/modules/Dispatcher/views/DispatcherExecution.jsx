@@ -216,27 +216,62 @@ class DispatcherExecution extends React.Component {
                                             </Select>
                                         </FormControl>
                                     </GridItem>
+                                    {
+                                    //    this.state.inputFlag &&
+                                    //<GridItem xs={4} sm={12} md={7}>
+                                    //    <CustomInput labelText=""
+                                    //        value={this.state.InputObject}
+                                    //        multiline={true}
+                                    //        name='InputObject'
+                                    //        onChange={this.onInputChange}
+                                    //        formControlProps={{ fullWidth: true }} />
+                                    //</GridItem>
+                                    }
+
                                     {this.state.inputFlag &&
-                                    <GridItem xs={4} sm={12} md={7}>
-                                        <CustomInput labelText=""
-                                            value={this.state.InputObject}
-                                            multiline={true}
-                                            name='InputObject'
-                                            onChange={this.onInputChange}
-                                            formControlProps={{ fullWidth: true }} />
-                                    </GridItem>
+                                        <GridItem xs={4} sm={12} md={7}>
+                                            <label><h5><b>Input : </b></h5></label>
+                                            <textarea
+                                                value={this.state.InputObject}
+                                                multiline={true}
+                                                name='InputObject'
+                                                onChange={this.onInputChange}
+                                                formControlProps={{ fullWidth: true }}
+                                                rows={4}
+                                                cols={90}
+                                            />
+                                        </GridItem>
+                                    }
+
+                                    {
+                                        //this.state.outputFlag &&
+                                        //<GridItem xs={4} sm={12} md={7}>
+                                        //    <CustomInput labelText=""
+                                        //        value={this.state.OutputObject}
+                                        //        multiline={true}
+                                        //        disabled={true}
+                                        //        name='OutputObject'
+                                        //        onChange={this.onInputChange}
+                                        //        formControlProps={{ fullWidth: true }} />
+                                        //</GridItem>
                                     }
                                     {this.state.outputFlag &&
                                         <GridItem xs={4} sm={12} md={7}>
-                                            <CustomInput labelText=""
+                                            <label><h5><b>Output : </b></h5></label>
+                                            <textarea
                                                 value={this.state.OutputObject}
                                                 multiline={true}
                                                 disabled={true}
                                                 name='OutputObject'
                                                 onChange={this.onInputChange}
-                                                formControlProps={{ fullWidth: true }} />
+                                                formControlProps={{ fullWidth: true }}
+                                                rows={4}
+                                                cols={90}
+                                            />
                                         </GridItem>
                                     }
+
+
                                 </GridContainer>
                             </CardBody>
                         </Card>
