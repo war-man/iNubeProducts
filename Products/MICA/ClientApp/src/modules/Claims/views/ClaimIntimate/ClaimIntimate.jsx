@@ -437,8 +437,8 @@ class ClaimIntimate extends React.Component {
                         },
                         body: JSON.stringify(detailsdto)
                     }).then(response => {
-                        if (response.statusCode != 200) { this.setState({ responseflag: false });};
-                        return Promise.all([response.statusCode, response.json()]);
+                        if (response.status != 200) { this.setState({ responseflag: false });};
+                        return response.json();
                     })
                         .then(data => {
                             console.log("responseData", data);

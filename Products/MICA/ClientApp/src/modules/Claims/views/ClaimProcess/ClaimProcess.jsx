@@ -528,10 +528,10 @@ class ClaimProcess extends React.Component {
                         },
                         body: JSON.stringify(field)
                     }).then(response => {
-                        if (response.statusCode != 200) {
+                        if (response.status != 200) {
                             this.setState({ responseflag: false });
                         };
-                        return Promise.all([response.statusCode, response.json()]);
+                        return response.json();
                     }).then(data => {
                             console.log("response: ", data)
                             //      if (data.status == 200) {
