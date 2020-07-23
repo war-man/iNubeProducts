@@ -298,9 +298,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpPost]
-        public async Task<IActionResult> NewPremiumBookingScheduler (DateTime? dateTime, List<string> PolicyNoList)
+        public async Task<IActionResult> NewPremiumBookingScheduler (PremiumBookingDTO bookingDTO)
         {
-            var response = await _quotationService.NewPremiumBookingScheduler(dateTime, PolicyNoList, Context);
+            var response = await _quotationService.NewPremiumBookingScheduler(bookingDTO.TxnDateTime, bookingDTO.PolicyNumberList, Context);
             return Ok(response);
         }
     }

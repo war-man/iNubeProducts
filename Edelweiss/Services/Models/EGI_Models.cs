@@ -933,5 +933,11 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public decimal AdTotalAmount { get; set; }
     }
 
+    public partial class PremiumBookingDTO
+    {
+        public DateTime? TxnDateTime { get; set; }
+        public List<string> PolicyNumberList { get; set; }
+    }
+
 }
 
