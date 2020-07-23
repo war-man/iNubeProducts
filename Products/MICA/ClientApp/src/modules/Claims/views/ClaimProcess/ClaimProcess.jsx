@@ -545,7 +545,7 @@ class ClaimProcess extends React.Component {
                                     buttons: [false, "OK"],
                                 }).then((willDelete) => {
                                     if (willDelete) {
-                                        this.setState({ responseflag: false });
+                                     
                                         this.handlepagereload();
                                     }
                                 });

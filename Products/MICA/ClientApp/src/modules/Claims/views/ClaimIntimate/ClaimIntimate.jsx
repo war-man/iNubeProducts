@@ -452,7 +452,7 @@ class ClaimIntimate extends React.Component {
                                     buttons: [false, "OK"],
                                 }).then((willDelete) => {
                                     if (willDelete) {
-                                        this.setState({ redirect: true, responseflag: false });
+                                        this.setState({ redirect: true});
                                         this.renderRedirect();
                                     }
                                 });

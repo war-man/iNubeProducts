@@ -526,7 +526,7 @@ class InboxClaimProcess extends React.Component {
                                 })
                                     .then((willDelete) => {
                                         if (willDelete) {
-                                            this.setState({ responseflag: false });
+                                          
                                               this.handlepagereload();
                                         }
                                     });
