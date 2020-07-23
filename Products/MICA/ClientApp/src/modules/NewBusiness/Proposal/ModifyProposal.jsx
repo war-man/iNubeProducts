@@ -140,7 +140,7 @@ class ModifyProposal extends React.Component {
                                         },
                                         {
                                             title: "Questionnaires",
-                                            content: <Questionnaries AlcoholQuestionAddButton={this.props.AlcoholQuestionAddButton} alcoholdata={this.props.alcoholdata} TobaccoQuestionAddButton={this.props.TobaccoQuestionAddButton} tobaccodata={this.props.tobaccodata} LifeStyleQA={this.props.LifeStyleQA} QuestionalDetailsSetValue={this.props.QuestionalDetailsSetValue} MasterDataDto={this.props.MasterDataDto} />
+                                            content: <Questionnaries handleAddButton={this.props.handleAddButton} familydatatable={this.props.familydatatable} familyBackground={this.props.familyBackground} SaveProposalDto={this.props.SaveProposalDto} FamilyDetailSetValue={this.props.FamilyDetailSetValue} familyBackgroundDto={this.props.familyBackgroundDto} AlcoholQuestionAddButton={this.props.AlcoholQuestionAddButton} alcoholdata={this.props.alcoholdata} TobaccoQuestionAddButton={this.props.TobaccoQuestionAddButton} tobaccodata={this.props.tobaccodata} LifeStyleQA={this.props.LifeStyleQA} QuestionalDetailsSetValue={this.props.QuestionalDetailsSetValue} MasterDataDto={this.props.MasterDataDto} />
 
                                         },
                                         {

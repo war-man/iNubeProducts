@@ -26,7 +26,7 @@ class Questionnaries extends React.Component {
         super(props);
         this.state = {
             ddlval: "",
-            MasterDataDto:[],
+            MasterDataDto: [],
 
             MasQuesDTO: [],
             LifeStyleQuesDTO:[],
@@ -34,13 +34,14 @@ class Questionnaries extends React.Component {
             FBQuesDTO: [],
             ADQuesDTO: [],
             PCQuesDTO:[], 
- 
+
             
             showMLLS: false,
             selectedValue: null,
             selectedValueMLLSQ2: null,
             selectedValueIns: null,
-            selectedValueMH:null,
+            selectedValueMH: null,
+            selectedValueFB: null,
            
             showradioval: false,
             showAlcoholradioval: false,
@@ -67,6 +68,7 @@ class Questionnaries extends React.Component {
             radioVal: "",
             radioValPCIns: "",
             radioValMH: "",
+            radioValFB: "",
                
            
 
@@ -124,7 +126,7 @@ class Questionnaries extends React.Component {
              
          });
 
-
+        
     
     }
 
@@ -408,6 +410,8 @@ class Questionnaries extends React.Component {
     }
     
     handleRadioChangeFB = (e) => {
+
+        
        
         this.state.radioValFB = e.target.value;
         this.state.selectedValueFB = e.target.value;
@@ -415,19 +419,20 @@ class Questionnaries extends React.Component {
         console.log("radioValFB", this.state.radioValFB)
         console.log("selectedValueFB", this.state.selectedValueFB)
         
-        if (this.state.radioValMH == "FBQues1Yes") {
+        if (this.state.radioValFB == "FBQues1Yes") {
             this.setState({
                 showFBQ1: true
-            })
+            });
+            
         }
-        else if (this.state.radioValMH == "FBQues1No") {
+        else if (this.state.radioValFB == "FBQues1No") {
             this.setState({
                 showFBQ1: false
             })
         }
     }
 
-
+    
     getRadioButtonVal = event => {
         this.setState({
             radioVal: event.target.value
@@ -492,6 +497,9 @@ class Questionnaries extends React.Component {
                         // FAMILY BACKGROUND
                         handleRadioChangeFB={this.handleRadioChangeFB}
                         showFBQ1={this.state.showFBQ1}
+                        selectedValueFB={this.state.selectedValueFB}
+                        familydatatable={this.props.familydatatable}
+                        handleAddButton={this.props.handleAddButton}
 
                     />
                     </GridItem>

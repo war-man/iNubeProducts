@@ -28,6 +28,8 @@ import Download from "@material-ui/icons/GetApp";
 import Proposal from './Proposal.jsx';
 import NewBusinessConfig from 'modules/NewBusiness/NewBusinessConfig.js';
 import Delete from "@material-ui/icons/Delete";
+import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
+
 
 const dataTable = {
     headerRow: ["ProposalNo", "ProposerName", "NIC", "LeadNo", "BancaIntroducerCode", "ProposalStatus", "Actions"],
@@ -183,6 +185,19 @@ class ProposalIncomplete extends React.Component {
                 "IsNarcoticDrugs": ""
             }],
 
+            familyBackgroundDto: {
+                "relationship": "",
+                "presentage": "",
+                "stateofhealth": "",
+                "ageatdeath": "",
+                "cause": ""
+            },
+
+            familyBackground: [],
+
+            familytable: [],
+            familydatatable: [],
+
             SaveProposalDto: {
 
                 "policyStartDate": "2019-10-16T05:30:00.625Z",
@@ -193,7 +208,8 @@ class ProposalIncomplete extends React.Component {
                 "planId": 0,
                 "paymentFrequency": "string",
                 "proposalSubmitDate": "2019-10-16T05:30:00.626Z",
-                "tblPolicyMemberDetails": []
+                "tblPolicyMemberDetails": [],
+                "familyBackgroundDetails": [],
 
 
             },
@@ -539,6 +555,8 @@ class ProposalIncomplete extends React.Component {
     }
 
 
+    
+
     leadTable = (data) => {
         console.log("incompletedata", data);
         this.setState({
@@ -671,6 +689,50 @@ class ProposalIncomplete extends React.Component {
 
     }
 
+
+    ///////////////////Handling Family Background//////////////////////
+
+
+    handleFamilydatatable = () => {
+        this.setState({
+            familydatatable: this.state.familytable.map((m, index) => {
+                return {
+                    relationship : <MasterDropdown value={m.relationship} lstObject={this.state.MasterDataDto} filterName='FamilyBackGroundRelationship' name='relationship' onChange={(e) => this.handleFamilySetValues(e, index)} formControlProps={{ fullWidth: true }} />,
+                    presentage : <CustomInput value={m.presentage} onChange={(e) => this.handleFamilySetValues(e, index)} name="presentage" formControlProps={{ fullWidth: true }} />,
+                    stateofhealth : <MasterDropdown value={m.stateofhealth} lstObject={this.state.MasterDataDto} filterName='StateOfHealth' onChange={(e) => this.handleFamilySetValues(e, index)} name="stateofhealth" formControlProps={{ fullWidth: true }} />,
+                    ageatdeath : <CustomInput value={m.ageatdeath} onChange={(e) => this.handleFamilySetValues(e, index)} name="stateofhealth" formControlProps={{ fullWidth: true }} />,
+                    cause : <MasterDropdown value={m.cause} lstObject={this.state.MasterDataDto} filterName='CauseOfDeath' onChange={(e) => this.handleFamilySetValues(e, index)} name="cause" formControlProps={{ fullWidth: true }} />,
+                    actions: <Button justIcon round simple color="danger" className="remove" disabled={(this.state.nonedit === true) ? true : false} onClick={(e) => this.deleteFamilydata(e, index)} ><Delete /> </Button >
+
+                };
+            })
+        })
+    }
+
+    handleFamilySetValues = (event, index) => {
+        let familytabledto = this.state.familytable;
+        let name = event.target.name;
+        let value = event.target.value;
+        familytabledto[index][name] = value;
+        this.setState({ familytabledto });
+        
+        console.log("dssythfkgui", this.state.familytable);
+        this.handleFamilydatatable();
+    }
+
+    handleAddButton = () => {
+        let FamilyObjectNew = Object.assign({}, this.state.familyBackgroundDto);
+        this.state.familytable.push(FamilyObjectNew);
+        this.handleFamilydatatable();
+
+    }
+
+    deleteFamilydata = (index) => {
+        this.state.familytable.splice(index, 1);
+        this.handleFamilydatatable();
+        console.log("familytable", this.state.familytable);
+    }
+
     render() {
         const { classes } = this.props;
 
@@ -797,7 +859,7 @@ class ProposalIncomplete extends React.Component {
                                                         </Button>
                                                         */}
                         {this.state.open &&
-                            <ModifyProposal AlcoholQuestionAddButton={this.AlcoholQuestionAddButton} alcoholdata={this.state.alcoholdata} TobaccoQuestionAddButton={this.TobaccoQuestionAddButton} tobaccodata={this.state.tobaccodata} handlePolicyOwnerData={this.handlePolicyOwnerData} DateChange={this.DateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails} SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer} singleValueSelected={this.state.singleValueSelected} handleRadioChange={this.handleRadioChange} handleRadioOnChange={this.handleRadioOnChange} leadTable={this.leadTable} SetValue={this.SetValue} MasterDataDto={this.state.MasterDataDto} filterData={this.state.filterData} PolicyOwnerDetailsDto={this.state.PolicyOwnerDetailsDto} PolicyOwnerDetailsSetValue={this.PolicyOwnerDetailsSetValue} PolicyOwnerDetailsdataOnYesConditioinDto={this.state.PolicyOwnerDetailsdataOnYesConditioinDto} PolicyOwnerDetailsdataOnNoCondition={this.state.PolicyOwnerDetailsdataOnNoCondition} handleClose={this.handleClose} SetPermanentAddCheckBox={this.SetPermanentAddCheckBox} singleValueCheckboxSelected={this.state.singleValueCheckboxSelected} citizenshipCheckboxSelected={this.state.citizenshipCheckboxSelected} SetCitizenshipCheckBox={this.SetCitizenshipCheckBox} />
+                            <ModifyProposal handleAddButton={this.handleAddButton} familydatatable={this.state.familydatatable} familyBackground={this.state.familyBackground} FamilyDetailSetValue={this.FamilyDetailSetValue} familyBackgroundDto={this.state.familyBackgroundDto} AlcoholQuestionAddButton={this.AlcoholQuestionAddButton} alcoholdata={this.state.alcoholdata} TobaccoQuestionAddButton={this.TobaccoQuestionAddButton} tobaccodata={this.state.tobaccodata} handlePolicyOwnerData={this.handlePolicyOwnerData} DateChange={this.DateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails} SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer} singleValueSelected={this.state.singleValueSelected} handleRadioChange={this.handleRadioChange} handleRadioOnChange={this.handleRadioOnChange} leadTable={this.leadTable} SetValue={this.SetValue} MasterDataDto={this.state.MasterDataDto} filterData={this.state.filterData} PolicyOwnerDetailsDto={this.state.PolicyOwnerDetailsDto} PolicyOwnerDetailsSetValue={this.PolicyOwnerDetailsSetValue} PolicyOwnerDetailsdataOnYesConditioinDto={this.state.PolicyOwnerDetailsdataOnYesConditioinDto} PolicyOwnerDetailsdataOnNoCondition={this.state.PolicyOwnerDetailsdataOnNoCondition} handleClose={this.handleClose} SetPermanentAddCheckBox={this.SetPermanentAddCheckBox} singleValueCheckboxSelected={this.state.singleValueCheckboxSelected} citizenshipCheckboxSelected={this.state.citizenshipCheckboxSelected} SetCitizenshipCheckBox={this.SetCitizenshipCheckBox} />
                         }
                         {/*</div>
                     </Modal>*/}
