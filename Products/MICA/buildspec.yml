@@ -26,7 +26,7 @@ phases:
         - echo $CODEBUILD_SRC_DIR
         - aws s3 sync ./build/ s3://egiswitch.edelweisscustomeruat.com
         
-   
+    
 
 artifacts:
   files:
