@@ -14,6 +14,7 @@ namespace iNube.Services.Rating.Helpers
         public DbHelper(IIntegrationService integrationService)
         {
             _integrationService = integrationService;
+            lstDbCon.TryAdd(7, "Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Initial Catalog=EdelweissTest;User Id=admin;Password=micaadmin");
         }
          
         public async Task<string> GetEnvironmentConnectionAsync(string product,decimal EnvId)
