@@ -9822,7 +9822,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     return response;
                 }
 
-                var GetPolicyData = await GetPolicyDetails(PolicyNumber,context);
+                var GetPolicyData = await GetPolicyDetails(PolicyNumber,"ExceptionCheck",context);
 
                 if(GetPolicyData.Status != BusinessStatus.Ok)
                 {
@@ -9946,7 +9946,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 response.ResponseMessage = "Some Exception Occured";
                 response.Status = BusinessStatus.Error;
-                errorInfo.ErrorMessage = ex.ToString();
+                errorInfo.ErrorMessage = ex.Message;
                 errorInfo.ErrorCode = "ExtException";
                 errorInfo.PropertyName = "Catch";
                 response.Errors.Add(errorInfo);
@@ -10451,7 +10451,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
 
 
-                var PolicyVerify = await GetPolicyDetails(scheduleDTO.PolicyNo, context);
+                var PolicyVerify = await GetPolicyDetails(scheduleDTO.PolicyNo,"CreateUpdateSchedule" ,context);
 
                 if (PolicyVerify.Status != BusinessStatus.Ok)
                 {
@@ -10482,6 +10482,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
 
                         mapData.CreatedDate = IndianTime;
+                        mapData.ModifiedDate = IndianTime;
                         mapData.ModifyCount = 0;
                         mapData.IsActive = true;
 
@@ -10539,13 +10540,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
             catch(Exception Ex)
             {
+                _logger.LogError(Ex, "Mica_EGI", MethodBase.GetCurrentMethod().Name, scheduleDTO, null, context);
+
                 ErrorInfo errorInfo = new ErrorInfo();
 
-                response.ResponseMessage = "Null/Empty Inputs";
+                response.ResponseMessage = "Some Exception has Occured CreateUpdateSchedule";
                 response.Status = BusinessStatus.PreConditionFailed;
-                errorInfo.ErrorMessage = "Vehicle Type Should be either PC [Private Car] or TW [Two Wheeler]";
-                errorInfo.ErrorCode = "ExtCUS001";
-                errorInfo.PropertyName = "MandatoryfieldsMissing";
+                errorInfo.ErrorMessage = Ex.Message;
+                errorInfo.ErrorCode = "ExtCUS";
+                errorInfo.PropertyName = "Exception";
                 response.Errors.Add(errorInfo);
                 return response;
             }
@@ -10553,87 +10556,99 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         public async Task<dynamic> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo,string CallType,ApiContext context)
         {
-            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
-
             GetScheduleResponse response = new GetScheduleResponse();
             GetSwitchResponse ExceptionResponse = new GetSwitchResponse();
 
-            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
-            var CurrentTimeHour = IndianTime.Hour;
-            var CurrentDay = IndianTime.DayOfWeek.ToString();
-
-
-            if (!String.IsNullOrEmpty(VehicleRegistrationNo) && !String.IsNullOrEmpty(PolicyNo))
+            try
             {
-                var checkdata = _context.TblSchedule.Any(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
 
-                if (checkdata)
+                _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+
+                DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+                var CurrentTimeHour = IndianTime.Hour;
+                var CurrentDay = IndianTime.DayOfWeek.ToString();
+
+
+                if (!String.IsNullOrEmpty(VehicleRegistrationNo) && !String.IsNullOrEmpty(PolicyNo))
                 {
+                    var checkdata = _context.TblSchedule.Any(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
 
-                    var scheduledata = _context.TblSchedule.FirstOrDefault(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
-                                                         
-                    response.GetSchedule.PolicyNo = PolicyNo;
-                    response.GetSchedule.VehicleRegistrationNo = VehicleRegistrationNo;
-                    response.GetSchedule.VehicleType = scheduledata.VehicleType;
-                    response.GetSchedule.Mon = scheduledata.Mon;
-                    response.GetSchedule.Tue = scheduledata.Tue;
-                    response.GetSchedule.Wed = scheduledata.Wed;
-                    response.GetSchedule.Thu = scheduledata.Thu;
-                    response.GetSchedule.Fri = scheduledata.Fri;
-                    response.GetSchedule.Sat = scheduledata.Sat;
-                    response.GetSchedule.Sun = scheduledata.Sun;
-
-
-                    ExceptionResponse = await ExceptionCheck(PolicyNo,0,scheduledata,context);
-
-                    if(ExceptionResponse.Status != BusinessStatus.Ok)
+                    if (checkdata)
                     {
-                        response.GetSchedule.SwitchStatus = false;
-                        response.GetSchedule.SwitchEnabled = false;
-                        response.ResponseMessage = ExceptionResponse.ResponseMessage;
-                        response.Errors = ExceptionResponse.Errors;
-                        response.Status = BusinessStatus.Ok;
 
-                        if (CallType == "SwitchOnOff")
+                        var scheduledata = _context.TblSchedule.FirstOrDefault(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
+
+                        response.GetSchedule.PolicyNo = PolicyNo;
+                        response.GetSchedule.VehicleRegistrationNo = VehicleRegistrationNo;
+                        response.GetSchedule.VehicleType = scheduledata.VehicleType;
+                        response.GetSchedule.Mon = scheduledata.Mon;
+                        response.GetSchedule.Tue = scheduledata.Tue;
+                        response.GetSchedule.Wed = scheduledata.Wed;
+                        response.GetSchedule.Thu = scheduledata.Thu;
+                        response.GetSchedule.Fri = scheduledata.Fri;
+                        response.GetSchedule.Sat = scheduledata.Sat;
+                        response.GetSchedule.Sun = scheduledata.Sun;
+
+
+                        ExceptionResponse = await ExceptionCheck(PolicyNo, 0, scheduledata, context);
+
+                        if (ExceptionResponse.Status != BusinessStatus.Ok)
                         {
-                            //Get Schedule Complete Response
-                            ExceptionResponse.ScheduleData = response.GetSchedule;
+                            response.GetSchedule.SwitchStatus = false;
+                            response.GetSchedule.SwitchEnabled = false;
+                            response.ResponseMessage = ExceptionResponse.ResponseMessage;
+                            response.Errors = ExceptionResponse.Errors;
+                            response.Status = BusinessStatus.Ok;
 
-                            return ExceptionResponse;
+                            if (CallType == "SwitchOnOff")
+                            {
+                                //Get Schedule Complete Response
+                                ExceptionResponse.ScheduleData = response.GetSchedule;
+
+                                return ExceptionResponse;
+                            }
+
+                            return response;
                         }
 
-                        return response;
-                    }
+                        var SwitchLogData = _context.TblSwitchLog.Where(x => x.PolicyNo == PolicyNo
+                                                                       && x.VehicleNumber == VehicleRegistrationNo
+                                                                       && x.CreatedDate.Value.Date == IndianTime.Date).ToList();
 
-                    var SwitchLogData = _context.TblSwitchLog.Where(x => x.PolicyNo == PolicyNo
-                                                                   && x.VehicleNumber == VehicleRegistrationNo
-                                                                   && x.CreatedDate.Value.Date == IndianTime.Date).ToList();
+                        List<TblSwitchLog> ManualData = new List<TblSwitchLog>();
 
-                    List<TblSwitchLog> ManualData = new List<TblSwitchLog>();
-
-                    if (CurrentTimeHour <  ModuleConstants.SchedulerRunTime)
-                    {
-                        if (SwitchLogData.Count() > 0)
+                        if (CurrentTimeHour < ModuleConstants.SchedulerRunTime)
                         {
-
-                            ManualData = SwitchLogData.OrderByDescending(x => x.CreatedDate)
-                                                      .Where(x => x.SwitchType == "Manual").ToList();
-
-                            if (ManualData.Count() > 0)
+                            if (SwitchLogData.Count() > 0)
                             {
-                                //Taking First Record Bcz using Order By Descending.
-                                var finalRecord = ManualData.FirstOrDefault();
 
-                                response.GetSchedule.SwitchStatus = finalRecord.SwitchStatus;
+                                ManualData = SwitchLogData.OrderByDescending(x => x.CreatedDate)
+                                                          .Where(x => x.SwitchType == "Manual").ToList();
 
-                                if (finalRecord.SwitchStatus == true)
+                                if (ManualData.Count() > 0)
                                 {
-                                    response.GetSchedule.SwitchEnabled = false;
+                                    //Taking First Record Bcz using Order By Descending.
+                                    var finalRecord = ManualData.FirstOrDefault();
+
+                                    response.GetSchedule.SwitchStatus = finalRecord.SwitchStatus;
+
+                                    if (finalRecord.SwitchStatus == true)
+                                    {
+                                        response.GetSchedule.SwitchEnabled = false;
+                                    }
+                                    else
+                                    {
+                                        response.GetSchedule.SwitchEnabled = true;
+                                    }
                                 }
                                 else
                                 {
+                                    bool ScheduleSwitchStatus = CurrentDaySwitchStatus(scheduledata);
+                                    response.GetSchedule.SwitchStatus = ScheduleSwitchStatus;
                                     response.GetSchedule.SwitchEnabled = true;
                                 }
+
                             }
                             else
                             {
@@ -10645,93 +10660,103 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
                         else
                         {
-                            bool ScheduleSwitchStatus = CurrentDaySwitchStatus(scheduledata);
-                            response.GetSchedule.SwitchStatus = ScheduleSwitchStatus;
-                            response.GetSchedule.SwitchEnabled = true;
+                            if (SwitchLogData.Count() > 0)
+                            {
+                                var LatestData = SwitchLogData.OrderByDescending(x => x.CreatedDate).FirstOrDefault();
+
+                                response.GetSchedule.SwitchStatus = LatestData.SwitchStatus;
+
+                                if (LatestData.SwitchStatus == true)
+                                {
+                                    response.GetSchedule.SwitchEnabled = false;
+                                }
+                                else
+                                {
+                                    response.GetSchedule.SwitchEnabled = true;
+                                }
+
+                            }
+                            else
+                            {
+                                //PBS Has Not RAN ITS AN EXCEPTION 
+                                response.GetSchedule.SwitchStatus = false;
+                                response.GetSchedule.SwitchEnabled = false;
+                            }
                         }
+
+                        response.Status = BusinessStatus.Ok;
+
+                        if (CallType == "SwitchOnOff")
+                        {
+                            //Get Schedule Complete Response
+                            ExceptionResponse.ScheduleData = response.GetSchedule;
+
+                            return ExceptionResponse;
+                        }
+
+
+                        return response;
 
                     }
                     else
                     {
-                        if (SwitchLogData.Count() > 0)
+                        //Return No Records Found 
+                        response.GetSchedule = null;
+                        ErrorInfo errorInfo = new ErrorInfo();
+                        response.ResponseMessage = "No Records Found";
+                        response.Status = BusinessStatus.NotFound;
+                        errorInfo.ErrorMessage = "No records found in the Schedule table for the sent input";
+                        errorInfo.ErrorCode = "GEN001";
+                        errorInfo.PropertyName = "NoRecords";
+                        response.Errors.Add(errorInfo);
+
+                        if (CallType == "SwitchOnOff")
                         {
-                            var LatestData = SwitchLogData.OrderByDescending(x => x.CreatedDate).FirstOrDefault();
-
-                            response.GetSchedule.SwitchStatus = LatestData.SwitchStatus;
-
-                            if (LatestData.SwitchStatus == true)
-                            {
-                                response.GetSchedule.SwitchEnabled = false;
-                            }
-                            else
-                            {
-                                response.GetSchedule.SwitchEnabled = true;
-                            }
-
+                            ExceptionResponse.Status = response.Status;
+                            ExceptionResponse.ResponseMessage = response.ResponseMessage;
+                            ExceptionResponse.Errors = response.Errors;
+                            return ExceptionResponse;
                         }
-                        else
-                        {
-                            //PBS Has Not RAN ITS AN EXCEPTION 
-                            response.GetSchedule.SwitchStatus = false;
-                            response.GetSchedule.SwitchEnabled = false;
-                        }
+
+                        return response;
+
                     }
 
-                    response.Status = BusinessStatus.Ok;
-
-                    if (CallType == "SwitchOnOff")
-                    {
-                        //Get Schedule Complete Response
-                        ExceptionResponse.ScheduleData = response.GetSchedule;
-
-                        return ExceptionResponse;
-                    }
-
-
-                    return response;
 
                 }
                 else
                 {
-                    //Return No Records Found 
+                    //Return Wrong NUll DATA 
                     response.GetSchedule = null;
+
                     ErrorInfo errorInfo = new ErrorInfo();
-                    response.ResponseMessage = "No Records Found";
-                    response.Status = BusinessStatus.NotFound;
-                    errorInfo.ErrorMessage = "No records found in the Schedule table for the sent input";
-                    errorInfo.ErrorCode = "GEN001";
-                    errorInfo.PropertyName = "NoRecords";
+
+                    response.ResponseMessage = "Null/Empty Inputs";
+                    response.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Either Policy Number or Vehicle Number is Null";
+                    errorInfo.ErrorCode = "GEN002";
+                    errorInfo.PropertyName = "MandatoryfieldsMissing";
                     response.Errors.Add(errorInfo);
-
-                    if (CallType == "SwitchOnOff")
-                    {
-                        ExceptionResponse.Status = response.Status;
-                        ExceptionResponse.ResponseMessage = response.ResponseMessage;
-                        ExceptionResponse.Errors = response.Errors;
-                        return ExceptionResponse;
-                    }
-
                     return response;
 
                 }
-
-
             }
-            else
+            catch(Exception Ex)
             {
+                _logger.LogError(Ex, "Mica_EGI", MethodBase.GetCurrentMethod().Name, VehicleRegistrationNo, null, context);
+
                 //Return Wrong NUll DATA 
                 response.GetSchedule = null;
 
                 ErrorInfo errorInfo = new ErrorInfo();
 
-                response.ResponseMessage = "Null/Empty Inputs";
+                response.ResponseMessage = "Some Exception has occured Get Schedule";
                 response.Status = BusinessStatus.PreConditionFailed;
-                errorInfo.ErrorMessage = "Either Policy Number or Vehicle Number is Null";
-                errorInfo.ErrorCode = "GEN002";
-                errorInfo.PropertyName = "MandatoryfieldsMissing";
+                errorInfo.ErrorMessage = Ex.Message;
+                errorInfo.ErrorCode = "GEN";
+                errorInfo.PropertyName = "Exception";
                 response.Errors.Add(errorInfo);
                 return response;
-
             }
 
         }
@@ -10784,7 +10809,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        private async Task<GenericDTO> GetPolicyDetails(string PolicyNumber,ApiContext context)
+        private async Task<GenericDTO> GetPolicyDetails(string PolicyNumber,string CallType,ApiContext context)
         {
             GenericDTO response = new GenericDTO();
             ErrorInfo errorInfo = new ErrorInfo();
@@ -10831,8 +10856,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     return response;
                 }
 
-
-                if (PolicyStageStatusId != ModuleConstants.PolicyStageStatusLive)
+                if (PolicyStageStatusId != ModuleConstants.PolicyStageStatusLive && CallType != "CreateUpdateSchedule")
                 {
                     errorInfo = new ErrorInfo();
 
@@ -10858,7 +10882,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 errorInfo = new ErrorInfo();
 
-                response.ResponseMessage = "Some Exception Occured";
+                response.ResponseMessage = "Some Exception Occured PolicyDetails";
                 response.Status = BusinessStatus.Error;
                 errorInfo.ErrorMessage = "Get Policy Details Call Failed due to some exception";
                 errorInfo.ErrorCode = "GetPolicyDetails";
@@ -10906,13 +10930,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         response.Errors.Add(errorInfo);
                     }               
             }
-            catch (Exception ex)
+            catch (Exception Ex)
             {
+                _logger.LogError(Ex, "Mica_EGI", MethodBase.GetCurrentMethod().Name, PolicyData, null, null);
+
                 response.ResponseMessage = "Some Exception While Verifying Vehicle Number";
                 response.Status = BusinessStatus.Error;
-                errorInfo.ErrorMessage = ex.Message;
+                errorInfo.ErrorMessage = Ex.Message;
                 errorInfo.ErrorCode = "EXTCUS002";
-                errorInfo.PropertyName = "PolicyNumber";
+                errorInfo.PropertyName = "Exception";
                 response.Errors.Add(errorInfo);
             }
 
@@ -10955,7 +10981,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     return response;
                 }
 
-
+                //If GetSchedule doesn't send proper response 
+                //Then it will go to catch block
                 GetSwitchResponse GetSchedule = await NewGetSchedule(VehicleNumber, PolicyNumber, "SwitchOnOff", context);
 
                 bool? GetSwitchStatus = GetSchedule.ScheduleData.SwitchStatus;
@@ -11275,8 +11302,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
             catch(Exception Ex)
             {
+                _logger.LogError(Ex, "Mica_EGI", MethodBase.GetCurrentMethod().Name, switchOnOff, null, context);
+
                 errorInfo = new ErrorInfo();
-                response.ResponseMessage = "Some Exception Has Occurred";
+                response.ResponseMessage = "Some Exception Has Occurred Switch On Off";
                 response.Status = BusinessStatus.Ok;
                 errorInfo.ErrorMessage = Ex.Message;
                 errorInfo.ErrorCode = "ExtSWT";
@@ -11423,7 +11452,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     try
                     {
                         BatchSteps = "GetPolicyDetails";
-                        var PolicyResponse = await GetPolicyDetails(PolicyNumber, context);
+                        var PolicyResponse = await GetPolicyDetails(PolicyNumber, "PBS",context);
 
 
                         if (PolicyResponse.Status != BusinessStatus.Ok)
@@ -11863,9 +11892,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 response.Status = BusinessStatus.Ok;
                 response.ResponseMessage = "Calculate Premium Method Successful";
             }
-            catch (Exception ex)
+            catch (Exception Ex)
             {
-                response.ResponseMessage = "Calculate Premium Method Failed Due to Some Exception - " + ex.Message.ToString();
+                _logger.LogError(Ex, "Mica_EGI", MethodBase.GetCurrentMethod().Name, premiumDTO, null, context);
+
+                response.ResponseMessage = "Calculate Premium Method Failed Due to Some Exception - " + Ex.Message;
                 response.Status = BusinessStatus.Error;
             }
 
