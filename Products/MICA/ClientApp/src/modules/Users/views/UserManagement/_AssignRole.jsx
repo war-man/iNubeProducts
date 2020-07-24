@@ -1064,7 +1064,7 @@ class AssignRole extends React.Component {
                                             </CardIcon>
                                             {
                                                 <h4 >
-                                                    <small><TranslationContainer translationKey="SearchUser" /></small>
+                                                    <small><TranslationContainer translationKey="Searchuser" /></small>
                                                 </h4>
                                             }
                                         </CardHeader>
