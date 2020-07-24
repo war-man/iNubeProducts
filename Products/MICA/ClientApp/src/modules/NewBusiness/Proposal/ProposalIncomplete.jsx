@@ -192,11 +192,28 @@ class ProposalIncomplete extends React.Component {
                 "ageatdeath": "",
                 "cause": ""
             },
-
             familyBackground: [],
-
             familytable: [],
             familydatatable: [],
+            insurancetable: [],
+            insuranceDto: {
+                "insuranceCompanyName": "",
+                "policyNo": "",
+                "sumAssured": "",
+                "accidentalDeathBenefit": "",
+                "criticalIllnessBenefit": "",
+                "permanentDisability": "",
+                "hospitalization": "",
+                "status": ""
+            },
+            claimedtable: [],
+            claimedDto: {
+                "companyName": "",
+                "policyNo": "",
+                "natureOfClaim": "",
+                "dateOfClaim": ""
+            },
+        
 
             SaveProposalDto: {
 
@@ -733,6 +750,7 @@ class ProposalIncomplete extends React.Component {
         console.log("familytable", this.state.familytable);
     }
 
+
     render() {
         const { classes } = this.props;
 
@@ -859,7 +877,13 @@ class ProposalIncomplete extends React.Component {
                                                         </Button>
                                                         */}
                         {this.state.open &&
-                            <ModifyProposal handleAddButton={this.handleAddButton} familydatatable={this.state.familydatatable} familyBackground={this.state.familyBackground} FamilyDetailSetValue={this.FamilyDetailSetValue} familyBackgroundDto={this.state.familyBackgroundDto} AlcoholQuestionAddButton={this.AlcoholQuestionAddButton} alcoholdata={this.state.alcoholdata} TobaccoQuestionAddButton={this.TobaccoQuestionAddButton} tobaccodata={this.state.tobaccodata} handlePolicyOwnerData={this.handlePolicyOwnerData} DateChange={this.DateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails} SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer} singleValueSelected={this.state.singleValueSelected} handleRadioChange={this.handleRadioChange} handleRadioOnChange={this.handleRadioOnChange} leadTable={this.leadTable} SetValue={this.SetValue} MasterDataDto={this.state.MasterDataDto} filterData={this.state.filterData} PolicyOwnerDetailsDto={this.state.PolicyOwnerDetailsDto} PolicyOwnerDetailsSetValue={this.PolicyOwnerDetailsSetValue} PolicyOwnerDetailsdataOnYesConditioinDto={this.state.PolicyOwnerDetailsdataOnYesConditioinDto} PolicyOwnerDetailsdataOnNoCondition={this.state.PolicyOwnerDetailsdataOnNoCondition} handleClose={this.handleClose} SetPermanentAddCheckBox={this.SetPermanentAddCheckBox} singleValueCheckboxSelected={this.state.singleValueCheckboxSelected} citizenshipCheckboxSelected={this.state.citizenshipCheckboxSelected} SetCitizenshipCheckBox={this.SetCitizenshipCheckBox} />
+                            <ModifyProposal
+                            claimedDto={this.state.claimedDto} claimedtable={this.state.claimedtable} insurancetable={this.state.insurancetable} insuranceDto={this.state.insuranceDto} handleAddButton={this.handleAddButton} familydatatable={this.state.familydatatable} familyBackground={this.state.familyBackground} FamilyDetailSetValue={this.FamilyDetailSetValue} familyBackgroundDto={this.state.familyBackgroundDto} AlcoholQuestionAddButton={this.AlcoholQuestionAddButton} alcoholdata={this.state.alcoholdata}
+                            TobaccoQuestionAddButton={this.TobaccoQuestionAddButton} tobaccodata={this.state.tobaccodata} handlePolicyOwnerData={this.handlePolicyOwnerData} DateChange={this.DateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails}
+                            SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer}
+                            singleValueSelected={this.state.singleValueSelected} handleRadioChange={this.handleRadioChange} handleRadioOnChange={this.handleRadioOnChange} leadTable={this.leadTable} SetValue={this.SetValue} MasterDataDto={this.state.MasterDataDto} filterData={this.state.filterData} PolicyOwnerDetailsDto={this.state.PolicyOwnerDetailsDto} PolicyOwnerDetailsSetValue={this.PolicyOwnerDetailsSetValue}
+                            PolicyOwnerDetailsdataOnYesConditioinDto={this.state.PolicyOwnerDetailsdataOnYesConditioinDto} PolicyOwnerDetailsdataOnNoCondition={this.state.PolicyOwnerDetailsdataOnNoCondition} handleClose={this.handleClose} SetPermanentAddCheckBox={this.SetPermanentAddCheckBox} singleValueCheckboxSelected={this.state.singleValueCheckboxSelected} citizenshipCheckboxSelected={this.state.citizenshipCheckboxSelected}
+                            SetCitizenshipCheckBox={this.SetCitizenshipCheckBox} />
                         }
                         {/*</div>
                     </Modal>*/}

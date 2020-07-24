@@ -15,6 +15,15 @@ import GridContainer from "../../../components/Grid/GridContainer.jsx";
 import GridItem from "../../../components/Grid/GridItem.jsx";
 import PrevCurrLifeInsurance from "./_PCLifeInsurance.jsx";
 import NewBusinessConfig from 'modules/NewBusiness/NewBusinessConfig.js';
+import Delete from "@material-ui/icons/Delete";
+import Button from "components/CustomButtons/Button.jsx";
+import CustomInput from "components/CustomInput/CustomInput.jsx";
+
+
+
+
+
+
 const dataTable = {
 
     dataRows: [  ["NO ITEMS"] ]
@@ -71,6 +80,8 @@ class Questionnaries extends React.Component {
             radioValFB: "",
                
            
+            insurancedatatable: [],
+            claimeddatatable: [],
 
             data1: dataTable.dataRows.map((prop, key) => {
                 return {
@@ -162,7 +173,6 @@ class Questionnaries extends React.Component {
     };
  
     handleRadioChangeT = (e) => {
-       // debugger;
         this.state.radioVal = e.target.value;
         this.state.selectedValue = e.target.value;
         this.state.selectedValueMLLSQ2 = e.target.value;
@@ -228,7 +238,6 @@ class Questionnaries extends React.Component {
     }
 
     handleRadioChangePCIns = (e) => {
-        debugger;
         this.state.radioValPCIns = e.target.value;
         this.state.selectedValueIns = e.target.value;
         
@@ -280,7 +289,6 @@ class Questionnaries extends React.Component {
 
     
     handleRadioChangeMH = (e) => {
-        debugger;
         this.state.radioValMH = e.target.value;
         this.state.selectedValueMH = e.target.value;
 
@@ -424,6 +432,93 @@ class Questionnaries extends React.Component {
         }
     }
 
+
+    /////////////////////////////////////////Handlig Current/Previous Life Insurance///////////////////////////////////////////////////////////////////////////////
+
+    handleInsurancedatatable = () => {
+        this.setState({
+            insurancedatatable: this.props.insurancetable.map((m, index) => {
+                return {
+                    insuranceCompanyName: <CustomInput value={m.insuranceCompanyName} onChange={(e) => this.handleInsuranceSetValues(e, index)} name="insuranceCompanyName" formControlProps={{ fullWidth: true }} />,
+                    policyNo: <CustomInput value={m.policyNo} onChange={(e) => this.handleInsuranceSetValues(e, index)} name="policyNo" formControlProps={{ fullWidth: true }} />,
+                    sumAssured: <CustomInput value={m.sumAssured} onChange={(e) => this.handleInsuranceSetValues(e, index)} name="sumAssured" formControlProps={{ fullWidth: true }} />,
+                    accidentalDeathBenefit: <CustomInput value={m.accidentalDeathBenefit} onChange={(e) => this.handleInsuranceSetValues(e, index)} name="accidentalDeathBenefit" formControlProps={{ fullWidth: true }} />,
+                    criticalIllnessBenefit: <CustomInput value={m.criticalIllnessBenefit} onChange={(e) => this.handleInsuranceSetValues(e, index)} name="criticalIllnessBenefit" formControlProps={{ fullWidth: true }} />,
+                    permanentDisability: <CustomInput value={m.permanentDisability} onChange={(e) => this.handleInsuranceSetValues(e, index)} name="permanentDisability" formControlProps={{ fullWidth: true }} />,
+                    hospitalization: <CustomInput value={m.hospitalization} onChange={(e) => this.handleInsuranceSetValues(e, index)} name="hospitalization" formControlProps={{ fullWidth: true }} />,
+                    status: <CustomInput value={m.status} onChange={(e) => this.handleInsuranceSetValues(e, index)} name="status" formControlProps={{ fullWidth: true }} />,
+                    actions: <Button justIcon round simple color="danger" className="remove" disabled={(this.state.nonedit === true) ? true : false} onClick={(e) => this.deleteInsurancedata(e, index)} ><Delete /> </Button >
+                };
+            })
+        })
+    }
+
+    handleInsuranceSetValues = (event, index) => {
+        let insurancetabledto = this.props.insurancetable;
+        let name = event.target.name;
+        let value = event.target.value;
+        insurancetabledto[index][name] = value;
+        this.setState({ insurancetabledto });
+
+        console.log("insurace table testing:", this.props.insurancetable);
+        this.handleInsurancedatatable();
+    }
+
+    handleInsuranceAddButton = () => {
+        let InsuranceObjectNew = Object.assign({}, this.props.insuranceDto);
+        this.props.insurancetable.push(InsuranceObjectNew);
+        this.setState({});
+        this.handleInsurancedatatable();
+
+    }
+
+    deleteInsurancedata = (index) => {
+        this.props.insurancetable.splice(index, 1);
+        this.handleInsurancedatatable();
+        console.log("insurancetable:", this.props.insurancetable);
+    }
+
+    /////////////////////////////////////////Handlig Current/Previously Claimed details///////////////////////////////////////////////////////////////////////////////
+
+    handleClaimeddatatable = () => {
+        this.setState({
+            claimeddatatable: this.props.claimedtable.map((m, index) => {
+                return {
+                    companyName: <CustomInput value={m.companyName} onChange={(e) => this.handleClaimedSetValues(e, index)} name="companyName" formControlProps={{ fullWidth: true }} />,
+                    policyNo: <CustomInput value={m.policyNo} onChange={(e) => this.handleClaimedSetValues(e, index)} name="policyNo" formControlProps={{ fullWidth: true }} />,
+                    natureOfClaim: <CustomInput value={m.natureOfClaim} onChange={(e) => this.handleClaimedSetValues(e, index)} name="natureOfClaim" formControlProps={{ fullWidth: true }} />,
+                    dateOfClaim: <CustomInput value={m.dateOfClaim} onChange={(e) => this.handleClaimedSetValues(e, index)} name="dateOfClaim" formControlProps={{ fullWidth: true }} />,
+                    actions: <Button justIcon round simple color="danger" className="remove" disabled={(this.state.nonedit === true) ? true : false} onClick={(e) => this.deleteClaimeddata(e, index)} ><Delete /> </Button >
+                };
+            })
+        })
+    }
+
+    handleClaimedSetValues = (event, index) => {
+        let claimedtabledto = this.props.claimedtable;
+        let name = event.target.name;
+        let value = event.target.value;
+        claimedtabledto[index][name] = value;
+        this.setState({ claimedtabledto });
+
+        console.log("claimed table testing:", this.props.claimedtable);
+        this.handleClaimeddatatable();
+    }
+
+    handleClaimedAddButton = () => {
+        let ClaimedObjectNew = Object.assign({}, this.props.claimedDto);
+        this.props.claimedtable.push(ClaimedObjectNew);
+        this.setState({});
+        this.handleClaimeddatatable();
+
+    }
+
+    deleteClaimeddata = (index) => {
+        this.props.claimedtable.splice(index, 1);
+        this.handleClaimeddatatable();
+        console.log("insurancetable:", this.props.claimedtable);
+    }
+
     
     getRadioButtonVal = event => {
         this.setState({
@@ -493,6 +588,13 @@ class Questionnaries extends React.Component {
                         familydatatable={this.props.familydatatable}
                         handleAddButton={this.props.handleAddButton}
 
+                        //CURRENT/PREVIOUS LIFE INSURANCE
+                        handleInsuranceAddButton={this.handleInsuranceAddButton}
+                        insurancedatatable={this.state.insurancedatatable}
+
+                        //CURRENT/PREVIOUS CLAIMED DETAILS
+                        handleClaimedAddButton={this.handleClaimedAddButton}
+                        claimeddatatable={this.state.claimeddatatable}
                     />
                     </GridItem>
             </GridContainer>

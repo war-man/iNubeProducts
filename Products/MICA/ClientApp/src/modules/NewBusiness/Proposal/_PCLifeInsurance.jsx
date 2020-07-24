@@ -319,116 +319,112 @@ const PrevCurrLifeInsurance = (props) => {
                     <GridItem xl={12} sm={4} md={3}>
                         <Button color="info"
                             round className={props.classes.marginRight}
-                            //onClick={props.handleAddButton}
+                        onClick={props.handleInsuranceAddButton}
                             id="saveBtn" >
                             Add
                                 </Button>
                     </GridItem>
                 }
                 {
-                    props.showPCL2 &&
+                    props.insurancedatatable.length > 0 &&
                     <GridItem lg={12}>
 
                         <CardBody>
 
                             <ReactTable
-                                data={props.data}
+                                data={props.insurancedatatable}
                                 filterable
                                 columns={[
                                     {
                                         Header: "INSURANCE COMPANY NAME",
                                         accessor: "insuranceCompanyName",
-                                        style: { textAlign: "center" },
-                                        headerClassName: 'react-table-center',
-                                        minWidth: 100,
-                                        resizable: false,
+                                        //style: { textAlign: "center" },
+                                        //headerClassName: 'react-table-center',
+                                        //minWidth: 100,
+                                        //resizable: false,
 
                                     },
                                     {
                                         Header: "POLICY NO",
-                                        accessor: "PolicyNo",
-                                        style: { textAlign: "center" },
-                                        headerClassName: 'react-table-center',
-                                        minWidth: 100,
-                                        resizable: false,
-                                        /* minWidth: 150,
-                                           style: { textAlign: "center" },
-                                           headerClassName: 'react-table-center'*/
+                                        accessor: "policyNo",
+                                        //style: { textAlign: "center" },
+                                        //headerClassName: 'react-table-center',
+                                        //minWidth: 100,
+                                        //resizable: false,
+                                        
                                     },
                                     {
 
                                         Header: "SUM ASSURED",
                                         accessor: "sumAssured",
-                                        //minWidth: 150,
-                                        style: { textAlign: "center" },
-                                        headerClassName: 'react-table-center',
-                                        minWidth: 100,
-                                        resizable: false,
+                                        ////minWidth: 150,
+                                        //style: { textAlign: "center" },
+                                        //headerClassName: 'react-table-center',
+                                        //minWidth: 100,
+                                        //resizable: false,
                                     },
                                     {
                                         Header: "ACCIDENTAL DEATH BENIFIT",
                                         accessor: "accidentalDeathBenefit",
-                                        style: { textAlign: "center" },
-                                        headerClassName: 'react-table-center',
-                                        minWidth: 100,
-                                        resizable: false,
-                                        /* minWidth: 150,
-                                           style: { textAlign: "center" },
-                                           headerClassName: 'react-table-center'*/
+                                        //style: { textAlign: "center" },
+                                        //headerClassName: 'react-table-center',
+                                        //minWidth: 100,
+                                        //resizable: false,
+                                        
                                     },
                                     {
 
                                         Header: "CRITICAL ILLNESS BENIFIT",
                                         accessor: "criticalIllnessBenefit",
+                                        ////minWidth: 100,
+                                        //style: { textAlign: "center" },
+                                        //headerClassName: 'react-table-center',
                                         //minWidth: 100,
-                                        style: { textAlign: "center" },
-                                        headerClassName: 'react-table-center',
-                                        minWidth: 100,
-                                        resizable: false,
+                                        //resizable: false,
                                     },
                                     {
 
                                         Header: "TOTAL PERMANENT DISABILITY/WAIVER",
-                                        accessor: "PermanentDisability",
-                                        //minWidth: 150,
-                                        style: { textAlign: "center" },
-                                        headerClassName: 'react-table-center',
-                                        minWidth: 100,
-                                        resizable: false,
+                                        accessor: "permanentDisability",
+                                        ////minWidth: 150,
+                                        //style: { textAlign: "center" },
+                                        //headerClassName: 'react-table-center',
+                                        //minWidth: 100,
+                                        //resizable: false,
                                     },
                                     {
 
                                         Header: "HOSPITALIZATION DAILY BENIFIT",
-                                        accessor: "Hospitalization",
-                                        //minWidth: 150,
-                                        style: { textAlign: "center" },
-                                        headerClassName: 'react-table-center',
-                                        minWidth: 100,
-                                        resizable: false,
+                                        accessor: "hospitalization",
+                                        ////minWidth: 150,
+                                        //style: { textAlign: "center" },
+                                        //headerClassName: 'react-table-center',
+                                        //minWidth: 100,
+                                        //resizable: false,
                                     },
                                     {
 
                                         Header: "CURRENT STATUS",
-                                        accessor: "Status",
-                                        //minWidth: 150,
-                                        style: { textAlign: "center" },
-                                        headerClassName: 'react-table-center',
-                                        minWidth: 60,
-                                        resizable: false,
+                                        accessor: "status",
+                                        ////minWidth: 150,
+                                        //style: { textAlign: "center" },
+                                        //headerClassName: 'react-table-center',
+                                        //minWidth: 60,
+                                        //resizable: false,
                                     },
                                     {
 
                                         Header: "DELETE",
                                         accessor: "actions",
                                         //minWidth: 150,
-                                        style: { textAlign: "center" },
-                                        headerClassName: 'react-table-center',
-                                        minWidth: 60,
-                                        resizable: false,
+                                        //style: { textAlign: "center" },
+                                        //headerClassName: 'react-table-center',
+                                        //minWidth: 60,
+                                        //resizable: false,
                                     },
 
                                 ]}
-                                defaultPageSize={1}
+                                defaultPageSize={10}
                                 showPaginationTop={false}
                                 // pageSize={([props.data.length + 1] < 3) ? [props.data.length + 1] : 3}
                                 showPaginationBottom
@@ -523,20 +519,20 @@ const PrevCurrLifeInsurance = (props) => {
                     <GridItem xl={12} sm={4} md={3}>
                         <Button color="info"
                             round className={props.classes.marginRight}
-                            //onClick={props.handleAddButton}
+                            onClick={props.handleClaimedAddButton}
                             id="saveBtn" >
                             Add
                                 </Button>
                     </GridItem>
                 }
                 {
-                    props.showPCL3 &&
+                    props.claimeddatatable.length > 0 &&
                     <GridItem lg={12}>
 
                         <CardBody>
 
                             <ReactTable
-                                data={props.data}
+                                data={props.claimeddatatable}
                                 filterable
                                 columns={[
                                     {
@@ -550,7 +546,7 @@ const PrevCurrLifeInsurance = (props) => {
                                     },
                                     {
                                         Header: "POLICY NO",
-                                        accessor: "PolicyNo",
+                                        accessor: "policyNo",
                                         style: { textAlign: "center" },
                                         headerClassName: 'react-table-center',
                                         minWidth: 100,
@@ -593,7 +589,7 @@ const PrevCurrLifeInsurance = (props) => {
                                     },
 
                                 ]}
-                                defaultPageSize={1}
+                                defaultPageSize={10}
                                 showPaginationTop={false}
                                 // pageSize={([props.data.length + 1] < 3) ? [props.data.length + 1] : 3}
                                 showPaginationBottom
