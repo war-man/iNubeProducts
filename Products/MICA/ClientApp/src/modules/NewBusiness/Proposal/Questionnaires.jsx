@@ -234,15 +234,7 @@ class Questionnaries extends React.Component {
         
 
         console.log("radioval3", this.state.radioVal3)
-        //let selected = this.state.selectedvalue;
-        //let name = e.target.name;
-        //let value = e.target.value;
-
-        //selected[name] = value;
-        //this.setstate({ selected });
-        //this.state.selectedValueC = e.target.value;
-        
-
+       
       
         if (this.state.radioValPCIns == "Question.1Yes") {
             this.setState({
