@@ -695,7 +695,7 @@ const NeedIdentification = (props) => {
                                                         </Button>
                     {/* <ProspectScreen surNameState="" classes={classes} handleSimple={this.handleSimple} handleClose={this.handleClose} />*/}
 
-                    {props.componentData.showCalc && <Calculator RetirementCalculatorDTO={props.componentData.RetirementCalculatorDTO}
+                    {props.componentData.showCalc && <Calculator data2={props.componentData.data2} data3={props.componentData.data3} RetirementCalculatorDTO={props.componentData.RetirementCalculatorDTO}
                         RetCalSetValue={props.componentData.RetCalSetValue}
                         calcObj={props.componentData.calcObj}
                         handleChangeCalc={props.componentData.handleChangeCalc} showRetirement={props.componentData.showRetirement}

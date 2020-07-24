@@ -131,7 +131,7 @@ class NeedAnalysisCompleted extends React.Component {
             ProspectData: [],
             eventId: "",
             policyNumber: "",
-            //display: false,
+            display: false,
             PartnerData: [],
             ProductData: [],
             datalist: [],
@@ -265,6 +265,11 @@ class NeedAnalysisCompleted extends React.Component {
 
             //prospect pool data
             ProspectDTO: [],
+           Relationship: [
+
+                { mID: 1, mValue: "DAUGHTER", mType: 1 },
+               { mID: 2, mValue: "SON", mType: 2 },
+            ],
 
             //Radio Button filterd data Storing
             RadioFilterData: [],
@@ -589,6 +594,7 @@ class NeedAnalysisCompleted extends React.Component {
     };
 
     componentDidMount() {
+      console.log("NeedAnalysis Name: ", this.props);
         fetch(`${NewBusinessConfig.NewBusinessConfigUrl}/api/NeedAnalysis/GetProspectPool`)
             .then(response => response.json())
             .then(data => {
@@ -715,6 +721,8 @@ class NeedAnalysisCompleted extends React.Component {
             }} />
         }
     }
+
+
     render() {
         const { classes } = this.props;
 
@@ -739,6 +747,8 @@ class NeedAnalysisCompleted extends React.Component {
                                 healthAdversitiesData={this.state.healthAdversitiesData} HealthMasddlDTO={this.state.HealthMasddlDTO}
                                 masterList={this.state.masterList} openCal={this.state.openCal} showCalc={this.state.showCalc}
                                 showFNA={this.state.showFNA} caledit={this.caledit} handleClose={this.handleClose} FNAedit={this.FNAedit}
+
+                                LeadDTO={this.props.LeadDTO} firstNameState={this.state.firstNameState} ageState={this.state.ageState} dateOfBirthState={this.state.dateOfBirthState}
                             />
 
                             </Animated>

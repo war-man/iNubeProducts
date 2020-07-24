@@ -2,13 +2,13 @@
 import React from "react";
 // @material-ui/icons
 import ChromeReader from "@material-ui/icons/ChromeReaderMode";
-
-
+import GridContainer from "components/Grid/GridContainer.jsx";
+import GridItem from '../../../components/Grid/GridItem.jsx';
 import Card from "components/Card/Card.jsx";
 import CardBody from "components/Card/CardBody.jsx";
 import NavPills from "components/NavPills/NavPills.jsx";
 import Wizard from "components/Wizard/Wizard.jsx";
-
+import { Animated } from "react-animated-css";
 import FinancialAnalysis from "./Calculator.jsx";
 import PersonalInformation from "./PersonalInformation.jsx";
 import NeedIdentification from "./NeedIdentification.jsx";
@@ -24,9 +24,13 @@ const NeedAnalysis = (props) => {
     
     console.log("NeedAnalysis Analysis: ",props);
     return (
-        <Card>
-            <CardBody>
-               
+        <GridContainer xl={12}>
+
+            <GridItem lg={12}>
+
+                <CardBody>
+                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+
                                 <Wizard
                                     validate
                                     steps={[
@@ -38,10 +42,14 @@ const NeedAnalysis = (props) => {
                                     ]}
                                     title=""
                                     subtitle=""
-                                />
-               
-            </CardBody>
-        </Card>
+                        />
+                    </Animated>
+                </CardBody>
+
+            </GridItem>
+          
+                </GridContainer >
+
     );
 }
 export default NeedAnalysis;

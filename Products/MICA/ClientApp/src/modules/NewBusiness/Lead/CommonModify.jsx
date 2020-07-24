@@ -37,7 +37,7 @@ import LeadPool from "./LeadPool.jsx";
 import Accordion from "components/Accordion/Accordion.jsx";
 import NeedAnalysis from "modules/NewBusiness/Prospect/NeedAnalysis.jsx";
 import LeadInformation from "modules/NewBusiness/Lead/LeadInformation.jsx";
-
+//import ProsptInformation from "modules/NewBusiness/Prospect/PersonalInformation.jsx";
 import NeedAnalysisCompleted from "modules/NewBusiness/Prospect/NeedAnalysisCompleted.jsx";
 
 
@@ -912,23 +912,15 @@ class CommonModify extends React.Component {
                                                 dateOfBirthState={this.state.dateOfBirthState} ageState={this.state.ageState} occupationIDState={this.state.occupationIDState}
                                                 monthlyIncomeState={this.state.monthlyIncomeState} address1State={this.state.address1State} address2State={this.state.address2State}
                                                 address3State={this.state.address3State}
-                                                
-                                                
-                                                
-                                                
-                                                
-                                                
-                                                
-                                                
-                                                
-                                                
-                                                
+                                               
                                             />
 
                                         },
                                         {
                                             title: "Need Analysis",
-                                            content: <NeedAnalysisCompleted/>
+                                            content: <NeedAnalysisCompleted LeadDTO={this.state.LeadDTO}
+                                                firstNameState={this.state.firstNameState} ageState={this.state.ageState} dateOfBirthState={this.state.dateOfBirthState}
+                                            />
                                         }
 
                                     ]}
@@ -1545,7 +1537,7 @@ class CommonModify extends React.Component {
                 }  {this.renderRedirectL()}
                 {this.renderRedirect()}
 
-
+                
             </GridContainer>
         );
     }

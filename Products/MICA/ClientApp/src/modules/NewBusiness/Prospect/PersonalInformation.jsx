@@ -26,400 +26,154 @@ import PermIdentity from "@material-ui/icons/PermIdentity";
 import Button from "components/CustomButtons/Button.jsx";
 import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 import ChromeReader from "@material-ui/icons/ChromeReaderMode";
+import { Animated } from "react-animated-css";
 
-import ReactTable from "react-table";
 import Datetime from "react-datetime";
 import { max } from "moment";
+import CommonModify from 'modules/NewBusiness/Lead/CommonModify.jsx';
+import ReactTable from 'components/MuiTable/MuiTable.jsx';
 
 
 
 const ProsptInformation = (props) => {
 
     let classes = props.classes;
-    console.log("PI", props);
+    console.log("PersnInfo", props, props.componentData);
 
     return (
         <div>
 
-                    <GridContainer>
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
+            <GridContainer>
+               
 
-                                labelText="Emirates ID"
-                                id="EmiratesId"
-                                name="EmiratesId"
-                               // onChange={(e) => props.SetValue("string", e)}
-                               // value={props.ContactsDTO.EmiratesId}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
+                            <GridItem xs={12} sm={12} md={3}>
+                                <CustomInput
+                                    required={true}
+                                   success={props.componentData.firstNameState === "success"}
+                                    error={props.componentData.firstNameState === "error"}
+                                    labelText="Given Name"
+                                    id="givenName"
+                                    name="firstName"
+                                    value={props.componentData.LeadDTO[0].firstName}
+                                   // value={props.LeadDTO[0].firstName}
+                                 //   onChange={(e) => props.componentData.SetValue("string", e)}
+                                    formControlProps={{
+                                        fullWidth: true
+                                    }} />
+                                                              
+                            </GridItem>
+                            <GridItem xs={12} sm={12} md={3}>
+                                <CustomDatetime
+                                    required={true}
+                                    success={props.componentData.dateOfBirthState === "success"}
+                                    error={props.componentData.dateOfBirthState === "error"}
+                                    value={props.componentData.LeadDTO[0].dateOfBirth}
+                                    labelText="Date Of Birth"
+                                    id='dob'
+                                    name='dateOfBirth'
+                                   // onChange={(e) => props.onDateChange("date", "dateOfBirth", e)}
+                                    formControlProps={{ fullWidth: true }} />
+                                
+                            </GridItem>
 
+                            <GridItem xs={12} sm={12} md={3}>
+                                <CustomInput
+                                    required={true}
+                                    success={props.componentData.ageState === "success"}
+                                    error={props.componentData.ageState === "error"}
+                                    labelText="Age"
+                                    id="age"
+                                    name="age"
+                                    value={props.componentData.LeadDTO[0].age}
+                                   // onChange={(e) => props.SetValue("string", e)}
+                                    formControlProps={{
+                                        fullWidth: true
+                                    }}
+                                />
+                                
 
-                        {/*   <GridItem xs={12} sm={12} md={4}>
-                            <MasterDropdown
-                                labelText="Type"
-                                id="ContactsDTO.TypeId"
-                              //  value={props.ContactsDTO.ContactTypeId}
-                                lstObject={props.masterList}
-                                required={true}
-                                //filterName='Type'
-                                model="ContactsDTO"
-                                name='ContactTypeId'
-                               // onChange={(e) => props.SetValue("string", e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <MasterDropdown
-                                labelText="Salutation"
-                                id="ContactsDTO.SalutationId"
-                               // value={props.ContactsDTO.Salutation}
-                                lstObject={props.masterList}
-                                required={true}
-                                //filterName='Salutation'
-                                model="ContactsDTO"
-                                name='Salutation'
-                               // onChange={(e) => props.SetValue("string", e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>*/}
-
-
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
-
-                                labelText="Given Name"
-                                id="GivenName"
-                                name="GivenName"
-                                //onChange={(e) => props.SetValue("string", e)}
-                               // value={props.ContactsDTO.GivenName}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
-                                labelText="Sur Name"
-                                id="SurName"
-                                name="SurName"
-                               // onChange={(e) => props.SetValue("string", e)}
-                               // value={props.ContactsDTO.SurName}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
-
-                                labelText="Mobile"
-                                id="MobileNo "
-                                name="MobileNo"
-                               // onChange={(e) => props.SetValue("string", e)}
-                               // value={props.ContactsDTO.MobileNo}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                labelText="Home"
-                                id="Home"
-                                name="Home"
-                               // onChange={(e) => props.SetValue("string", e)}
-                               // value={props.ContactsDTO.Home}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                labelText="Office"
-                                id="Office"
-                                name="Office"
-                                //onChange={(e) => props.SetValue("string", e)}
-                               // value={props.ContactsDTO.Office}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
-
-                                labelText="E-Mail"
-                                id="Email"
-                                name="Email"
-                               // onChange={(e) => props.SetValue("string", e)}
-                               // value={props.ContactsDTO.Email}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
-
-                                labelText="Place"
-                                id="Place"
-                                name="Place"
-                               // onChange={(e) => props.SetValue("string", e)}
-                               // value={props.ContactsDTO.Place}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        {/* <GridItem xs={12} sm={12} md={4}>
-                            <MasterDropdown
-                                labelText="Gender"
-                                id="ContactsDTO.GenderId"
-                               // value={props.ContactsDTO.Gender}
-                                lstObject={props.masterList}
-                                required={true}
-                                //filterName='Gender'
-                                model="ContactsDTO"
-                                name='Gender'
-                               // onChange={(e) => props.SetValue("string", e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <MasterDropdown
-                                labelText="MaritialStatus"
-                                id="ContactsDTO.MaritialStatusId"
-                               // value={props.ContactsDTO.MaritialStatus}
-                                lstObject={props.masterList}
-                                required={true}
-                               // filterName='MaritialStatus'
-                                model="ContactsDTO"
-                                name='MaritialStatus'
-                               // onChange={(e) => props.SetValue("string", e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-                        */}
+                            </GridItem>
+                <GridItem xs={12} sm={12} md={3}>
+                    <CustomInput
+                        required={true}
+                      //  success={props.componentData.ageState === "success"}
+                      //  error={props.componentData.ageState === "error"}
+                        labelText="Number Of Children"
+                        id="NoOfChildren"
+                        name="NoOfChildren"
+                       // value={props.componentData.LeadDTO[0].NoOfChildren}
+                        // onChange={(e) => props.SetValue("string", e)}
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
 
 
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomDatetime required={true} onFocus={props.onClick} validdate={props.validdate} labelText="Date Of Birth" id='dob' name='dob' /*onChange={(evt) => props.onDateChange('datetime', 'ProductDTO', 'activeFrom', evt)}*/ formControlProps={{ fullWidth: true }} />
-                        </GridItem>
-
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
-
-                                labelText="Age"
-                                id="Age"
-                                name="Age"
-                               // onChange={(e) => props.SetValue("string", e)}
-                                //value={props.ContactsDTO.Age}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
-
-                                labelText="Occupation"
-                                id="Occupation"
-                                name="Occupation"
-                               // onChange={(e) => props.SetValue("string", e)}
-                              //  value={props.ContactsDTO.Occupation}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
-
-                                labelText="Average Annual Income"
-                                id="AverageAnnualIncome"
-                                name="AverageAnnualIncome"
-                               // onChange={(e) => props.SetValue("string", e)}
-                               // value={props.ContactsDTO.AverageAnnualIncome}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-                        {/* <GridItem xs={12} sm={12} md={4}>
-                            <MasterDropdown
-                                labelText="Currency"
-                                id="ContactsDTO.CurrencyId"
-                               // value={props.ContactsDTO.Currency}
-                                lstObject={props.masterList}
-                                required={true}
-                                //filterName='Currency'
-                                model="ContactsDTO"
-                                name='Currency'
-                              //  onChange={(e) => props.SetValue("string", e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-                        */}
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                labelText="Passport"
-                                id="Passport"
-                                name="Passport"
-                              //  onChange={(e) => props.SetValue("string", e)}
-                               // value={props.ContactsDTO.Passport}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-                    </GridContainer>
+                </GridItem>
+  
                 
-                    <CardHeader color="rose" icon>
+            </GridContainer> 
+            <GridContainer xl={12}>
+                <GridItem xs={12}>
+                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+
+                        <ReactTable
+                          //  data={this.state.newParamData}
+                            filterable
+                            columns={[
+                                
+                                {
+                                    Header: "NAME  ",
+                                //    accessor: "MasterList",
+                                    minWidth: 30,
+                                    style: { textAlign: "center" },
+                                    headerClassName: 'react-table-center',
+                                    resizable: false,
+
+                                }, {
+                                    Header: "DOB",
+                                  //  accessor: "input",
+                                    minWidth: 30,
+                                    style: { textAlign: "center" },
+                                    headerClassName: 'react-table-center',
+                                    resizable: false,
+
+                                },
+                                {
+                                    Header: "AGE AT NEXT BIRTHDAY ",
+                                   // accessor: "dataType",
+                                    minWidth: 30,
+                                    style: { textAlign: "center" },
+                                    headerClassName: 'react-table-center',
+                                    resizable: false,
+
+                                },
+                                {
+                                    Header: "RELATIONSHIP",
+                                  //  accessor: "allocParamName",
+                                    minWidth: 30,
+                                    style: { textAlign: "center" },
+                                    headerClassName: 'react-table-center',
+                                    resizable: false,
+
+                                }
+                            ]}
+                            defaultPageSize={5}
+                            showPaginationTop={false}
+                           // pageSize={([this.state.newParamData.length + 1] < 5) ? [this.state.newParamData.length + 1] : 5}
+                            showPaginationBottom
+                            className="-striped -highlight"
+                        />
+
+
+                    </Animated>
+                </GridItem>
+            </GridContainer>
+
                    
-                    {
-                        <h4 >
-                            <small> Communication Address </small>
-                        </h4>
-                    }
-                </CardHeader>
-               
-                    <GridContainer>
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
 
-                                labelText="Address 1"
-                                id="address1"
-                                name="address1"
-                                //onChange={(e) => props.SetValue("string", e)}
-                                //value={props.ContactsDTO.Passport}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
-
-                                labelText="Address 2"
-                                id="address2"
-                                name="address2"
-                                //value={this.state.PartnerSearchDTO.partnerCode}
-                                //onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-
-                                labelText="Address 3"
-                                id="address3"
-                                name="address3"
-                                //value={this.state.PartnerSearchDTO.partnerCode}
-                                //onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
-
-                                labelText="Postal Code | City"
-                                id="postalCode|city"
-                                name="postalCose|city"
-                                //value={this.state.PartnerSearchDTO.partnerCode}
-                                //onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
-
-                                labelText="District "
-                                id="district"
-                                name="district"
-                                //value={this.state.PartnerSearchDTO.partnerCode}
-                                //onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                required={true}
-
-                                labelText="Province"
-                                id="province"
-                                name="province"
-                                //value={this.state.PartnerSearchDTO.partnerCode}
-                                //onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-                    </GridContainer>
-
-                    <div>
-                        <Button color="info" round className="edit" onClick={props.handleClose}>Save</Button>
-                    </div>
-               
         </div>
+
 
            ) }
 
