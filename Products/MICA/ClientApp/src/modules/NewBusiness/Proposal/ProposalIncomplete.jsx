@@ -165,15 +165,15 @@ class ProposalIncomplete extends React.Component {
                 "Height": "",
                 "HeightFeets": "",
                 "Weight": "",
-                "SteadyWeight": "",
-                "HeightUnit": "",
+               // "SteadyWeight": "",
+               // "HeightUnit": "",
                 "WeightUnit": "",
-                "IsSmoker": "",
+                "IsSmoker": 0,
                 "SmokeType": "",
                 "SmokeQuantity": "",
                 "SmokePerDay": "",
                 "SmokeDuration": "",
-                "IsAlcholic": "",
+                "IsAlcholic": 0,
                 "AlcholType": "",
                 "AlcholQuantity": "",
                 "AlcholPerDay": "",
@@ -576,13 +576,13 @@ class ProposalIncomplete extends React.Component {
         const MasterDataDto1 = this.state.MasterDataDto[143].mdata;
         const MasterDataDto2 = this.state.MasterDataDto[223].mdata;
 
-        obj.smokecount = MasterDataDto2.filter(a => a.mID == LifeStyleQA[0].SmokeQuantity)[0].mValue === undefined
-            ? [] : MasterDataDto2.filter(a => a.mID == LifeStyleQA[0].SmokeQuantity)[0].mValue;
+        obj.smokecount = MasterDataDto2.filter(a => a.mID == LifeStyleQA.SmokeQuantity)[0].mValue === undefined
+            ? [] : MasterDataDto2.filter(a => a.mID == LifeStyleQA.SmokeQuantity)[0].mValue;
        
-        obj.smoketype = MasterDataDto1.filter(a => a.mID == LifeStyleQA[0].SmokeType)[0].mValue === undefined
-            ? [] : MasterDataDto1.filter(a => a.mID == LifeStyleQA[0].SmokeType)[0].mValue;
+        obj.smoketype = MasterDataDto1.filter(a => a.mID == LifeStyleQA.SmokeType)[0].mValue === undefined
+            ? [] : MasterDataDto1.filter(a => a.mID == LifeStyleQA.SmokeType)[0].mValue;
 
-        obj.smokeduration = LifeStyleQA[0].SmokeDuration;
+        obj.smokeduration = LifeStyleQA.SmokeDuration;
 
         this.state.TobData.push(obj);
         this.setState({});
@@ -601,16 +601,16 @@ class ProposalIncomplete extends React.Component {
         const MasterDataDto3 = this.state.MasterDataDto[145].mdata;
         const MasterDataDto4 = this.state.MasterDataDto[142].mdata;
 
-        console.log("MasterDataDto1", MasterDataDto3, MasterDataDto4, MasterDataDto3.filter(a => a.mID == LifeStyleQA[0].AlcoholTypes) );
+        console.log("MasterDataDto1", MasterDataDto3, MasterDataDto4, MasterDataDto3.filter(a => a.mID == LifeStyleQA.AlcoholTypes) );
 
-        obj.alcoholType = MasterDataDto3.filter(a => a.mID == LifeStyleQA[0].AlcholType)[0].mValue === undefined
-            ? [] : MasterDataDto3.filter(a => a.mID == LifeStyleQA[0].AlcholType)[0].mValue;
+        obj.alcoholType = MasterDataDto3.filter(a => a.mID == LifeStyleQA.AlcholType)[0].mValue === undefined
+            ? [] : MasterDataDto3.filter(a => a.mID == LifeStyleQA.AlcholType)[0].mValue;
 
-        obj.alcoholPer = MasterDataDto4.filter(a => a.mID == LifeStyleQA[0].AlcholPerDay)[0].mValue === undefined
-            ? [] : MasterDataDto4.filter(a => a.mID == LifeStyleQA[0].AlcholPerDay)[0].mValue;
+        obj.alcoholPer = MasterDataDto4.filter(a => a.mID == LifeStyleQA.AlcholPerDay)[0].mValue === undefined
+            ? [] : MasterDataDto4.filter(a => a.mID == LifeStyleQA.AlcholPerDay)[0].mValue;
 
-        obj.alcoholQuantity = LifeStyleQA[0].AlcholQuantity;
-        obj.alcoholDuration = LifeStyleQA[0].AlcholDuration;
+        obj.alcoholQuantity = LifeStyleQA.AlcholQuantity;
+        obj.alcoholDuration = LifeStyleQA.AlcholDuration;
 
         this.state.AlcoData.push(obj);
         this.setState({});

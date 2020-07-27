@@ -238,7 +238,7 @@ const MainlifeLifeStyle = (props) => {
                 <GridItem xl={12} sm={4} md={3}>
                 <Button color="info"
                     round className={props.classes.marginRight}
-                        onClick={props.QuestionAddButton}
+                        onClick={props.TobaccoQuestionAddButton}
                     id="saveBtn" >
                         ADD
                                 </Button>
