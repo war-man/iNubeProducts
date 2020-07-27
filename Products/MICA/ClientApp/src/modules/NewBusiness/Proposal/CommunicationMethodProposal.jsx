@@ -86,9 +86,9 @@ class CommunicationMethod extends React.Component {
                                 labelText="Preferred language for Policy Document & Correspondence"
                                 lstObject={this.props.MasterDataDto}
                                 filterName='Language'
-                                // value={orgData.selectedlevel}
-                                //name='selectedlevel'
-                                //onChange={(e) => orgData.handlelevels(e)}
+                                value={this.props.preferredCommunication.preferredLanguage}
+                                name='preferredLanguage'
+                                onChange={(e) => this.props.CommunicationSetValues(e)}
                                 formControlProps={{ fullWidth: true }}
                             />
                         </GridItem>
@@ -97,11 +97,11 @@ class CommunicationMethod extends React.Component {
                         <MasterDropdown
                                 required={true}
                                 labelText="Premium Method of Communication"
-                            lstObject={this.props.MasterDataDto}
-                            filterName='ModeOfCommunication'
-                                // value={orgData.selectedlevel}
-                                //name='selectedlevel'
-                                //onChange={(e) => orgData.handlelevels(e)}
+                                lstObject={this.props.MasterDataDto}
+                                filterName='ModeOfCommunication'
+                                value={this.props.preferredCommunication.premiumMethodOfComm}
+                            name='premiumMethodOfComm'
+                                onChange={(e) => this.props.CommunicationSetValues(e)}
                                 formControlProps={{ fullWidth: true }}
                             />
                         </GridItem>

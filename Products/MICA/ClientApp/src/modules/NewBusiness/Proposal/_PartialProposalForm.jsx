@@ -76,7 +76,8 @@ const PartialProposalForm = (props) => {
                                 <CustomInput
                                     labelText="Quotation No"
                                     value={props.filterData.quoteNo}
-                                    name="quoteNo"
+                        name="quoteNo"
+                        disabled={props.proposalFormFlag}
                                     onChange={(e) => props.proposalSetValue(e)}
                                     id="QuoteNo"
                                     formControlProps={{
@@ -89,7 +90,7 @@ const PartialProposalForm = (props) => {
                                     labelText="Proposal No"
                                     value={props.filterData.proposalNo}
                                     name="proposalNo"
-                                    
+                        disabled={props.proposalFormFlag}
                                     onChange={(e) => props.proposalSetValue(e)}
                                     id="ProposalNo"
                                     formControlProps={{
@@ -103,7 +104,7 @@ const PartialProposalForm = (props) => {
                                     value={props.filterData.planId}
                                     name="planId"
                                     onChange={(e) => props.proposalSetValue(e)}
-                                  
+                        disabled={props.proposalFormFlag}
                                     id="PlanName"
                                     formControlProps={{
                                         fullWidth: true
@@ -114,7 +115,8 @@ const PartialProposalForm = (props) => {
                                 <CustomInput
                                     labelText="Payment Frequency"
                                     value={props.filterData.paymentFrequency}
-                                    name="paymentFrequency"
+                        name="paymentFrequency"
+                        disabled={props.proposalFormFlag}
                                     onChange={(e) => props.proposalSetValue(e)}
                                     id="PaymentFrequency"
                                     formControlProps={{
@@ -140,8 +142,8 @@ const PartialProposalForm = (props) => {
                                         classes={{
                                             select: classes.select
                                         }}
-                                       // value={props.filterData.need}
-                                        //onChange={(e) => props.SetValue("ProposalFormData", e)}
+                                        value={props.filterData.need}
+                            onChange={(e) => props.proposalSetValue("ProposalFormData", e)}
                                         inputProps={{
                                             name: "Need",
                                             id: "Need"

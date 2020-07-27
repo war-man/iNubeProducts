@@ -87,7 +87,6 @@ class ProposalIncomplete extends React.Component {
             citizenshipCheckboxSelected: false,
             singleValue: "0",
             singleValue1: "0",
-            
             editModal: false,
             btnvisibility: false,
             disabled: false,
@@ -95,12 +94,12 @@ class ProposalIncomplete extends React.Component {
             simpleSelect: "",
             selectedValue: null,
             masterList: [],
-
             show: false,
             submitshow: false,
             data: [],
             filterData: [],
             ProposalDto: [],
+            proposalFormFlag: true,
             //PolicyOwnerDetailsDto: {
             //    "salutation": "",
             //},
@@ -161,7 +160,7 @@ class ProposalIncomplete extends React.Component {
             AlcoData: [],
 
             //Questionaris part start from here
-            LifeStyleQA: [{
+            LifeStyleQA: {
                 "MemberLifeStyleID": "",
                 "Height": "",
                 "HeightFeets": "",
@@ -169,21 +168,21 @@ class ProposalIncomplete extends React.Component {
                 "SteadyWeight": "",
                 "HeightUnit": "",
                 "WeightUnit": "",
-
                 "IsSmoker": "",
                 "SmokeType": "",
                 "SmokeQuantity": "",
                 "SmokePerDay": "",
                 "SmokeDuration": "",
-
                 "IsAlcholic": "",
                 "AlcholType": "",
                 "AlcholQuantity": "",
                 "AlcholPerDay": "",
                 "AlcholDuration": "",
-
-                "IsNarcoticDrugs": ""
-            }],
+                "IsNarcoticDrugs": "",
+                "Q1Specification": "",
+                "Q2Specification": "",
+                "Q3Specification": ""
+            },
 
             familyBackgroundDto: {
                 "relationship": "",
@@ -212,6 +211,50 @@ class ProposalIncomplete extends React.Component {
                 "policyNo": "",
                 "natureOfClaim": "",
                 "dateOfClaim": ""
+            },
+            cmedicinetable: [],
+            cmedicineDto: {
+                "nameOfMedication": "",
+                "dose": "",
+                "frequency": ""
+            },
+            lmedicinetable: [],
+            lmedicineDto: {
+                "nameOfMedication": "",
+                "dose": "",
+                "frequency": "",
+                "dateLastTaken": ""
+            },
+            Treatmenttable: [],
+            TreatmentDto: {
+                "nameOfTreatment": "",
+                "location": "",
+                "date": "",
+                "result": ""
+            },
+            DHCtable: [],
+            DHCtDto: {
+                "nameOfDoctor": "",
+                "address": "",
+                "dateOfLastConsult": ""
+            },
+
+            premiumPayingDto: {
+                "premiumPaymentMethod": "",
+                "paymentPaidBy": "",
+                "Relationshipwithproposer": "",
+                "paymentRecieptPreferredBy": "",
+                "totalAnnualPremium": "",
+                "proposalDepositPremium": "",
+                "bankAccNo": "",
+                "nameOfBranch": "",
+                "creditCardNo": "",
+                "nameOfBank": ""
+            },
+
+            preferredCommunication: {
+                "preferredLanguage": "",
+                "premiumMethodOfComm": ""
             },
         
 
@@ -281,6 +324,19 @@ class ProposalIncomplete extends React.Component {
                 "gender": "",
                 "maritialStatus": "",
 
+            },
+
+            "SaveModifiedProposalDetails": {
+                "policyMemberOwnerDetails": [],  // this.state.tblPolicyMemberDetails
+                "LifeStyleDetails": [],  //this.state.LifeStyleQA
+                "FamilyBackgroundDetails": [], // this.state.familytable
+                "PCLifeInsuranceDetails": [], //this.state.insurancetable
+                "PCClaimedDetails": [], // this.state.claimedtable
+                "PremiumPayingDetails": [], //this.state.premiumPayingDto
+                "CommunicationMethod": [], 
+                "ProposerSignature": [],
+                "ProposerDetails": [],
+                "WealthPlannerSignature": []
             }
 
         }
@@ -449,14 +505,34 @@ class ProposalIncomplete extends React.Component {
 
     // Setting values for questinaries part
 
+    PremiumPaymentSetValue = (evt) => {
+        debugger;
+        let premiumPayingDto = this.state.premiumPayingDto;
+        premiumPayingDto[evt.target.name] = evt.target.value;
+        this.setState({ premiumPayingDto });
+
+        console.log("premiumPayingDto", this.state.premiumPayingDto);
+        
+    }
+
+    CommunicationSetValues = (evt) => {
+
+        let preferredCommunication = this.state.preferredCommunication;
+        preferredCommunication[evt.target.name] = evt.target.value;
+        this.setState({ preferredCommunication });
+
+        console.log("preferredCommunication", this.state.preferredCommunication);
+    }
+
+
     QuestionalDetailsSetValue = (evt) => {
         debugger;
         let LifeStyleQA = this.state.LifeStyleQA;
-        LifeStyleQA[0][evt.target.name] = evt.target.value;
+        LifeStyleQA[evt.target.name] = evt.target.value;
         this.setState({ LifeStyleQA });
 
         console.log("lifeStyleQa ", this.state.LifeStyleQA);
-        
+
     }
 
     tobaccoDataTable = () => {
@@ -877,8 +953,8 @@ class ProposalIncomplete extends React.Component {
                                                         </Button>
                                                         */}
                         {this.state.open &&
-                            <ModifyProposal
-                            claimedDto={this.state.claimedDto} claimedtable={this.state.claimedtable} insurancetable={this.state.insurancetable} insuranceDto={this.state.insuranceDto} handleAddButton={this.handleAddButton} familydatatable={this.state.familydatatable} familyBackground={this.state.familyBackground} FamilyDetailSetValue={this.FamilyDetailSetValue} familyBackgroundDto={this.state.familyBackgroundDto} AlcoholQuestionAddButton={this.AlcoholQuestionAddButton} alcoholdata={this.state.alcoholdata}
+                            <ModifyProposal proposalFormFlag={this.state.proposalFormFlag} premiumPayingDto={this.state.premiumPayingDto} PremiumPaymentSetValue={this.PremiumPaymentSetValue} preferredCommunication={this.state.preferredCommunication} CommunicationSetValues={this.CommunicationSetValues} cmedicinetable={this.state.cmedicinetable} cmedicineDto={this.state.cmedicineDto} lmedicinetable={this.state.lmedicinetable} lmedicineDto={this.state.lmedicineDto} Treatmenttable={this.state.Treatmenttable} TreatmentDto={this.state.TreatmentDto}
+                            DHCtable={this.state.DHCtable} DHCtDto={this.state.DHCtDto} claimedDto={this.state.claimedDto} claimedtable={this.state.claimedtable} insurancetable={this.state.insurancetable} insuranceDto={this.state.insuranceDto} handleAddButton={this.handleAddButton} familydatatable={this.state.familydatatable} familyBackground={this.state.familyBackground} FamilyDetailSetValue={this.FamilyDetailSetValue} familyBackgroundDto={this.state.familyBackgroundDto} AlcoholQuestionAddButton={this.AlcoholQuestionAddButton} alcoholdata={this.state.alcoholdata}
                             TobaccoQuestionAddButton={this.TobaccoQuestionAddButton} tobaccodata={this.state.tobaccodata} handlePolicyOwnerData={this.handlePolicyOwnerData} DateChange={this.DateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails}
                             SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer}
                             singleValueSelected={this.state.singleValueSelected} handleRadioChange={this.handleRadioChange} handleRadioOnChange={this.handleRadioOnChange} leadTable={this.leadTable} SetValue={this.SetValue} MasterDataDto={this.state.MasterDataDto} filterData={this.state.filterData} PolicyOwnerDetailsDto={this.state.PolicyOwnerDetailsDto} PolicyOwnerDetailsSetValue={this.PolicyOwnerDetailsSetValue}

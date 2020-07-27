@@ -61,7 +61,7 @@ const MainlifeLifeStyle = (props) => {
                     labelText="Height"
                         id="Height"
                         name="Height"
-                       // value={props.LifeStyleQA.Height}
+                        value={props.LifeStyleQA.Height}
                         onChange={props.QuestionalDetailsSetValue}
                     formControlProps={{
                         fullWidth: true
@@ -72,7 +72,7 @@ const MainlifeLifeStyle = (props) => {
                     <MasterDropdown
                         labelText=""
                         // id="LeadDTO.gender"
-                        value={""}
+                        value={props.LifeStyleQA.HeightFeets}
                         lstObject={props.MasterDataDto}
                         filterName='HeightFeets'
                         //  model="LeadDTO"
@@ -89,7 +89,7 @@ const MainlifeLifeStyle = (props) => {
                 <CustomInput
                     labelText="Weight"
                         id="Weight"
-                       // value={props.LifeStyleQA.Weight}
+                        value={props.LifeStyleQA.Weight}
                         onChange={(e) => props.QuestionalDetailsSetValue(e)}
                         name="Weight"
                     formControlProps={{
@@ -103,11 +103,11 @@ const MainlifeLifeStyle = (props) => {
                     <MasterDropdown
                         labelText=""
                         // id="LeadDTO.gender"
-                      //  value={props.LifeStyleQA.WeightUnit}
+                        value={props.LifeStyleQA.WeightUnit}
                         lstObject={props.MasterDataDto}
-                        filterName='HeightFeets'
+                        filterName='WeightUnit'
                         //  model="LeadDTO"
-                        name='HeightFeets'
+                        name='WeightUnit'
                        onChange={(e)=>props.QuestionalDetailsSetValue(e)}
                         formControlProps={{
                             fullWidth: true
@@ -613,6 +613,9 @@ const MainlifeLifeStyle = (props) => {
                     
                     <CustomInput
                         labelText={(props.LifeStyleQuesDTO[4] !== undefined) ? props.LifeStyleQuesDTO[4].questionText : ""}
+                        value={props.LifeStyleQA.Q1Specification}
+                        name="Q1Specification"
+                        onChange={(e) => props.QuestionalDetailsSetValue(e)}
                         id="Specification"
                         formControlProps={{
                             fullWidth: true
@@ -705,6 +708,9 @@ const MainlifeLifeStyle = (props) => {
                    
                     <CustomInput
                         labelText={(props.LifeStyleQuesDTO[5] !== undefined) ? props.LifeStyleQuesDTO[5].questionText : ""}
+                        value={props.LifeStyleQA.Q2Specification}
+                        name="Q2Specification"
+                        onChange={(e) => props.QuestionalDetailsSetValue(e)}
                         id="Specification"
                         formControlProps={{
                             fullWidth: true
@@ -798,6 +804,9 @@ const MainlifeLifeStyle = (props) => {
                 <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.LifeStyleQuesDTO[6] !== undefined) ? props.LifeStyleQuesDTO[6].questionText : ""}
+                        value={props.LifeStyleQA.Q3Specification}
+                        name="Q3Specification"
+                        onChange={(e) => props.QuestionalDetailsSetValue(e)}
                         id="Specification"
                         formControlProps={{
                             fullWidth: true

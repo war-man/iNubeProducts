@@ -14,7 +14,7 @@ import Radio from "@material-ui/core/Radio";
 import FiberManualRecord from "@material-ui/icons/FiberManualRecord";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Button from "components/CustomButtons/Button.jsx";
-import ReactTable from "react-table";
+import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import CardBody from "components/Card/CardBody.jsx";
 
 
@@ -535,16 +535,1141 @@ const MLMedicalHistory = (props) => {
                 </GridItem>
 
 
-                {props.showMHQ4 && <GridItem xs={12}>
-                    
+                {props.showMHQ4 &&
+                    <GridItem xs={12} sm={12} md={12}>
+
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[7] !== undefined) ? props.MedHistQuesDTO[7].questionText : ""}
-                        id="MHQ1.5"
+                        //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
                         }}
                     />
                 </GridItem>}
+
+                    {props.showMHQ4 &&
+                    <GridItem xs={12} sm={12} md={12}>
+
+                        <CustomInput
+                            labelText={(props.MedHistQuesDTO[8] !== undefined) ? props.MedHistQuesDTO[8].questionText : ""}
+                            //id="MHQ1.5"
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>}
+
+                {props.showMHQ4 &&
+                    <GridItem xs={12} sm={12} md={12}>
+
+                        <CustomInput
+                            labelText={(props.MedHistQuesDTO[9] !== undefined) ? props.MedHistQuesDTO[9].questionText : ""}
+                            //id="MHQ1.5"
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>}
+
+                {props.showMHQ4 &&
+                    <GridItem>
+
+                    <p>{(props.MedHistQuesDTO[10] !== undefined) ? props.MedHistQuesDTO[10].questionText : ""}</p>
+
+                    <GridItem xs={12}>
+                        <FormControlLabel
+                            control={
+                                <Radio
+                                    checked={props.selectedValueMH === "MHQues4.4Yes"}
+                                    onChange={props.handleRadioChangeMH}
+                                    value="MHQues4.4Yes"
+                                    //name="radio4"
+                                    aria-label="B"
+                                    icon={
+                                        <FiberManualRecord
+                                            className={classes.radioUnchecked}
+                                        />
+                                    }
+                                    checkedIcon={
+                                        <FiberManualRecord
+                                            className={classes.radioChecked}
+                                        />
+                                    }
+                                    classes={{
+                                        checked: classes.radio,
+                                        root: classes.radioRoot
+                                    }}
+                                />
+                            }
+                            classes={{
+                                label: classes.label
+                            }}
+                            label="Yes"
+                        />
+
+                        <FormControlLabel
+                            control={
+                                <Radio
+                                    checked={props.selectedValueMH === "MHQues4.4No"}
+                                    onChange={props.handleRadioChangeMH}
+                                    value="MHQues4.4No"
+                                    //name="radio3"
+                                    aria-label="B"
+                                    icon={
+                                        <FiberManualRecord
+                                            className={classes.radioUnchecked}
+                                        />
+                                    }
+                                    checkedIcon={
+                                        <FiberManualRecord
+                                            className={classes.radioChecked}
+                                        />
+                                    }
+                                    classes={{
+                                        checked: classes.radio,
+                                        root: classes.radioRoot
+                                    }}
+                                />
+                            }
+                            classes={{
+                                label: classes.label
+                            }}
+                            label="No"
+                        />
+                    </GridItem>
+
+                    </GridItem>
+                }
+
+                {props.show4MHQ4 &&
+                    <GridItem xs={12} sm={12} md={12}>
+
+                        <CustomInput
+                            labelText={(props.MedHistQuesDTO[11] !== undefined) ? props.MedHistQuesDTO[11].questionText : ""}
+                            //id="MHQ1.5"
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>}
+
+                {props.show4MHQ1 &&
+                    <GridItem>
+
+                        <p>4. {(props.MedHistQuesDTO[10] !== undefined) ? props.MedHistQuesDTO[10].questionText : ""}</p>
+
+                        <GridItem xs={12}>
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.1Yes"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.1Yes"
+                                        //name="radio4"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="Yes"
+                            />
+
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.1No"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.1No"
+                                        //name="radio3"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="No"
+                            />
+                        </GridItem>
+
+                    </GridItem>
+                }
+                {props.showMHQ4 &&
+                    <GridItem xs={12} sm={12} md={12}>
+
+                        <CustomInput
+                            labelText={(props.MedHistQuesDTO[12] !== undefined) ? props.MedHistQuesDTO[12].questionText : ""}
+                            //id="MHQ1.5"
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>}
+                {props.showMHQ4 &&
+                    <GridItem xs={12} sm={12} md={12}>
+
+                        <CustomInput
+                            labelText={(props.MedHistQuesDTO[13] !== undefined) ? props.MedHistQuesDTO[13].questionText : ""}
+                            //id="MHQ1.5"
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>}
+
+                {props.showMHQ4 &&
+                    <GridItem>
+
+                        <p>{(props.MedHistQuesDTO[14] !== undefined) ? props.MedHistQuesDTO[14].questionText : ""}</p>
+
+                        <GridItem xs={12}>
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.7Yes"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.7Yes"
+                                        //name="radio4"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="Yes"
+                            />
+
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.7No"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.7No"
+                                        //name="radio3"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="No"
+                            />
+                        </GridItem>
+
+                    </GridItem>
+                }
+                {props.show4MHQ7 &&
+                    <GridItem xs={12} sm={12} md={12}>
+
+                        <CustomInput
+                            labelText={(props.MedHistQuesDTO[15] !== undefined) ? props.MedHistQuesDTO[15].questionText : ""}
+                            //id="MHQ1.5"
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>}
+                {props.showMHQ4 &&
+                    <GridItem>
+
+                        <p>{(props.MedHistQuesDTO[16] !== undefined) ? props.MedHistQuesDTO[16].questionText : ""}</p>
+
+                        <GridItem xs={12}>
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.8Yes"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.8Yes"
+                                        //name="radio4"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="Yes"
+                            />
+
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.8No"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.8No"
+                                        //name="radio3"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="No"
+                            />
+                        </GridItem>
+
+                    </GridItem>
+                }
+                {props.show4MHQ8 &&
+                    <GridItem xs={12} sm={12} md={12}>
+
+                        <CustomInput
+                            labelText={(props.MedHistQuesDTO[17] !== undefined) ? props.MedHistQuesDTO[17].questionText : ""}
+                            //id="MHQ1.5"
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>}
+
+                {props.showMHQ4 &&
+                    <GridItem>
+
+                        <p>{(props.MedHistQuesDTO[18] !== undefined) ? props.MedHistQuesDTO[18].questionText : ""}</p>
+
+                        <GridItem xs={12}>
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.9Yes"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.9Yes"
+                                        //name="radio4"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="Yes"
+                            />
+
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.9No"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.9No"
+                                        //name="radio3"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="No"
+                            />
+                        </GridItem>
+
+                    </GridItem>
+                }
+                {props.show4MHQ9 &&
+                    <GridItem>
+                    <p>{(props.MedHistQuesDTO[19] !== undefined) ? props.MedHistQuesDTO[19].questionText : ""}</p>
+
+                    <GridItem xl={12} sm={4} md={3}>
+                        <Button color="info"
+                            round className={props.classes.marginRight}
+                            onClick={props.handleCMAddButton}
+                            id="saveBtn" >
+                            Add Medicine Details
+                                </Button>
+                    </GridItem>
+
+                    <GridItem lg={12}>
+                       
+                            <CardBody>
+
+                                <ReactTable
+                                data={props.CMdatatable}
+                                    filterable
+                                    columns={[
+                                        {
+                                            Header: "NAME OF MEDICATION",
+                                            accessor: "nameOfMedication",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+
+                                        },
+                                        {
+                                            Header: "DOSE",
+                                            accessor: "dose",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+                                        {
+
+                                            Header: "FREQUENCY",
+                                            accessor: "frequency",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+                                        {
+
+                                            Header: "DELETE",
+                                            accessor: "actions",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+
+                                    ]}
+                                    defaultPageSize={10}
+                                    showPaginationTop={false}
+                                    // pageSize={([props.data.length + 1] < 3) ? [props.data.length + 1] : 3}
+                                    showPaginationBottom
+                                    className="-striped -highlight discription-tab"
+                                />
+
+                            </CardBody>
+                    </GridItem>
+                    </GridItem>
+                }
+
+
+                {props.showMHQ4 &&
+                    <GridItem>
+
+                        <p>{(props.MedHistQuesDTO[20] !== undefined) ? props.MedHistQuesDTO[20].questionText : ""}</p>
+
+                        <GridItem xs={12}>
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.10Yes"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.10Yes"
+                                        //name="radio4"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="Yes"
+                            />
+
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.10No"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.10No"
+                                        //name="radio3"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="No"
+                            />
+                        </GridItem>
+
+                    </GridItem>
+                }
+                {props.show4MHQ10 &&
+                    <GridItem>
+                        <p>{(props.MedHistQuesDTO[21] !== undefined) ? props.MedHistQuesDTO[21].questionText : ""}</p>
+
+                        <GridItem xl={12} sm={4} md={3}>
+                            <Button color="info"
+                                round className={props.classes.marginRight}
+                            onClick={props.handleLMAddButton}
+                                id="saveBtn" >
+                                Add Medicine Details
+                                </Button>
+                        </GridItem>
+
+                        <GridItem lg={12}>
+
+                            <CardBody>
+
+                                <ReactTable
+                                data={props.LMdataTable}
+                                    filterable
+                                    columns={[
+                                        {
+                                            Header: "NAME OF MEDICATION",
+                                            accessor: "nameOfMedication",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+
+                                        },
+                                        {
+                                            Header: "DOSE",
+                                            accessor: "dose",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+                                        {
+
+                                            Header: "FREQUENCY",
+                                            accessor: "frequency",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+                                        {
+
+                                            Header: "DATE LAST TAKEN",
+                                            accessor: "dateLastTaken",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+                                        {
+
+                                            Header: "DELETE",
+                                            accessor: "actions",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+
+                                    ]}
+                                    defaultPageSize={10}
+                                    showPaginationTop={false}
+                                    // pageSize={([props.data.length + 1] < 3) ? [props.data.length + 1] : 3}
+                                    showPaginationBottom
+                                    className="-striped -highlight discription-tab"
+                                />
+
+                            </CardBody>
+                        </GridItem>
+                    </GridItem>
+                }
+
+
+                {props.showMHQ4 &&
+                    <GridItem>
+
+                        <p>{(props.MedHistQuesDTO[22] !== undefined) ? props.MedHistQuesDTO[22].questionText : ""}</p>
+
+                        <GridItem xs={12}>
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.11Yes"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.11Yes"
+                                        //name="radio4"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="Yes"
+                            />
+
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.11No"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.11No"
+                                        //name="radio3"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="No"
+                            />
+                        </GridItem>
+
+                    </GridItem>
+                }
+                {props.show4MHQ11 &&
+                    <GridItem>
+                        <p>{(props.MedHistQuesDTO[23] !== undefined) ? props.MedHistQuesDTO[23].questionText : ""}</p>
+
+                        <GridItem xl={12} sm={4} md={3}>
+                            <Button color="info"
+                                round className={props.classes.marginRight}
+                            onClick={props.handleTreatAddButton}
+                                id="saveBtn" >
+                                Add Medicine Details
+                                </Button>
+                        </GridItem>
+
+                        <GridItem lg={12}>
+
+                            <CardBody>
+
+                                <ReactTable
+                                data={props.TreatdataTable}
+                                    filterable
+                                    columns={[
+                                        {
+                                            Header: "NAME OF TREATMENT,TEST OR INVESTMENT",
+                                            accessor: "nameOfTreatment",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+
+                                        },
+                                        {
+                                            Header: "LOCATION",
+                                            accessor: "location",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+                                        {
+
+                                            Header: "DATE",
+                                            accessor: "date",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+                                        {
+
+                                            Header: "RESULT",
+                                            accessor: "result",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+                                        {
+
+                                            Header: "DELETE",
+                                            accessor: "actions",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+
+                                    ]}
+                                    defaultPageSize={10}
+                                    showPaginationTop={false}
+                                    // pageSize={([props.data.length + 1] < 3) ? [props.data.length + 1] : 3}
+                                    showPaginationBottom
+                                    className="-striped -highlight discription-tab"
+                                />
+
+                            </CardBody>
+                        </GridItem>
+                    </GridItem>
+                }
+
+                {props.showMHQ4 &&
+                    <GridItem>
+
+                        <p>{(props.MedHistQuesDTO[24] !== undefined) ? props.MedHistQuesDTO[24].questionText : ""}</p>
+
+                        <GridItem xs={12}>
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.12Yes"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.12Yes"
+                                        //name="radio4"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="Yes"
+                            />
+
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.12No"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.12No"
+                                        //name="radio3"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="No"
+                            />
+                        </GridItem>
+
+                    </GridItem>
+                }
+                {props.show4MHQ12 &&
+                    <GridItem xs={12}>
+                    <CustomInput
+                        labelText={(props.MedHistQuesDTO[25] !== undefined) ? props.MedHistQuesDTO[25].questionText : ""}
+                        //id="MHQ1.5"
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
+                    </GridItem>
+                }
+
+                {props.showMHQ4 &&
+                    <GridItem>
+                        <p>{(props.MedHistQuesDTO[26] !== undefined) ? props.MedHistQuesDTO[26].questionText : ""}</p>
+
+                        <GridItem xl={12} sm={4} md={3}>
+                            <Button color="info"
+                                round className={props.classes.marginRight}
+                                onClick={props.handleDHCAddButton}
+                                id="saveBtn" >
+                                Add Details
+                                </Button>
+                        </GridItem>
+
+                        <GridItem lg={12}>
+                        {props.DHCdataTable.length > 0 &&
+                            <CardBody>
+
+                                <ReactTable
+                                    data={props.DHCdataTable}
+                                    filterable
+                                    columns={[
+                                        {
+                                            Header: "NAME OF DOCTOR,HOSPITAL OR CLINIC",
+                                            accessor: "nameOfDoctor",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+
+                                        },
+                                        {
+                                            Header: "ADDRESS",
+                                            accessor: "address",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+                                        {
+
+                                            Header: "DATE OF LAST CONSULT",
+                                            accessor: "dateOfLastConsult",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        },
+                                        {
+
+                                            Header: "DELETE",
+                                            accessor: "actions",
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 100,
+                                            resizable: false,
+                                        }
+
+                                    ]}
+                                    defaultPageSize={10}
+                                    showPaginationTop={false}
+                                    // pageSize={([props.data.length + 1] < 3) ? [props.data.length + 1] : 3}
+                                    showPaginationBottom
+                                    className="-striped -highlight discription-tab"
+                                />
+
+                            </CardBody>
+                        }
+                        </GridItem>
+                    </GridItem>
+                }
+
+
+                {props.showMHQ4 &&
+                    <GridItem>
+
+                        <p>{(props.MedHistQuesDTO[27] !== undefined) ? props.MedHistQuesDTO[27].questionText : ""}</p>
+
+                        <GridItem xs={12}>
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.14Yes"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.14Yes"
+                                        //name="radio4"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="Yes"
+                            />
+
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.14No"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.14No"
+                                        //name="radio3"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="No"
+                            />
+                        </GridItem>
+
+                    </GridItem>
+                }
+                {props.show4MHQ14 &&
+                    <GridItem xs={12}>
+                        <CustomInput
+                            labelText={(props.MedHistQuesDTO[28] !== undefined) ? props.MedHistQuesDTO[28].questionText : ""}
+                            //id="MHQ1.5"
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                }
+
+                {props.showMHQ4 &&
+                    <GridItem>
+
+                        <p>{(props.MedHistQuesDTO[29] !== undefined) ? props.MedHistQuesDTO[29].questionText : ""}</p>
+
+                        <GridItem xs={12}>
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.15Yes"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.15Yes"
+                                        //name="radio4"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="Yes"
+                            />
+
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={props.selectedValueMH === "MHQues4.15No"}
+                                        onChange={props.handleRadioChangeMH}
+                                        value="MHQues4.15No"
+                                        //name="radio3"
+                                        aria-label="B"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="No"
+                            />
+                        </GridItem>
+
+                    </GridItem>
+                }
+                {props.show4MHQ15 &&
+                    <GridItem xs={12}>
+                        <CustomInput
+                            labelText={(props.MedHistQuesDTO[30] !== undefined) ? props.MedHistQuesDTO[30].questionText : ""}
+                            //id="MHQ1.5"
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                }
+
+                {props.showMHQ4 &&
+                    <GridItem xs={12}>
+                        <CustomInput
+                            labelText={(props.MedHistQuesDTO[31] !== undefined) ? props.MedHistQuesDTO[31].questionText : ""}
+                            //id="MHQ1.5"
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                }
+
 
             </GridContainer>
 

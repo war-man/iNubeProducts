@@ -71,7 +71,7 @@ class PremiumPayingDetails extends React.Component {
         const { classes } = this.props;
 
 
-        console.log("premiumpaymentmethod", this.props.MasterDataDto);
+        console.log("premiumpaymentmethod", this.props.MasterDataDto, this.props);
 
         return (
            
@@ -85,9 +85,9 @@ class PremiumPayingDetails extends React.Component {
                                     labelText="Premium Payment Method"
                                     lstObject={this.props.MasterDataDto}
                                     filterName='PaymentMethod'
-                                    // value={orgData.selectedlevel}
-                                    //name='selectedlevel'
-                                    //onChange={(e) => orgData.handlelevels(e)}
+                                    value={this.props.premiumPayingDto.premiumPaymentMethod}
+                                    name='premiumPaymentMethod'
+                                    onChange={(e) => this.props.PremiumPaymentSetValue(e)}
                                     formControlProps={{ fullWidth: true }}
                                 />
                             </GridItem>
@@ -99,9 +99,9 @@ class PremiumPayingDetails extends React.Component {
                                 labelText=" Payment Paid By"
                                 lstObject={this.props.MasterDataDto}
                                 //filterName='PaymentMethod'
-                                // value={orgData.selectedlevel}
-                                //name='selectedlevel'
-                                //onChange={(e) => orgData.handlelevels(e)}
+                                value={this.props.premiumPayingDto.paymentPaidBy}
+                                name='paymentPaidBy'
+                                onChange={(e) =>this.props.PremiumPaymentSetValue(e)}
                                 formControlProps={{ fullWidth: true }}
                             />
                         </GridItem>
@@ -111,9 +111,9 @@ class PremiumPayingDetails extends React.Component {
                                 
                                 <CustomInput
                                     labelText="If other, please specify"
-                                    //value={props.ProductDTO.ProductName}
-                                    name="Proposer"
-                                    //onChange={props.SetValue}
+                                    value={this.props.premiumPayingDto.Relationshipwithproposer}
+                                    name="Relationshipwithproposer"
+                                    onChange={(e) => this.props.PremiumPaymentSetValue(e)}
                                     id="Proposer"
                                     formControlProps={{
                                         fullWidth: true
@@ -125,9 +125,9 @@ class PremiumPayingDetails extends React.Component {
 
                             <CustomInput
                                 labelText="Payment Recipt Prefered By"
-                                //value={props.ProductDTO.ProductName}
-                                name="Proposer"
-                                //onChange={props.SetValue}
+                                value={this.props.premiumPayingDto.paymentRecieptPreferredBy}
+                                name="paymentRecieptPreferredBy"
+                            onChange={(e) => this.props.PremiumPaymentSetValue(e)}
                                 id="Proposer"
                                 formControlProps={{
                                     fullWidth: true
@@ -139,9 +139,9 @@ class PremiumPayingDetails extends React.Component {
 
                                 <CustomInput
                                     labelText="Total Annual Premium Contribution"
-                                    //value={props.ProductDTO.ProductName}
-                                    name="AnnualPremium"
-                                    //onChange={props.SetValue}
+                                    value={this.props.premiumPayingDto.totalAnnualPremium}
+                                    name="totalAnnualPremium"
+                            onChange={(e) => this.props.PremiumPaymentSetValue(e)}
                                     id="AnnualPremium"
                                     formControlProps={{
                                         fullWidth: true
@@ -152,9 +152,9 @@ class PremiumPayingDetails extends React.Component {
 
                                 <CustomInput
                                     labelText="Proposer Deposit Premium"
-                                    //value={props.ProductDTO.ProductName}
-                                    name="ProposerDepositPremium"
-                                    //onChange={props.SetValue}
+                                    value={this.props.premiumPayingDto.proposalDepositPremium}
+                                    name="proposalDepositPremium"
+                            onChange={(e) => this.props.PremiumPaymentSetValue(e)}
                                     id="ProposerDepositPremium"
                                     formControlProps={{
                                         fullWidth: true
@@ -180,9 +180,9 @@ class PremiumPayingDetails extends React.Component {
 
                                 <CustomInput
                                     labelText="Bank Account No"
-                                    //value={props.ProductDTO.ProductName}
-                                    name="BankAccountNo"
-                                    //onChange={props.SetValue}
+                                    value={this.props.premiumPayingDto.bankAccNo}
+                                    name="bankAccNo"
+                            onChange={(e) => this.props.PremiumPaymentSetValue(e)}
                                     id="BankAccountNo"
                                     formControlProps={{
                                         fullWidth: true
@@ -194,9 +194,9 @@ class PremiumPayingDetails extends React.Component {
 
                                 <CustomInput
                                     labelText="Name Of Bank/Branch"
-                                    //value={props.ProductDTO.ProductName}
-                                    name="NameOfBankBranch"
-                                    //onChange={props.SetValue}
+                                    value={this.props.premiumPayingDto.nameOfBranch}
+                                    name="nameOfBranch"
+                            onChange={(e) => this.props.PremiumPaymentSetValue(e)}
                                     id="NameOfBankBranch"
                                     formControlProps={{
                                         fullWidth: true
@@ -208,9 +208,9 @@ class PremiumPayingDetails extends React.Component {
                         <GridItem xs={12} sm={4} md={3}>
                                 <CustomInput
                                     labelText="Credit Card No"
-                                    //value={props.ProductDTO.ProductName}
-                                    name="CreditCardNo"
-                                    //onChange={props.SetValue}
+                                    value={this.props.premiumPayingDto.creditCardNo}
+                                    name="creditCardNo"
+                            onChange={(e) => this.props.PremiumPaymentSetValue(e)}
                                     id="CreditCardNo"
                                     formControlProps={{
                                         fullWidth: true
@@ -221,9 +221,9 @@ class PremiumPayingDetails extends React.Component {
                         <GridItem xs={12} sm={4} md={3}>
                                 <CustomInput
                                     labelText="Name Of Bank"
-                                    //value={props.ProductDTO.ProductName}
-                                    name="NameOfBank"
-                                    //onChange={props.SetValue}
+                                    value={this.props.premiumPayingDto.nameOfBank}
+                                    name="nameOfBank"
+                            onChange={(e) => this.props.PremiumPaymentSetValue(e)}
                                     id="NameOfBank"
                                     formControlProps={{
                                         fullWidth: true

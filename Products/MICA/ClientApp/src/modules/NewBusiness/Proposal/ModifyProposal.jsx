@@ -125,7 +125,7 @@ class ModifyProposal extends React.Component {
                                     collapses={[
                                         {
                                             title: "Proposal Form",
-                                            content: <PartialProposalForm SaveProposalDto={this.props.SaveProposalDto} proposalSetValue={this.props.proposalSetValue} ModifySetValue={this.ModifySetValue} ProposalFormData={this.state.ProposalFormData} filterData={this.props.filterData} />
+                                            content: <PartialProposalForm proposalFormFlag={this.props.proposalFormFlag} SaveProposalDto={this.props.SaveProposalDto} proposalSetValue={this.props.proposalSetValue} ModifySetValue={this.ModifySetValue} ProposalFormData={this.state.ProposalFormData} filterData={this.props.filterData} />
 
                                         },
                                          {
@@ -140,7 +140,7 @@ class ModifyProposal extends React.Component {
                                         },
                                         {
                                             title: "Questionnaires",
-                                            content: <Questionnaries claimedDto={this.props.claimedDto} claimedtable={this.props.claimedtable} insurancetable={this.props.insurancetable} insuranceDto={this.props.insuranceDto} handleAddButton={this.props.handleAddButton} familydatatable={this.props.familydatatable} familyBackground={this.props.familyBackground} SaveProposalDto={this.props.SaveProposalDto} FamilyDetailSetValue={this.props.FamilyDetailSetValue} familyBackgroundDto={this.props.familyBackgroundDto} AlcoholQuestionAddButton={this.props.AlcoholQuestionAddButton} alcoholdata={this.props.alcoholdata} TobaccoQuestionAddButton={this.props.TobaccoQuestionAddButton} tobaccodata={this.props.tobaccodata} LifeStyleQA={this.props.LifeStyleQA} QuestionalDetailsSetValue={this.props.QuestionalDetailsSetValue} MasterDataDto={this.props.MasterDataDto} />
+                                            content: <Questionnaries DHCtable={this.props.DHCtable} DHCtDto={this.props.DHCtDto} Treatmenttable={this.props.Treatmenttable} TreatmentDto={this.props.TreatmentDto} lmedicinetable={this.props.lmedicinetable} lmedicineDto={this.props.lmedicineDto} cmedicinetable={this.props.cmedicinetable} cmedicineDto={this.props.cmedicineDto} claimedDto={this.props.claimedDto} claimedtable={this.props.claimedtable} insurancetable={this.props.insurancetable} insuranceDto={this.props.insuranceDto} handleAddButton={this.props.handleAddButton} familydatatable={this.props.familydatatable} familyBackground={this.props.familyBackground} SaveProposalDto={this.props.SaveProposalDto} FamilyDetailSetValue={this.props.FamilyDetailSetValue} familyBackgroundDto={this.props.familyBackgroundDto} AlcoholQuestionAddButton={this.props.AlcoholQuestionAddButton} alcoholdata={this.props.alcoholdata} TobaccoQuestionAddButton={this.props.TobaccoQuestionAddButton} tobaccodata={this.props.tobaccodata} LifeStyleQA={this.props.LifeStyleQA} QuestionalDetailsSetValue={this.props.QuestionalDetailsSetValue} MasterDataDto={this.props.MasterDataDto} />
 
                                         },
                                         {
@@ -155,7 +155,7 @@ class ModifyProposal extends React.Component {
                                         },
                                         {
                                             title: "Declaration And Document",
-                                            content: <DeclarationAndDocument SetValue={this.SetValue} MasterDataDto={this.props.MasterDataDto}/>
+                                            content: <DeclarationAndDocument SetValue={this.SetValue} MasterDataDto={this.props.MasterDataDto} premiumPayingDto={this.props.premiumPayingDto} PremiumPaymentSetValue={this.props.PremiumPaymentSetValue} preferredCommunication={this.props.preferredCommunication} CommunicationSetValues={this.props.CommunicationSetValues}/>
 
                                         },
 

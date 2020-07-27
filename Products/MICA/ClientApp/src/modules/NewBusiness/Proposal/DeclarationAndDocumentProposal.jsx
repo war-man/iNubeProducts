@@ -58,12 +58,12 @@ class Panels extends React.Component {
                                     collapses={[
                                         {
                                             title: "Premium Paying Details",
-                                            content: <PremiumPayingDetails  MasterDataDto={this.props.MasterDataDto}/>
+                                            content: <PremiumPayingDetails MasterDataDto={this.props.MasterDataDto} premiumPayingDto={this.props.premiumPayingDto} PremiumPaymentSetValue={this.props.PremiumPaymentSetValue}/>
                                            
                                         },
                                         {
                                             title: "Preferred Communication Method",
-                                            content: <CommunicationMethod MasterDataDto={this.props.MasterDataDto}/>
+                                            content: <CommunicationMethod MasterDataDto={this.props.MasterDataDto} preferredCommunication={this.props.preferredCommunication} CommunicationSetValues={this.props.CommunicationSetValues}/>
 
                                         },
                                         {

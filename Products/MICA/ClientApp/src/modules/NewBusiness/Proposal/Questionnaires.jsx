@@ -65,6 +65,15 @@ class Questionnaries extends React.Component {
             showMHQ2: false,
             showMHQ3: false,
             showMHQ4: false,
+            show4MHQ4: false,
+            show4MHQ7: false,
+            show4MHQ8: false,
+            show4MHQ9: false,
+            show4MHQ10: false,
+            show4MHQ11: false,
+            show4MHQ12: false,
+            show4MHQ14: false,
+            show4MHQ15: false,
             showMHQ5: false,
             showMHQ6: false,
             showMHQ7: false,
@@ -82,6 +91,9 @@ class Questionnaries extends React.Component {
            
             insurancedatatable: [],
             claimeddatatable: [],
+            CMdatatable: [],
+            LMdataTable: [],
+            DHCdataTable: [],
 
             data1: dataTable.dataRows.map((prop, key) => {
                 return {
@@ -346,6 +358,96 @@ class Questionnaries extends React.Component {
                 showMHQ4: false
             })
         }
+        else if (this.state.radioValMH == "MHQues4.4Yes") {
+            this.setState({
+                show4MHQ4: true
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.4No") {
+            this.setState({
+                show4MHQ4: false
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.7Yes") {
+            this.setState({
+                show4MHQ7: true
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.7No") {
+            this.setState({
+                show4MHQ7: false
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.8Yes") {
+            this.setState({
+                show4MHQ8: true
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.8No") {
+            this.setState({
+                show4MHQ8: false
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.9Yes") {
+            this.setState({
+                show4MHQ9: true
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.9No") {
+            this.setState({
+                show4MHQ9: false
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.10Yes") {
+            this.setState({
+                show4MHQ10: true
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.10No") {
+            this.setState({
+                show4MHQ10: false
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.11Yes") {
+            this.setState({
+                show4MHQ11: true
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.11No") {
+            this.setState({
+                show4MHQ11: false
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.12Yes") {
+            this.setState({
+                show4MHQ12: true
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.12No") {
+            this.setState({
+                show4MHQ12: false
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.14Yes") {
+            this.setState({
+                show4MHQ14: true
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.14No") {
+            this.setState({
+                show4MHQ14: false
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.12Yes") {
+            this.setState({
+                show4MHQ15: true
+            })
+        }
+        else if (this.state.radioValMH == "MHQues4.12No") {
+            this.setState({
+                show4MHQ15: false
+            })
+        }
         else if (this.state.radioValMH == "MHQues5Yes") {
             this.setState({
                 showMHQ5: true
@@ -516,7 +618,169 @@ class Questionnaries extends React.Component {
     deleteClaimeddata = (index) => {
         this.props.claimedtable.splice(index, 1);
         this.handleClaimeddatatable();
-        console.log("insurancetable:", this.props.claimedtable);
+        console.log("claimedtable:", this.props.claimedtable);
+    }
+
+    ////////////////////////////////////////////////////////////////// Handling Currently taking Medicine details ///////////////////////////////////////////////////////////////////////////////////////
+
+    handleCMDataTable = () => {
+        this.setState({
+            CMdatatable: this.props.cmedicinetable.map((m, index) => {
+                return {
+                    nameOfMedication: <CustomInput value={m.nameOfMedication} onChange={(e) => this.handleCMSetValues(e, index)} name="nameOfMedication" formControlProps={{ fullWidth: true }} />,
+                    dose: <CustomInput value={m.dose} onChange={(e) => this.handleCMSetValues(e, index)} name="dose" formControlProps={{ fullWidth: true }} />,
+                    frequency: <CustomInput value={m.frequency} onChange={(e) => this.handleCMSetValues(e, index)} name="frequency" formControlProps={{ fullWidth: true }} />,
+                    actions: <Button justIcon round simple color="danger" className="remove" disabled={(this.state.nonedit === true) ? true : false} onClick={(e) => this.deleteCMdata(e, index)} ><Delete /> </Button >
+                };
+            })
+        })
+    }
+
+    handleCMSetValues = (event, index) => {
+        let cmedicinetabledto = this.props.cmedicinetable;
+        let name = event.target.name;
+        let value = event.target.value;
+        cmedicinetabledto[index][name] = value;
+        this.setState({ cmedicinetabledto });
+
+        console.log("cmedicine table testing:", this.props.cmedicinetable);
+        this.handleCMDataTable();
+    }
+
+    handleCMAddButton = () => {
+        let CMObjectNew = Object.assign({}, this.props.cmedicineDto);
+        this.props.cmedicinetable.push(CMObjectNew);
+        this.setState({});
+        this.handleCMDataTable();
+
+    }
+
+    deleteCMdata = (index) => {
+        this.props.cmedicinetable.splice(index, 1);
+        this.handleCMDataTable();
+        console.log("cmedicinetable:", this.props.cmedicinetable);
+    }
+
+    ////////////////////////////////////////////////////////////////// Handling Last Taken Medicine details ///////////////////////////////////////////////////////////////////////////////////////
+
+    handleLMDataTable = () => {
+        this.setState({
+            LMdataTable: this.props.lmedicinetable.map((m, index) => {
+                return {
+                    nameOfMedication: <CustomInput value={m.nameOfMedication} onChange={(e) => this.handleLMSetValues(e, index)} name="nameOfMedication" formControlProps={{ fullWidth: true }} />,
+                    dose: <CustomInput value={m.dose} onChange={(e) => this.handleLMSetValues(e, index)} name="dose" formControlProps={{ fullWidth: true }} />,
+                    frequency: <CustomInput value={m.frequency} onChange={(e) => this.handleLMSetValues(e, index)} name="frequency" formControlProps={{ fullWidth: true }} />,
+                    dateLastTaken: <CustomInput value={m.dateLastTaken} onChange={(e) => this.handleLMSetValues(e, index)} name="dateLastTaken" formControlProps={{ fullWidth: true }} />,
+                    actions: <Button justIcon round simple color="danger" className="remove" disabled={(this.state.nonedit === true) ? true : false} onClick={(e) => this.deleteLMdata(e, index)} ><Delete /> </Button >
+                };
+            })
+        })
+    }
+
+    handleLMSetValues = (event, index) => {
+        let lmedicinetabledto = this.props.lmedicinetable;
+        let name = event.target.name;
+        let value = event.target.value;
+        lmedicinetabledto[index][name] = value;
+        this.setState({ lmedicinetabledto });
+
+        console.log("lmedicine table testing:", this.props.lmedicinetable);
+        this.handleLMDataTable();
+    }
+
+    handleLMAddButton = () => {
+        let LMedicineObjectNew = Object.assign({}, this.props.lmedicineDto);
+        this.props.lmedicinetable.push(LMedicineObjectNew);
+        this.setState({});
+        this.handleLMDataTable();
+
+    }
+
+    deleteLMdata = (index) => {
+        this.props.lmedicinetable.splice(index, 1);
+        this.handleLMDataTable();
+        console.log("lmedicinetable:", this.props.lmedicinetable);
+    }
+
+    ////////////////////////////////////////////////////////////////// Handling Treatent,Test or Investment details ///////////////////////////////////////////////////////////////////////////////////////
+
+    handleTreatDataTable = () => {
+        this.setState({
+            TreatdataTable: this.props.Treatmenttable.map((m, index) => {
+                return {
+                    nameOfTreatment: <CustomInput value={m.nameOfTreatment} onChange={(e) => this.handleTreatSetValues(e, index)} name="nameOfTreatment" formControlProps={{ fullWidth: true }} />,
+                    location: <CustomInput value={m.location} onChange={(e) => this.handleTreatSetValues(e, index)} name="location" formControlProps={{ fullWidth: true }} />,
+                    date: <CustomInput value={m.date} onChange={(e) => this.handleTreatSetValues(e, index)} name="date" formControlProps={{ fullWidth: true }} />,
+                    result: <CustomInput value={m.result} onChange={(e) => this.handleTreatSetValues(e, index)} name="result" formControlProps={{ fullWidth: true }} />,
+                    actions: <Button justIcon round simple color="danger" className="remove" disabled={(this.state.nonedit === true) ? true : false} onClick={(e) => this.deleteLMdata(e, index)} ><Delete /> </Button >
+                };
+            })
+        })
+    }
+
+    handleTreatSetValues = (event, index) => {
+        let Treattabledto = this.props.Treatmenttable;
+        let name = event.target.name;
+        let value = event.target.value;
+        Treattabledto[index][name] = value;
+        this.setState({ Treattabledto });
+
+        console.log("lmedicine table testing:", this.props.Treatmenttable);
+        this.handleTreatDataTable();
+    }
+
+    handleTreatAddButton = () => {
+        let TreatObjectNew = Object.assign({}, this.props.TreatmentDto);
+        this.props.Treatmenttable.push(TreatObjectNew);
+        this.setState({});
+        this.handleTreatDataTable();
+
+    }
+
+    deleteLMdata = (index) => {
+        this.props.Treatmenttable.splice(index, 1);
+        this.handleTreatDataTable();
+        console.log("lmedicinetable:", this.props.Treatmenttable);
+    }
+
+    ////////////////////////////////////////////////////////////////// Handling Doctor,Hospital or Clinic details ///////////////////////////////////////////////////////////////////////////////////////
+
+    handleDHCDataTable = () => {
+        this.setState({
+            DHCdataTable: this.props.DHCtable.map((m, index) => {
+                return {
+                    nameOfDoctor: <CustomInput value={m.nameOfDoctor} onChange={(e) => this.handleTreatSetValues(e, index)} name="nameOfDoctor" formControlProps={{ fullWidth: true }} />,
+                    address: <CustomInput value={m.address} onChange={(e) => this.handleTreatSetValues(e, index)} name="address" formControlProps={{ fullWidth: true }} />,
+                    dateOfLastConsult: <CustomInput value={m.dateOfLastConsult} onChange={(e) => this.handleTreatSetValues(e, index)} name="dateOfLastConsult" formControlProps={{ fullWidth: true }} />,
+                    actions: <Button justIcon round simple color="danger" className="remove" disabled={(this.state.nonedit === true) ? true : false} onClick={(e) => this.deleteLMdata(e, index)} ><Delete /> </Button >
+                };
+            })
+        })
+    }
+
+    handleDHCSetValues = (event, index) => {
+        let DHCTabledto = this.props.DHCtable;
+        let name = event.target.name;
+        let value = event.target.value;
+        DHCTabledto[index][name] = value;
+        this.setState({ DHCTabledto });
+
+        console.log("DHC table testing:", this.props.DHCtable);
+        this.handleDHCDataTable();
+    }
+
+    handleDHCAddButton = () => {
+        let DHCObjectNew = Object.assign({}, this.props.DHCtDto);
+        this.props.DHCtable.push(DHCObjectNew);
+        this.setState({});
+        this.handleDHCDataTable();
+
+    }
+
+    deleteLMdata = (index) => {
+        this.props.DHCtable.splice(index, 1);
+        this.handleDHCDataTable();
+        console.log("Treatmenttable:", this.props.Treatmenttable);
     }
 
     
@@ -580,6 +844,15 @@ class Questionnaries extends React.Component {
                         showMHQ8={this.state.showMHQ8}
                         showMHQ9={this.state.showMHQ9}
                         showMHQ10={this.state.showMHQ10}
+                        show4MHQ4={this.state.show4MHQ4}
+                        show4MHQ7={this.state.show4MHQ7}
+                        show4MHQ8={this.state.show4MHQ8}
+                        show4MHQ9={this.state.show4MHQ9}
+                        show4MHQ10={this.state.show4MHQ10}
+                        show4MHQ11={this.state.show4MHQ11}
+                        show4MHQ12={this.state.show4MHQ12}
+                        show4MHQ14={this.state.show4MHQ14}
+                        show4MHQ15={this.state.show4MHQ15}
 
                         // FAMILY BACKGROUND
                         handleRadioChangeFB={this.handleRadioChangeFB}
@@ -595,6 +868,16 @@ class Questionnaries extends React.Component {
                         //CURRENT/PREVIOUS CLAIMED DETAILS
                         handleClaimedAddButton={this.handleClaimedAddButton}
                         claimeddatatable={this.state.claimeddatatable}
+
+                        //MEDICINE DETAILS
+                        handleCMAddButton={this.handleCMAddButton}
+                        CMdatatable={this.state.CMdatatable}
+                        handleLMAddButton={this.handleLMAddButton}
+                        LMdataTable={this.state.LMdataTable}
+                        handleTreatAddButton={this.handleTreatAddButton}
+                        TreatdataTable={this.state.TreatdataTable}
+                        handleDHCAddButton={this.handleDHCAddButton}
+                        DHCdataTable={this.state.DHCdataTable}
                     />
                     </GridItem>
             </GridContainer>
