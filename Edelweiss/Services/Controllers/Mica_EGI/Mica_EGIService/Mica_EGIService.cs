@@ -11383,8 +11383,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                
                 TblBatchJobLog BatchJobLog = new TblBatchJobLog();
                 TblBatchJobDetailsLog BatchJobDetailsLog = new TblBatchJobDetailsLog();
-
-
+                
                 List<TblSwitchLog> SwitchLogData = new List<TblSwitchLog>();
                 List<TblSchedule> ScheduleData = new List<TblSchedule>();
 
