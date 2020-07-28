@@ -70,6 +70,8 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         //InternalGetPolicyDetailsByPolicyNumber - New Method with response status updated
         Task<PolicyDetailsDTOResponse> NewGetPolicyDetails(string PolicyNo, ApiContext apiContext);
 
+        Task<CustomerSettingsDTO> GetCustomerTimeZoneSettings(string TimeZone, ApiContext apiContext);
+
     }
     public class IntegrationService : IIntegrationService
     {
@@ -275,6 +277,15 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         {
             var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerTypeSettings?customerid=" + apiContext.OrgId + "&type=" + Type + "&envid=" + apiContext.ServerType;
             return await GetListApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+        }
+
+        public async Task<CustomerSettingsDTO> GetCustomerTimeZoneSettings(string TimeZone, ApiContext apiContext)
+        {
+
+            var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerSettings?customerid=" + apiContext.OrgId + "&type=" + TimeZone;
+
+            return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+
         }
 
         public async Task<PolicyDetailsDTOResponse> NewGetPolicyDetails (string PolicyNo, ApiContext apiContext)
