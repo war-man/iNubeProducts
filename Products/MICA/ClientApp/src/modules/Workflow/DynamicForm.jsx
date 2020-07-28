@@ -17,6 +17,7 @@ import Button from "components/CustomButtons/Button.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
 import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
+import CustomDropDownTree from "components/CustomDropdownTree/CustomDropDownTree.jsx";
 import UserConfig from 'modules/Users/UserConfig.js';
 import Dropdown from "components/Dropdown/Dropdown.jsx";
 import Accordion from "components/Accordion/Accordion.jsx";
@@ -160,6 +161,16 @@ class DynamicForm extends React.Component {
             AddAccordion: [],
             CoverAccordion: [],
             MasterDTO: {
+                Tax: [],
+                AllowPayment: [],
+                CDCreation: [],
+                PremiumBreakup: [],
+                ClaimSI: [],
+                Payment: [],
+                ProductType: [],
+                Switchon: [],
+                InsurableTypeMaster: [],
+                CoverMaster: [],
                 LOB: [],
                 COB: [],
                 Cover: [],
@@ -167,11 +178,23 @@ class DynamicForm extends React.Component {
                 CoverEventFactor: [],
                 CoverEventFactorValue: [],
                 InsuranceType: [],
-                InsurableCategory: [],
                 Risk: [],
                 Claim: [],
                 channel: [],
-                BenefitCriteria: []
+                BenefitCriteria: [],
+                InsurableCategory: [],
+                TableList: {
+                    InsurablesTable: [],
+                },
+                MasterList: {
+                    InsurablesClause: [],
+                },
+                checkBox: false,
+                ChangeTableList: {
+                    tableInsurabledata: []
+                },
+                tableInsurabledata: [],
+                mappingPop: false,
             },
             multipleflag: false,
             dynamicobject: [],
@@ -223,9 +246,9 @@ class DynamicForm extends React.Component {
     onDateChange = (name, event, entity) => {
         var today = event.toDate();
         var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-        let data = this.state.Dynamicdata;
+        let tdata = this.state.Dynamicdata;
 
-        data[name] = date;
+        tdata[name] = date;
 
         let objdata = this.state.dynamicobject
         for (let i = 0; i < objdata.length; i++) {
@@ -241,8 +264,8 @@ class DynamicForm extends React.Component {
             }
         }
 
-        this.setState({ data });
-        console.log("selected: ", data);
+        this.setState({ tdata });
+        console.log("selected: ", tdata);
     };
 
     handleRadioChange = (name, e, entity) => {
@@ -393,6 +416,14 @@ class DynamicForm extends React.Component {
                     formControlProps={{ fullWidth: true }} />
             );
         }
+        if (prop.componentType == "DropdownTree") {
+            return (
+                <CustomDropDownTree
+                    data={this.state.MasterDTO.MasterList.InsurablesClause}
+                    onChange={(e) => this.handleTreeChange(e)}
+                />
+            );
+        }
         if (prop.componentType == "Radio") {
             const { classes } = this.props;
             return (
@@ -453,6 +484,15 @@ class DynamicForm extends React.Component {
                 <label>{prop.labelText}</label>
             )
         }
+
+    }
+
+    handleTreeChange = (currentNode, level, Iindex = 0, Cindex = 0) => {
+        this.AddCWEClauses(level, Iindex, Cindex);
+        console.log("pks1", this.state.MasterDTO.MasterList.InsurablesClause);
+    }
+
+    AddCWEClauses(level, Iindex, Cindex) {
 
     }
 
@@ -569,45 +609,23 @@ class DynamicForm extends React.Component {
 
             //console.log("response: ", pid);
 
-            if (this.state.multipleflag == false) {
-                fetch(`${productConfig.productConfigUrl}/api/Product/GetMultipleEntitiesById?Id=` + id + ``,
-                    {
-                        method: 'Get',
-                        //body: JSON.stringify(this.state.searchOrg),
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                        },
-                    }
-                ).then(response => response.json())
-                    .then(data => {
-                        console.log("response: ", data);
-                        this.state.AddAccordion.push(data);
-                        console.log("response: ", this.state.AddAccordion)
-                        this.setState({ multipleflag: true });
-                    });
-                console.log("selected: ", this.state.AddAccordion);
-            }
-            if (this.state.multipleflag == true) {
-                fetch(`${productConfig.productConfigUrl}/api/Product/GetMultipleEntitiesById?Id=` + id + ``,
-                    {
-                        method: 'Get',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                        },
-                    }
-                ).then(response => response.json())
-                    .then(data => {
-                        console.log("response: ", data);
-                        this.state.AddAccordion.push(data);
-                        this.setState({ multipleflag: true });
-                    });
-                console.log("selected: ", this.state.AddAccordion)
-                this.setState({})
-            }
+            fetch(`${productConfig.productConfigUrl}/api/Product/GetMultipleEntitiesById?Id=` + id + ``,
+                {
+                    method: 'Get',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                    },
+                }
+            ).then(response => response.json())
+                .then(data => {
+                    console.log("response: ", data);
+                    this.state.AddAccordion.push(data);
+                    console.log("response: ", this.state.AddAccordion)
+                    this.setState({ multipleflag: true });
+                });
+            console.log("selected: ", this.state.AddAccordion);
         }
         if (name == "AddCover") {
             fetch(`${productConfig.productConfigUrl}/api/Product/GetMultipleEntitiesById?Id=` + id + ``,
@@ -868,7 +886,6 @@ class DynamicForm extends React.Component {
     handleGrid = () => {
         console.log("object: ", this.state.Dynamicdata)
         if (this.state.Dynamicdata != {}) {
-            this.state.emptyarray.push(this.state.Dynamicdata);
             this.state.tableArray.push(this.state.Dynamicdata);
             this.tabledata();
         }

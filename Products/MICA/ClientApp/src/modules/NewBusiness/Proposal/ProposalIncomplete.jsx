@@ -111,7 +111,8 @@ class ProposalIncomplete extends React.Component {
             PolicyOwnerDetailsdataOnYesConditioinDto: [],
             //   FilterPolicyOwnerDetailsdata: [],
             PolicyOwnerDetailsdataOnNoCondition: 
-                [{
+            {
+                   "relationShipWithProposer": 0,
                     "salutation": "",
                     "nameWithInitial": "",
                     "givenName": "",
@@ -148,7 +149,7 @@ class ProposalIncomplete extends React.Component {
                     "pDistrict": "",
                     "pProvince": ""
                    
-                }],
+                },
 
 
             //  Master Data for all the dropdowns
@@ -591,8 +592,8 @@ class ProposalIncomplete extends React.Component {
 
     //it will set the values for not same as the assured condition
     PolicyOwnerDetailsSetValue = (evt) => {
-
-        let modifiedPolicyOwnerDetailsDataonNo = this.state.PolicyOwnerDetailsdataOnNoCondition[0];
+        debugger;
+        let modifiedPolicyOwnerDetailsDataonNo = this.state.PolicyOwnerDetailsdataOnNoCondition;
         modifiedPolicyOwnerDetailsDataonNo[evt.target.name] = evt.target.value;
         this.setState({ modifiedPolicyOwnerDetailsDataonNo });
 
