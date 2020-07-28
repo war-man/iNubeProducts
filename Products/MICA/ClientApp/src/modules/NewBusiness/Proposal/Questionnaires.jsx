@@ -185,71 +185,95 @@ class Questionnaries extends React.Component {
     };
  
     handleRadioChangeT = (e) => {
+        debugger;
+
         this.state.radioVal = e.target.value;
         this.state.selectedValue = e.target.value;
         this.state.selectedValueMLLSQ2 = e.target.value;
         if (this.state.radioVal == "TabacoYes") {
             this.setState({
                 showradioval: true
-            })
-            console.log("Radio value", this.state.radioVal)
+            });
+            this.props.LifeStyleQA.IsSmoker = true;
+            this.setState({});
+            console.log("Radio value", this.state.radioVal);
+            console.log("LIFE STYLE TOBACCO", this.props.LifeStyleQA);
         }
         else if (this.state.radioVal == "TabacoNo") {
             this.setState({
                 showradioval: false
-            })
-            console.log("Radio value", this.state.radioVal)
+            });
+            this.props.LifeStyleQA.IsSmoker = false;
+            this.setState({});
+            console.log("Radio value", this.state.radioVal);
         }
 
         else if (this.state.radioVal == "AlcoholYes") {
             this.setState({
                 showAlcoholradioval: true
-            })
+            });
+            this.props.LifeStyleQA.IsAlcholic = true;
+            this.setState({});
             console.log("Radio value", this.state.radioVal)
         }
         else if (this.state.radioVal == "AlcoholNo") {
             this.setState({
                 showAlcoholradioval: false
-            })
+            });
+            this.props.LifeStyleQA.IsAlcholic = false;
+            this.setState({});
             console.log("Radio value", this.state.radioVal)
         }
 
         else if (this.state.radioVal == "Question1Yes") {
             this.setState({
                 showQuestion1: true
-            })
+            });
+            this.props.LifeStyleQA.Question1 = true;
+            this.setState({});
         }
         else if (this.state.radioVal == "Question1no") {
             this.setState({
                 showQuestion1: false
-            })
+            });
+            this.props.LifeStyleQA.Question1 = false;
+            this.setState({});
         }
 
         else if (this.state.radioVal == "Question2Yes") {
             this.setState({
                 showQuestion2: true
-            })
+            });
+            this.props.LifeStyleQA.Question2 = true;
+            this.setState({});
         }
         else if (this.state.radioVal == "Question2No") {
             this.setState({
                 showQuestion2: false
-            })
+            });
+            this.props.LifeStyleQA.Question2 = false;
+            this.setState({});
         }
 
         else if (this.state.radioVal == "Question3Yes") {
             this.setState({
                 showQuestion3: true
-            })
+            });
+            this.props.LifeStyleQA.Question3 = true;
+            this.setState({});
         }
         else if (this.state.radioVal == "Question3No") {
             this.setState({
                 showQuestion3: false
-            })
+            });
+            this.props.LifeStyleQA.Question3 = false;
+            this.setState({});
         }
 
     }
 
     handleRadioChangePCIns = (e) => {
+        debugger;
         this.state.radioValPCIns = e.target.value;
         this.state.selectedValueIns = e.target.value;
         
@@ -317,22 +341,31 @@ class Questionnaries extends React.Component {
         if (this.state.radioValMH == "MHQues1Yes") {
             this.setState({
                 showMHQ1: true
-            })
+            });
+
+            this.props.medicalHistoryDTO.Question1 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues1No") {
             this.setState({
                 showMHQ1: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question1 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues2Yes") {
             this.setState({
                 showMHQ2: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question2 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues2No") {
             this.setState({
                 showMHQ2: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question2 = false;
+            this.setState({});
             console.log("mhq2", this.state.showMHQ2)
         }
        
@@ -340,174 +373,251 @@ class Questionnaries extends React.Component {
         else if (this.state.radioValMH == "MHQues3Yes") {
             this.setState({
                 showMHQ3: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question3 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues3No") {
             this.setState({
                 showMHQ3: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question3 = false;
+            this.setState({});
         }
 
         else if (this.state.radioValMH == "MHQues4Yes") {
             this.setState({
                 showMHQ4: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question4 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4No") {
             this.setState({
                 showMHQ4: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question4 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.4Yes") {
             this.setState({
                 show4MHQ4: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of4 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.4No") {
             this.setState({
                 show4MHQ4: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of4 = false;
+            this.setState({});
+        }
+        else if (this.state.radioValMH == "MHQues4.4.1Yes") {
+            
+            this.props.medicalHistoryDTO.Question4of4of1 = true;
+            this.setState({});
+        }
+        else if (this.state.radioValMH == "MHQues4.4.1No") {
+            this.props.medicalHistoryDTO.Question4of4of1 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.7Yes") {
             this.setState({
                 show4MHQ7: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of7 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.7No") {
             this.setState({
                 show4MHQ7: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of7 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.8Yes") {
             this.setState({
                 show4MHQ8: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of8 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.8No") {
             this.setState({
                 show4MHQ8: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of8 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.9Yes") {
             this.setState({
                 show4MHQ9: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of9 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.9No") {
             this.setState({
                 show4MHQ9: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of9 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.10Yes") {
             this.setState({
                 show4MHQ10: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of10 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.10No") {
             this.setState({
                 show4MHQ10: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of10 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.11Yes") {
             this.setState({
                 show4MHQ11: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of11 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.11No") {
             this.setState({
                 show4MHQ11: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of11 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.12Yes") {
             this.setState({
                 show4MHQ12: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of12 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.12No") {
             this.setState({
                 show4MHQ12: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of12 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.14Yes") {
             this.setState({
                 show4MHQ14: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of14 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues4.14No") {
             this.setState({
                 show4MHQ14: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of14 = false;
+            this.setState({});
         }
-        else if (this.state.radioValMH == "MHQues4.12Yes") {
+        else if (this.state.radioValMH == "MHQues4.15Yes") {
             this.setState({
                 show4MHQ15: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of15 = true;
+            this.setState({});
         }
-        else if (this.state.radioValMH == "MHQues4.12No") {
+        else if (this.state.radioValMH == "MHQues4.15No") {
             this.setState({
                 show4MHQ15: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question4of15 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues5Yes") {
             this.setState({
                 showMHQ5: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question5 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues5No") {
             this.setState({
                 showMHQ5: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question5 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues6Yes") {
             this.setState({
                 showMHQ6: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question6 = true;
+            this.setState({});
             console.log("Radio valueA", this.state.radioValA)
         }
         else if (this.state.radioValMH == "MHQues6No") {
             this.setState({
                 showMHQ6: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question6 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues7Yes") {
             this.setState({
                 showMHQ7: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question7 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues7No") {
             this.setState({
                 showMHQ7: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question7 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues8Yes") {
             this.setState({
                 showMHQ8: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question8 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues8No") {
             this.setState({
                 showMHQ8: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question8 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues9Yes") {
             this.setState({
                 showMHQ9: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question9 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues9No") {
             this.setState({
                 showMHQ9: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question9 = false;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues10Yes") {
             this.setState({
                 showMHQ10: true
-            })
+            });
+            this.props.medicalHistoryDTO.Question10 = true;
+            this.setState({});
         }
         else if (this.state.radioValMH == "MHQues10No") {
             this.setState({
                 showMHQ10: false
-            })
+            });
+            this.props.medicalHistoryDTO.Question10 = false;
+            this.setState({});
         }
     }
     
@@ -806,8 +916,8 @@ class Questionnaries extends React.Component {
                         FBQuesDTO={this.state.FBQuesDTO}
                         ADQuesDTO={this.state.ADQuesDTO}
                         PCQuesDTO={this.state.PCQuesDTO}
-
-
+                        medicalHistoryDTO={this.props.medicalHistoryDTO}
+                        MHDetailsSetValue={this.props.MHDetailsSetValue}
 
                         selectedValue={this.state.selectedValue}
                         selectedValueMLLSQ2={this.state.selectedValueMLLSQ2}

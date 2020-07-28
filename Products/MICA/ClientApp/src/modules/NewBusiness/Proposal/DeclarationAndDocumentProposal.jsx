@@ -68,7 +68,7 @@ class Panels extends React.Component {
                                         },
                                         {
                                             title: "Document Updating And Declaration",
-                                            content: <DocumentUpdating />
+                                            content: <DocumentUpdating proposerSigDetailsDTO={this.props.proposerSigDetailsDTO} wealthSigDetailsDTO={this.props.wealthSigDetailsDTO} SaveModifiedProposalDetails={this.props.SaveModifiedProposalDetails}/>
 
                                         }
                                     ]}

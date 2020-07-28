@@ -137,7 +137,15 @@ class DocumentUpdating extends React.Component {
             .toDataURL('image/png');
        
         this.setState({});
-        console.log("proposerSignature", this.state.proposerSignature);
+
+        var base64result = this.state.proposerSignature.split(',')[1];
+
+        this.props.proposerSigDetailsDTO.proposerSignaturedoc = base64result;
+
+        //this.props.SaveModifiedProposalDetails.Proposerdoc = base64result;
+        this.setState({});
+
+        console.log("proposerSignature", this.state.proposerSignature, "base64result", base64result, "this.props.proposerSigDetailsDTO", this.props.proposerSigDetailsDTO );
 
 
     }
@@ -165,6 +173,11 @@ class DocumentUpdating extends React.Component {
             .toDataURL('image/png');
 
         this.setState({});
+        var base64result = this.state.wpSignature.split(',')[1];
+
+        this.props.wealthSigDetailsDTO.wealthSignaturedoc = base64result;
+        this.setState({});
+
         console.log("wpSignature", this.state.wpSignature);
 
 
@@ -215,6 +228,39 @@ class DocumentUpdating extends React.Component {
         this.setState({ openWPpop: false });
     }
 
+    /*************************************** Proposer Signature And details Handling **************************/
+
+    handleProposerDetails = (evt) => {
+        let proposerSigDetailsDTO = this.props.proposerSigDetailsDTO;
+        proposerSigDetailsDTO[evt.target.name] = evt.target.value;
+        this.setState({ proposerSigDetailsDTO });
+
+        console.log("proposerSigDetailsDTO", this.props.proposerSigDetailsDTO);
+    }
+
+    onDateChange = (formate, type, name, event) => {
+        debugger;
+        var today = event.toDate();
+
+        var day = today.getDate();
+        var month = today.getMonth() + 1;
+
+        if (month < 10) {
+            month = '0' + month;
+
+        }
+        if (day < 10) {
+            day = '0' + day;
+        }
+
+        var date = day + '/' + month + '/' + today.getFullYear();
+        let proposerSigDetailsDTO = this.props.proposerSigDetailsDTO;
+        proposerSigDetailsDTO[name] = date;
+       
+        this.setState({ proposerSigDetailsDTO });
+
+        console.log("sampledate", proposerSigDetailsDTO )
+    }
    
     render() {
         let { trimmedDataURL } = this.state;
@@ -426,16 +472,27 @@ class DocumentUpdating extends React.Component {
 
            
                         <GridItem xl={12} sm={4} md={4}>
-                        <CustomDatetime required={true} onFocus={this.onClick} validdate={this.validdate} labelText="Proposer Date" id='ProposerDate' name='ProposerDate' onChange={(evt) => this.onDateChange('datetime', 'ProductDTO', 'activeFrom', evt)} formControlProps={{ fullWidth: true }} />
-                </GridItem>
+                            <CustomDatetime
+                                required={true}
+                                onFocus={this.onClick}
+                                validdate={this.validdate}
+                                labelText="Proposer Date"
+                                id='ProposerDate'
+                                value={this.props.proposerSigDetailsDTO.proposerDate}
+                                name='proposerDate'
+                                onChange={(evt) => this.onDateChange('datetime', 'proposerSigDetailsDTO', 'proposerDate', evt)}
+                                formControlProps={{ fullWidth: true }}
+                            />
+                        </GridItem>
                         <GridItem xl={12} sm={4} md={4}>
                         <CustomInput
                             success={this.ProposerPlace === "success"}
                             error={this.ProposerPlace === "error"}
                             labelText="Proposer Place"
-                            name="ProposerPlace"
+                                name="proposerPlace"
+                                value={this.props.proposerSigDetailsDTO.proposerPlace}
                             required={true}
-                            onChange={(e) => this.detailsChange("string", e)}
+                            onChange={(e) => this.handleProposerDetails(e)}
                             value={this.ProposerPlace}
                             formControlProps={{
                                 fullWidth: true
@@ -447,9 +504,10 @@ class DocumentUpdating extends React.Component {
                             success={this.ProposerCountry === "success"}
                             error={this.ProposerCountry === "error"}
                             labelText="Proposer Country"
-                            name="Proposer Country"
+                                value={this.props.proposerSigDetailsDTO.proposerCountry}
+                                name="proposerCountry"
                             required={true}
-                            onChange={(e) => this.detailsChange("string", e)}
+                                onChange={(e) => this.handleProposerDetails(e)}
                             value={this.ProposerCountry}
                             formControlProps={{
                                 fullWidth: true

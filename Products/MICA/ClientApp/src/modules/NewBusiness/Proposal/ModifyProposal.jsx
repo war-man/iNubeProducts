@@ -140,7 +140,7 @@ class ModifyProposal extends React.Component {
                                         },
                                         {
                                             title: "Questionnaires",
-                                            content: <Questionnaries DHCtable={this.props.DHCtable} DHCtDto={this.props.DHCtDto} Treatmenttable={this.props.Treatmenttable} TreatmentDto={this.props.TreatmentDto} lmedicinetable={this.props.lmedicinetable} lmedicineDto={this.props.lmedicineDto} cmedicinetable={this.props.cmedicinetable} cmedicineDto={this.props.cmedicineDto} claimedDto={this.props.claimedDto} claimedtable={this.props.claimedtable} insurancetable={this.props.insurancetable} insuranceDto={this.props.insuranceDto} handleAddButton={this.props.handleAddButton} familydatatable={this.props.familydatatable} familyBackground={this.props.familyBackground} SaveProposalDto={this.props.SaveProposalDto} FamilyDetailSetValue={this.props.FamilyDetailSetValue} familyBackgroundDto={this.props.familyBackgroundDto} AlcoholQuestionAddButton={this.props.AlcoholQuestionAddButton} alcoholdata={this.props.alcoholdata} TobaccoQuestionAddButton={this.props.TobaccoQuestionAddButton} tobaccodata={this.props.tobaccodata} LifeStyleQA={this.props.LifeStyleQA} QuestionalDetailsSetValue={this.props.QuestionalDetailsSetValue} MasterDataDto={this.props.MasterDataDto} />
+                                            content: <Questionnaries MHDetailsSetValue={this.props.MHDetailsSetValue} medicalHistoryDTO={this.props.medicalHistoryDTO} DHCtable={this.props.DHCtable} DHCtDto={this.props.DHCtDto} Treatmenttable={this.props.Treatmenttable} TreatmentDto={this.props.TreatmentDto} lmedicinetable={this.props.lmedicinetable} lmedicineDto={this.props.lmedicineDto} cmedicinetable={this.props.cmedicinetable} cmedicineDto={this.props.cmedicineDto} claimedDto={this.props.claimedDto} claimedtable={this.props.claimedtable} insurancetable={this.props.insurancetable} insuranceDto={this.props.insuranceDto} handleAddButton={this.props.handleAddButton} familydatatable={this.props.familydatatable} familyBackground={this.props.familyBackground} SaveProposalDto={this.props.SaveProposalDto} FamilyDetailSetValue={this.props.FamilyDetailSetValue} familyBackgroundDto={this.props.familyBackgroundDto} AlcoholQuestionAddButton={this.props.AlcoholQuestionAddButton} alcoholdata={this.props.alcoholdata} TobaccoQuestionAddButton={this.props.TobaccoQuestionAddButton} tobaccodata={this.props.tobaccodata} LifeStyleQA={this.props.LifeStyleQA} QuestionalDetailsSetValue={this.props.QuestionalDetailsSetValue} MasterDataDto={this.props.MasterDataDto} />
 
                                         },
                                         {
@@ -155,7 +155,7 @@ class ModifyProposal extends React.Component {
                                         },
                                         {
                                             title: "Declaration And Document",
-                                            content: <DeclarationAndDocument SetValue={this.SetValue} MasterDataDto={this.props.MasterDataDto} premiumPayingDto={this.props.premiumPayingDto} PremiumPaymentSetValue={this.props.PremiumPaymentSetValue} preferredCommunication={this.props.preferredCommunication} CommunicationSetValues={this.props.CommunicationSetValues}/>
+                                            content: <DeclarationAndDocument SetValue={this.SetValue} MasterDataDto={this.props.MasterDataDto} premiumPayingDto={this.props.premiumPayingDto} PremiumPaymentSetValue={this.props.PremiumPaymentSetValue} preferredCommunication={this.props.preferredCommunication} CommunicationSetValues={this.props.CommunicationSetValues} proposerSigDetailsDTO={this.props.proposerSigDetailsDTO} wealthSigDetailsDTO={this.props.wealthSigDetailsDTO} SaveModifiedProposalDetails={this.props.SaveModifiedProposalDetails}/>
 
                                         },
 
@@ -172,7 +172,7 @@ class ModifyProposal extends React.Component {
                         <div className="actions-right">
                             <Button color="info"
                                 round className={this.props.classes.marginRight}
-                                // onClick={this.handleLeadSave}
+                                onClick={this.props.SubmitProposal}
                                 id="saveBtn" >
                                 Save Proposal
                                 </Button>

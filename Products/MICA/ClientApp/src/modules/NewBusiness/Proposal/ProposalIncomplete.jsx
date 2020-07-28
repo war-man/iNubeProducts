@@ -168,20 +168,85 @@ class ProposalIncomplete extends React.Component {
                // "SteadyWeight": "",
                // "HeightUnit": "",
                 "WeightUnit": "",
-                "IsSmoker": 0,
+                "IsSmoker": false,
                 "SmokeType": "",
                 "SmokeQuantity": "",
                 "SmokePerDay": "",
                 "SmokeDuration": "",
-                "IsAlcholic": 0,
+                "IsAlcholic": false,
                 "AlcholType": "",
                 "AlcholQuantity": "",
                 "AlcholPerDay": "",
                 "AlcholDuration": "",
                 "IsNarcoticDrugs": "",
+                "Question1": false,
+                "Question2": false,
+                "Question3": false,
                 "Q1Specification": "",
                 "Q2Specification": "",
                 "Q3Specification": ""
+            },
+
+            medicalHistoryDTO: {
+                "Question1": false,
+                "Question1of1": "",
+                "Question1of2": "",
+                "Question1of3": "",
+                "Question1of4": "",
+                "Question1of5": "",
+                "Question2": false,
+                "Question2of1": "",
+                "Question2of2": "",
+                "Question2of3": "",
+                "Question2of4": "",
+                "Question2of5": "",
+                "Question2of6": "",
+                "Question2of7": "",
+                "Question2of8": "",
+                "Question2of9": "",
+                "Question2of10": "",
+                "Question2of11": "",
+                "Question2of12": "",
+                "Question2of13": "",
+                "Question2of14": "",
+                "Question3": false,
+                "Question3of1": "",
+                "Question4": false,
+                "Question4of1": "",
+                "Question4of2": "",
+                "Question4of3": "",
+                "Question4of4": "",
+                "Question4of4of1": false,
+                "Question4of5": "",
+                "Question4of6": "",
+                "Question4of7": "",
+                "Question4of7of1": "",
+                "Question4of8": "",
+                "Question4of8of1": "",
+                "Question4of9": false,
+                "Question4of9of1": [],
+                "Question4of10": false,
+                "Question4of10of1": [],
+                "Question4of11": false,
+                "Question4of11of1": [],
+                "Question4of12": false,
+                "Question4of12of1": "",
+                "Question4of13": [],
+                "Question4of14": false,
+                "Question4of14of1": "",
+                "Question4of15": false,
+                "Question4of15of1": "",
+                "Question4of16": "",
+                "Question6": false,
+                "Question6of1": "",
+                "Question7": false,
+                "Question7of1": "",
+                "Question8": false,
+                "Question8of1": "",
+                "Question9": false,
+                "Question9of1": "",
+                "Question10": false,
+                "Question10of1": "",
             },
 
             familyBackgroundDto: {
@@ -256,10 +321,29 @@ class ProposalIncomplete extends React.Component {
                 "preferredLanguage": "",
                 "premiumMethodOfComm": ""
             },
-        
+           
+            proposerSigDetailsDTO: {
+                //"proposerSignaturedoc": "",
+                "proposerDate": "",
+                "proposerPlace": "",
+                "proposerCountry": ""
+            },
+
+            spouseSigDetailsDTO: {
+                "spouseDate": "",
+                "spousePlace": "",
+                "spouseCountry": ""
+            },
+
+            wealthSigDetailsDTO: {
+               // "wealthSignaturedoc": "",
+                "otherCircumstances": "",
+                "IsPolicy": "",
+                "comments": "",
+                "checkbox": ""
+            },
 
             SaveProposalDto: {
-
                 "policyStartDate": "2019-10-16T05:30:00.625Z",
                 "policyEndDate": "2019-10-16T05:30:00.625Z",
                 "quoteNo": "q23457",
@@ -270,8 +354,6 @@ class ProposalIncomplete extends React.Component {
                 "proposalSubmitDate": "2019-10-16T05:30:00.626Z",
                 "tblPolicyMemberDetails": [],
                 "familyBackgroundDetails": [],
-
-
             },
             
             tblPolicyMemberDetails: {
@@ -328,15 +410,10 @@ class ProposalIncomplete extends React.Component {
 
             "SaveModifiedProposalDetails": {
                 "policyMemberOwnerDetails": [],  // this.state.tblPolicyMemberDetails
-                "LifeStyleDetails": [],  //this.state.LifeStyleQA
-                "FamilyBackgroundDetails": [], // this.state.familytable
-                "PCLifeInsuranceDetails": [], //this.state.insurancetable
-                "PCClaimedDetails": [], // this.state.claimedtable
-                "PremiumPayingDetails": [], //this.state.premiumPayingDto
-                "CommunicationMethod": [], 
-                "ProposerSignature": [],
-                "ProposerDetails": [],
-                "WealthPlannerSignature": []
+                "QuestioneriesDetails": [],
+                "DocumentationUpdating": [], //this.state.premiumPayingDto,this.state.preferredCommunication
+                "ProposerSignatureDetails": [], //this.state.proposerSigDetailsDTO
+                "WealthSignatureDetails": []   //this.state.wealthSigDetailsDTO
             }
 
         }
@@ -349,7 +426,8 @@ class ProposalIncomplete extends React.Component {
     };
 
     SubmitProposal = () => {
-        console.log("sendingdata", this.state.SaveProposalDto);
+        debugger;
+        
         // this.state.fields.IsActive = 1;
         // this.state.fields.CreatedDate = date();
         // ${ NewBusinessConfig.ProposalConfigUrl }
@@ -363,7 +441,29 @@ class ProposalIncomplete extends React.Component {
         // tblPolicyMemberDetail.dob = this.newdatechange(this.state.tblPolicyMemberDetails.dob);
         // tblPolicyMemberDetail.doj = this.newdatechange(this.state.tblPolicyMemberDetails.doj);
         // this.setState({ tblPolicyMemberDetail})
-        this.state.SaveProposalDto.tblPolicyMemberDetails = this.state.tblPolicyMemberDetails;
+        //this.state.SaveProposalDto.tblPolicyMemberDetails = this.state.tblPolicyMemberDetails;
+
+        this.state.medicalHistoryDTO.Question4of9of1 = this.state.cmedicinetable;
+        this.state.medicalHistoryDTO.Question4of10of1 = this.state.lmedicinetable;
+        this.state.medicalHistoryDTO.Question4of11of1 = this.state.Treatmenttable;
+        this.state.medicalHistoryDTO.Question4of13 = this.state.DHCtable;
+        this.setState({});
+        console.log("medicalhistorydtodata", this.state.medicalHistoryDTO);
+
+        this.state.SaveModifiedProposalDetails.policyMemberOwnerDetails.push(this.state.tblPolicyMemberDetails);
+        this.state.SaveModifiedProposalDetails.QuestioneriesDetails.push(this.state.LifeStyleQA);
+        this.state.SaveModifiedProposalDetails.QuestioneriesDetails.push(this.state.familytable);
+        this.state.SaveModifiedProposalDetails.QuestioneriesDetails.push(this.state.insurancetable);
+        this.state.SaveModifiedProposalDetails.QuestioneriesDetails.push(this.state.claimedtable);
+        this.state.SaveModifiedProposalDetails.QuestioneriesDetails.push(this.state.medicalHistoryDTO);
+        this.state.SaveModifiedProposalDetails.DocumentationUpdating.push(this.state.premiumPayingDto);
+        this.state.SaveModifiedProposalDetails.DocumentationUpdating.push(this.state.preferredCommunication);
+        this.state.SaveModifiedProposalDetails.ProposerSignatureDetails.push(this.state.proposerSigDetailsDTO);
+        this.state.SaveModifiedProposalDetails.WealthSignatureDetails.push(this.state.wealthSigDetailsDTO);
+
+        this.setState({});
+
+        console.log("sendingdata", this.state.SaveModifiedProposalDetails);
 
         fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/CreateAccounts/PartialFormData`, {
             method: 'post',
@@ -372,7 +472,7 @@ class ProposalIncomplete extends React.Component {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
-            body: JSON.stringify(this.state.SaveProposalDto)
+            body: JSON.stringify(this.state.SaveModifiedProposalDetails)
         }).then(function (data) {
             console.log(data);
             alert("Parameter Saved");
@@ -532,6 +632,16 @@ class ProposalIncomplete extends React.Component {
         this.setState({ LifeStyleQA });
 
         console.log("lifeStyleQa ", this.state.LifeStyleQA);
+
+    }
+
+    MHDetailsSetValue = (evt) => {
+        debugger;
+        let medicalHistoryDTO = this.state.medicalHistoryDTO;
+        medicalHistoryDTO[evt.target.name] = evt.target.value;
+        this.setState({ medicalHistoryDTO });
+
+        console.log("medicalHistoryDTO ", this.state.medicalHistoryDTO);
 
     }
 
@@ -953,7 +1063,7 @@ class ProposalIncomplete extends React.Component {
                                                         </Button>
                                                         */}
                         {this.state.open &&
-                            <ModifyProposal proposalFormFlag={this.state.proposalFormFlag} premiumPayingDto={this.state.premiumPayingDto} PremiumPaymentSetValue={this.PremiumPaymentSetValue} preferredCommunication={this.state.preferredCommunication} CommunicationSetValues={this.CommunicationSetValues} cmedicinetable={this.state.cmedicinetable} cmedicineDto={this.state.cmedicineDto} lmedicinetable={this.state.lmedicinetable} lmedicineDto={this.state.lmedicineDto} Treatmenttable={this.state.Treatmenttable} TreatmentDto={this.state.TreatmentDto}
+                            <ModifyProposal SaveModifiedProposalDetails={this.state.SaveModifiedProposalDetails} MHDetailsSetValue={this.MHDetailsSetValue} medicalHistoryDTO={this.state.medicalHistoryDTO} wealthSigDetailsDTO={this.state.wealthSigDetailsDTO} proposerSigDetailsDTO={this.state.proposerSigDetailsDTO} proposalFormFlag={this.state.proposalFormFlag} premiumPayingDto={this.state.premiumPayingDto} PremiumPaymentSetValue={this.PremiumPaymentSetValue} preferredCommunication={this.state.preferredCommunication} CommunicationSetValues={this.CommunicationSetValues} cmedicinetable={this.state.cmedicinetable} cmedicineDto={this.state.cmedicineDto} lmedicinetable={this.state.lmedicinetable} lmedicineDto={this.state.lmedicineDto} Treatmenttable={this.state.Treatmenttable} TreatmentDto={this.state.TreatmentDto}
                             DHCtable={this.state.DHCtable} DHCtDto={this.state.DHCtDto} claimedDto={this.state.claimedDto} claimedtable={this.state.claimedtable} insurancetable={this.state.insurancetable} insuranceDto={this.state.insuranceDto} handleAddButton={this.handleAddButton} familydatatable={this.state.familydatatable} familyBackground={this.state.familyBackground} FamilyDetailSetValue={this.FamilyDetailSetValue} familyBackgroundDto={this.state.familyBackgroundDto} AlcoholQuestionAddButton={this.AlcoholQuestionAddButton} alcoholdata={this.state.alcoholdata}
                             TobaccoQuestionAddButton={this.TobaccoQuestionAddButton} tobaccodata={this.state.tobaccodata} handlePolicyOwnerData={this.handlePolicyOwnerData} DateChange={this.DateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails}
                             SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer}

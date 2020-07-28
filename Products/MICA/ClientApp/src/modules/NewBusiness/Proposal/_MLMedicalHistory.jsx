@@ -46,7 +46,7 @@ const radioAlign = {
 
 const MLMedicalHistory = (props) => {
     console.log("props", props);
-    console.log("My Life Styleprops1", props.MedHistQuesDTO);
+    console.log("My Life Styleprops1", props.MedHistQuesDTO, props);
     let classes = props.classes;
     return (
         <div>
@@ -134,31 +134,44 @@ const MLMedicalHistory = (props) => {
 
 
                
-                {props.showMHQ1 && <GridItem xs={12}>
+                {props.showMHQ1 &&
+                    <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[53] !== undefined) ? props.MedHistQuesDTO[53].questionText : ""}
-                        id="MHQ1.1"
+                        value={props.medicalHistoryDTO.Question1of1}
+                        name='Question1of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.1"
                         formControlProps={{
                             fullWidth: true
                         }}
                     />
-                </GridItem>}
+                    </GridItem>
+                }
 
-                {props.showMHQ1 && <GridItem xs={12}>
+                {props.showMHQ1 &&
+                    <GridItem xs={12}>
                     
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[54] !== undefined) ? props.MedHistQuesDTO[54].questionText : ""}
-                        id="MHQ1.2"
+                        value={props.medicalHistoryDTO.Question1of2}
+                        name='Question1of2'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.2"
                         formControlProps={{
                             fullWidth: true
                         }}
                     />
-                </GridItem>}
+                    </GridItem>
+                }
 
                 {props.showMHQ1 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[55] !== undefined) ? props.MedHistQuesDTO[55].questionText : ""}
-                        id="MHQ1.3"
+                        value={props.medicalHistoryDTO.Question1of3}
+                        name='Question1of3'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.3"
                         formControlProps={{
                             fullWidth: true
                         }}
@@ -168,7 +181,10 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ1 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[56] !== undefined) ? props.MedHistQuesDTO[56].questionText : ""}
-                        id="MHQ1.4"
+                        value={props.medicalHistoryDTO.Question1of4}
+                        name='Question1of4'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.4"
                         formControlProps={{
                             fullWidth: true
                         }}
@@ -178,7 +194,10 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ1 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[57] !== undefined) ? props.MedHistQuesDTO[57].questionText : ""}
-                        id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question1of5}
+                        name='Question1of5'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
                         }}
@@ -259,6 +278,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[37] !== undefined) ? props.MedHistQuesDTO[37].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of1}
+                        name='Question2of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ2.1"
                         formControlProps={{
                             fullWidth: true
@@ -268,6 +290,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[38] !== undefined) ? props.MedHistQuesDTO[38].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of2}
+                        name='Question2of2'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -277,6 +302,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[39] !== undefined) ? props.MedHistQuesDTO[39].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of3}
+                        name='Question2of3'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -286,6 +314,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[40] !== undefined) ? props.MedHistQuesDTO[40].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of4}
+                        name='Question2of4'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -295,6 +326,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[42] !== undefined) ? props.MedHistQuesDTO[41].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of5}
+                        name='Question2of5'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -304,6 +338,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[43] !== undefined) ? props.MedHistQuesDTO[43].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of6}
+                        name='Question2of6'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -313,6 +350,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[44] !== undefined) ? props.MedHistQuesDTO[44].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of7}
+                        name='Question2of7'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -322,6 +362,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[45] !== undefined) ? props.MedHistQuesDTO[45].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of8}
+                        name='Question2of8'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -331,6 +374,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[46] !== undefined) ? props.MedHistQuesDTO[46].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of9}
+                        name='Question2of9'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -340,6 +386,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[47] !== undefined) ? props.MedHistQuesDTO[47].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of10}
+                        name='Question2of10'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -349,6 +398,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[48] !== undefined) ? props.MedHistQuesDTO[48].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of11}
+                        name='Question2of11'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -358,6 +410,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[49] !== undefined) ? props.MedHistQuesDTO[49].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of12}
+                        name='Question2of12'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -367,6 +422,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[50] !== undefined) ? props.MedHistQuesDTO[50].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of13}
+                        name='Question2of13'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -376,6 +434,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ2 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[51] !== undefined) ? props.MedHistQuesDTO[51].questionText : ""}
+                        value={props.medicalHistoryDTO.Question2of14}
+                        name='Question2of14'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -457,6 +518,9 @@ const MLMedicalHistory = (props) => {
                 {props.showMHQ3 && <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
+                        value={props.medicalHistoryDTO.Question3of1}
+                        name='Question3of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -540,6 +604,9 @@ const MLMedicalHistory = (props) => {
 
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[7] !== undefined) ? props.MedHistQuesDTO[7].questionText : ""}
+                        value={props.medicalHistoryDTO.Question4of1}
+                        name='Question4of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -552,7 +619,10 @@ const MLMedicalHistory = (props) => {
 
                         <CustomInput
                             labelText={(props.MedHistQuesDTO[8] !== undefined) ? props.MedHistQuesDTO[8].questionText : ""}
-                            //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question4of2}
+                        name='Question4of2'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -564,7 +634,10 @@ const MLMedicalHistory = (props) => {
 
                         <CustomInput
                             labelText={(props.MedHistQuesDTO[9] !== undefined) ? props.MedHistQuesDTO[9].questionText : ""}
-                            //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question4of3}
+                        name='Question4of3'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -642,29 +715,17 @@ const MLMedicalHistory = (props) => {
                 }
 
                 {props.show4MHQ4 &&
-                    <GridItem xs={12} sm={12} md={12}>
-
-                        <CustomInput
-                            labelText={(props.MedHistQuesDTO[11] !== undefined) ? props.MedHistQuesDTO[11].questionText : ""}
-                            //id="MHQ1.5"
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                    </GridItem>}
-
-                {props.show4MHQ1 &&
                     <GridItem>
 
-                        <p>4. {(props.MedHistQuesDTO[10] !== undefined) ? props.MedHistQuesDTO[10].questionText : ""}</p>
+                        <p>4. {(props.MedHistQuesDTO[11] !== undefined) ? props.MedHistQuesDTO[11].questionText : ""}</p>
 
                         <GridItem xs={12}>
                             <FormControlLabel
                                 control={
                                     <Radio
-                                        checked={props.selectedValueMH === "MHQues4.1Yes"}
+                                        checked={props.selectedValueMH === "MHQues4.4.1Yes"}
                                         onChange={props.handleRadioChangeMH}
-                                        value="MHQues4.1Yes"
+                                        value="MHQues4.4.1Yes"
                                         //name="radio4"
                                         aria-label="B"
                                         icon={
@@ -692,9 +753,9 @@ const MLMedicalHistory = (props) => {
                             <FormControlLabel
                                 control={
                                     <Radio
-                                        checked={props.selectedValueMH === "MHQues4.1No"}
+                                        checked={props.selectedValueMH === "MHQues4.4.1No"}
                                         onChange={props.handleRadioChangeMH}
-                                        value="MHQues4.1No"
+                                        value="MHQues4.4.1No"
                                         //name="radio3"
                                         aria-label="B"
                                         icon={
@@ -727,7 +788,10 @@ const MLMedicalHistory = (props) => {
 
                         <CustomInput
                             labelText={(props.MedHistQuesDTO[12] !== undefined) ? props.MedHistQuesDTO[12].questionText : ""}
-                            //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question4of5}
+                        name='Question4of5'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -738,7 +802,10 @@ const MLMedicalHistory = (props) => {
 
                         <CustomInput
                             labelText={(props.MedHistQuesDTO[13] !== undefined) ? props.MedHistQuesDTO[13].questionText : ""}
-                            //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question4of6}
+                        name='Question4of6'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -819,12 +886,17 @@ const MLMedicalHistory = (props) => {
 
                         <CustomInput
                             labelText={(props.MedHistQuesDTO[15] !== undefined) ? props.MedHistQuesDTO[15].questionText : ""}
-                            //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question4of7of1}
+                        name='Question4of7of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                             formControlProps={{
                                 fullWidth: true
                             }}
                         />
                     </GridItem>}
+
+
                 {props.showMHQ4 &&
                     <GridItem>
 
@@ -899,7 +971,10 @@ const MLMedicalHistory = (props) => {
 
                         <CustomInput
                             labelText={(props.MedHistQuesDTO[17] !== undefined) ? props.MedHistQuesDTO[17].questionText : ""}
-                            //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question4of8of1}
+                        name='Question4of8of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -1416,6 +1491,9 @@ const MLMedicalHistory = (props) => {
                     <GridItem xs={12}>
                     <CustomInput
                         labelText={(props.MedHistQuesDTO[25] !== undefined) ? props.MedHistQuesDTO[25].questionText : ""}
+                        value={props.medicalHistoryDTO.Question4of12of1}
+                        name='Question4of12of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
                         //id="MHQ1.5"
                         formControlProps={{
                             fullWidth: true
@@ -1569,7 +1647,10 @@ const MLMedicalHistory = (props) => {
                     <GridItem xs={12}>
                         <CustomInput
                             labelText={(props.MedHistQuesDTO[28] !== undefined) ? props.MedHistQuesDTO[28].questionText : ""}
-                            //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question4of14of1}
+                        name='Question4of14of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -1650,7 +1731,10 @@ const MLMedicalHistory = (props) => {
                     <GridItem xs={12}>
                         <CustomInput
                             labelText={(props.MedHistQuesDTO[30] !== undefined) ? props.MedHistQuesDTO[30].questionText : ""}
-                            //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question4of15of1}
+                        name='Question4of15of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -1662,7 +1746,10 @@ const MLMedicalHistory = (props) => {
                     <GridItem xs={12}>
                         <CustomInput
                             labelText={(props.MedHistQuesDTO[31] !== undefined) ? props.MedHistQuesDTO[31].questionText : ""}
-                            //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question4of16of1}
+                        name='Question4of16of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -1747,7 +1834,10 @@ const MLMedicalHistory = (props) => {
             {props.showMHQ5 && <GridItem xs={12}>
                 <CustomInput
                     labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
-                    //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question5of1}
+                        name='Question5of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                     formControlProps={{
                         fullWidth: true
                     }}
@@ -1828,7 +1918,10 @@ const MLMedicalHistory = (props) => {
             {props.showMHQ6 && <GridItem xs={12}>
                 <CustomInput
                     labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
-                    //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question6of1}
+                        name='Question6of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                     formControlProps={{
                         fullWidth: true
                     }}
@@ -1909,7 +2002,10 @@ const MLMedicalHistory = (props) => {
             {props.showMHQ7 && <GridItem xs={12}>
                 <CustomInput
                     labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
-                    //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question7of1}
+                        name='Question7of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                     formControlProps={{
                         fullWidth: true
                     }}
@@ -1990,7 +2086,10 @@ const MLMedicalHistory = (props) => {
             {props.showMHQ8 && <GridItem xs={12}>
                 <CustomInput
                     labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
-                    //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question8of1}
+                        name='Question8of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                     formControlProps={{
                         fullWidth: true
                     }}
@@ -2071,7 +2170,10 @@ const MLMedicalHistory = (props) => {
             {props.showMHQ9 && <GridItem xs={12}>
                 <CustomInput
                     labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
-                    //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question9of1}
+                        name='Question9of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                     formControlProps={{
                         fullWidth: true
                     }}
@@ -2152,7 +2254,10 @@ const MLMedicalHistory = (props) => {
             {props.showMHQ10 && <GridItem xs={12}>
                 <CustomInput
                     labelText={(props.MedHistQuesDTO[61] !== undefined) ? props.MedHistQuesDTO[61].questionText : ""}
-                    //id="MHQ1.5"
+                        value={props.medicalHistoryDTO.Question10of1}
+                        name='Question10of1'
+                        onChange={(e) => props.MHDetailsSetValue(e)}
+                        //id="MHQ1.5"
                     formControlProps={{
                         fullWidth: true
                     }}
