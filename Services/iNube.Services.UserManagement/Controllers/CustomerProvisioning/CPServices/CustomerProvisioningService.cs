@@ -179,8 +179,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
                 {
                     userDTO.EnvId = item.Id;
                     var result = await _userService.CreateProfileUser(userDTO, apiContext);
-                    //var envids = _cpcontext.TblCustomerEnvironment.Where(a => a.CustomerId == customerProvisioningDTO.CustomerId).Select(x=>x);
-                    if (Convert.ToInt32(result.Status) == 7)
+                     if (Convert.ToInt32(result.Status) == 7)
                     {
                         return new CustomerResponse { Status = BusinessStatus.Error, ResponseMessage = $"Customer user already exists" };
                     }
