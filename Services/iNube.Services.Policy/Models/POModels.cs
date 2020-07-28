@@ -1824,6 +1824,27 @@ namespace iNube.Services.Policy.Models
     {
         public dynamic PolicyDetails { get; set; }
     }
+
+    public class FinalPremiumResponse
+    {
+        public string paymentGatewayRefrenceid { get; set; }
+        //public string ErrorDescription { get; set; }
+        public int ErroRowNo { get; set; }
+      
+        public DateTime? EndorsementEffectiveDate { get; set; }
+        public List<Dictionary<string, string>> ErrorDescription { get; set; }
+
+    }
+    public class DispatcherEventRequest
+    {
+        public string paymentGatewayRefrenceid { get; set; }
+        //public string ErrorDescription { get; set; }
+        public int ErroRowNo { get; set; }
+
+        public DateTime? EndorsementEffectiveDate { get; set; }
+        public List<Dictionary<string, string>> ErrorDescription { get; set; }
+
+    }
 }
 
 
