@@ -459,7 +459,6 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             return null;
         }
         
-        //Assign Product to Partner
         public async Task<IEnumerable<ddDTO>> GetAssignProductbyId(AssignedProducts assignedProducts, ApiContext apiContext)
         {
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
