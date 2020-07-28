@@ -141,12 +141,12 @@ const PartialMemberDetails = (props) => {
                                 <MasterDropdown
                                     labelText="Please Select Relationship"
                                     // id="LeadDTO.gender"
-                                    value={props.singleValueSelectedProposer === "0" ? "" : props.tblPolicyMemberDetails.relationShipWithProposer}
+                                    value={props.singleValueSelectedProposer === "0" ? "" : props.PolicyOwnerDetailsdataOnNoCondition.relationShipWithProposer}
                                     lstObject={props.MasterDataDto}
                                     filterName='Relationshipwiththepolicyowner'
                                     //  model="LeadDTO"
                                     name='relationShipWithProposer'
-                                    onChange={(e) => props.MasterSetValue(e)}
+                                    onChange={(e) => props.PolicyOwnerDetailsSetValue(e)}
                                     formControlProps={{
                                         fullWidth: true
                                     }}
@@ -162,10 +162,10 @@ const PartialMemberDetails = (props) => {
                                 //error={props.Salutation === "error"}
                                 disabled={(props.singleValueSelectedProposer === "0")?true:false}
                                 labelText="Salutation "
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].salutation  : props.tblPolicyMemberDetails.salutation}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.salutation  : props.tblPolicyMemberDetails.salutation}
                                 name="salutation"
                                 required={true}
-                                onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 //props.singleValueSelectedProposer === "0" ? "" :
                                 formControlProps={{
                                     fullWidth: true
@@ -175,9 +175,10 @@ const PartialMemberDetails = (props) => {
                         <GridItem xs={12} sm={12} md={3}>
                             <CustomInput
                                 labelText="Name With Initials"
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].nameWithInitial :props.tblPolicyMemberDetails.nameWithInitial}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.nameWithInitial :props.tblPolicyMemberDetails.nameWithInitial}
                                 name="nameWithInitial"
-                                onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                //onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 id="NameWithInitials"
                                 formControlProps={{
                                     fullWidth: true
@@ -192,8 +193,8 @@ const PartialMemberDetails = (props) => {
                                 disabled={(props.singleValueSelectedProposer === "0") ? true : false}
                                 name="givenName"
                                 required={true}
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].givenName : props.tblPolicyMemberDetails.givenName}
-                                onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.givenName : props.tblPolicyMemberDetails.givenName}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -207,8 +208,8 @@ const PartialMemberDetails = (props) => {
                                 labelText="Sur Name"
                                 name="surname"
                                 required={true}
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].surname :props.tblPolicyMemberDetails.surname}
-                                onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.surname :props.tblPolicyMemberDetails.surname}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -223,7 +224,7 @@ const PartialMemberDetails = (props) => {
                                 name="emiratesId"
                                 required={true}
                                 // value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].surname : props.SaveProposalDto.tblPolicyMemberDetails.nameWithInitial}
-                                onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -238,7 +239,7 @@ const PartialMemberDetails = (props) => {
                                 labelText="Date Of Birth"
                                 id='dob'
                                 name='dob'
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].dateOfBirth :props.tblPolicyMemberDetails.dob}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.dateOfBirth :props.tblPolicyMemberDetails.dob}
                                 onChange={(evt) => props.DateChange('dob', evt)}
                                 formControlProps={{ fullWidth: true }} />
                         </GridItem>
@@ -251,8 +252,8 @@ const PartialMemberDetails = (props) => {
                                 labelText="Age "
                                 name="age"
                                 required={true}
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].age :props.tblPolicyMemberDetails.age}
-                                onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.age :props.tblPolicyMemberDetails.age}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -262,8 +263,8 @@ const PartialMemberDetails = (props) => {
                             <MasterDropdown
                                 labelText="Gender"
                                 disabled={(props.singleValueSelectedProposer === "0") ? true : false}
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].genderID :props.tblPolicyMemberDetails.gender}
-                                onChange={(e) => props.MasterSetValue(e)}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.genderID :props.tblPolicyMemberDetails.gender}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 lstObject={props.MasterDataDto}
                                 filterName='Gender'
                                 name='gender'
@@ -281,8 +282,8 @@ const PartialMemberDetails = (props) => {
                             <MasterDropdown
                                 labelText="Marital Status"
                                 disabled={(props.singleValueSelectedProposer === "0") ? true : false}
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].maritialStatus :props.tblPolicyMemberDetails.maritialStatus}
-                                onChange={(e) => props.MasterSetValue(e)}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.maritialStatus :props.tblPolicyMemberDetails.maritialStatus}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
 
                                 lstObject={props.MasterDataDto}
                                 filterName='MaritalStatus'
@@ -299,7 +300,7 @@ const PartialMemberDetails = (props) => {
                                 labelText="Occupation"
                                 disabled={(props.singleValueSelectedProposer === "0") ? true : false}
                                 //value={props.singleValueSelectedProposer === "0" ? "" : props.tblPolicyMemberDetails[0].occupationId}
-                                onChange={(e) => props.MasterSetValue(e)}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
 
                                 lstObject={props.MasterDataDto}
 
@@ -322,8 +323,8 @@ const PartialMemberDetails = (props) => {
                                 name="annualIncome"
                                 required={true}
                                 disabled={(props.singleValueSelectedProposer === "0")?true:false}
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].annualIncome :props.tblPolicyMemberDetails.annualIncome}
-                                onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.annualIncome :props.tblPolicyMemberDetails.annualIncome}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -336,8 +337,8 @@ const PartialMemberDetails = (props) => {
                                 labelText="PassportNumber"
 
                                 name="passportNumber"
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].passportNumber :props.tblPolicyMemberDetails.passportNumber}
-                                onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.passportNumber :props.tblPolicyMemberDetails.passportNumber}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 id="PassportNumber"
                                 formControlProps={{
                                     fullWidth: true
@@ -347,8 +348,8 @@ const PartialMemberDetails = (props) => {
                         <GridItem xs={12} sm={12} md={3}>
                             <CustomInput
                                 labelText="Name Of Employee"
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].nameOfEmployee :props.tblPolicyMemberDetails.nameWithInitial}
-                                onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.nameOfEmployee :props.tblPolicyMemberDetails.nameWithInitial}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 name="nameWithInitial"
 
                                 id="NameOfEmployee"
@@ -362,8 +363,8 @@ const PartialMemberDetails = (props) => {
                             <MasterDropdown
                                 labelText="Nationality"
 
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].nationality :props.tblPolicyMemberDetails.nationality}
-                                onChange={(e) => props.MasterSetValue(e)}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.nationality :props.tblPolicyMemberDetails.nationality}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 lstObject={props.MasterDataDto}
                                 filterName='Country'
 
@@ -379,8 +380,8 @@ const PartialMemberDetails = (props) => {
                                 labelText="Country Of Residence"
                                 // id="LeadDTO.gender"
                                 //value={props.singleValueSelectedProposer === "1" ? "" : props.tblPolicyMemberDetails.residentialNationality}
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].countryOfResidence : props.tblPolicyMemberDetails.nationality}
-                                onChange={(e) => props.MasterSetValue(e)}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.countryOfResidence : props.tblPolicyMemberDetails.nationality}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 lstObject={props.MasterDataDto}
                                 filterName='Country'
                                 //  model="LeadDTO"
@@ -399,7 +400,7 @@ const PartialMemberDetails = (props) => {
                                 // id="LeadDTO.gender"
                                // value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].ageProof : props.tblPolicyMemberDetails.nationality}
                                 lstObject={props.MasterDataDto}
-                                onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 filterName='AgeProofList'
 
                                 name='ageProof'
@@ -486,7 +487,7 @@ const PartialMemberDetails = (props) => {
                                     name="specifyOccupationWork"
                                     required={true}
                                     // value={props.singleValueSelectedProposer === "1" ? "": props.SaveProposalDto.tblPolicyMemberDetails.nameWithInitial}
-                                    onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                    onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                     formControlProps={{
                                         fullWidth: true
                                     }}
@@ -497,8 +498,8 @@ const PartialMemberDetails = (props) => {
                             <MasterDropdown
                                 labelText="Country Of Occupation"
                                 // id="LeadDTO.gender"
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].countryOfOccupation : props.tblPolicyMemberDetails.nationality}
-                                onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.countryOfOccupation : props.tblPolicyMemberDetails.nationality}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 lstObject={props.MasterDataDto}
                                 filterName='Country'
 
@@ -528,7 +529,7 @@ const PartialMemberDetails = (props) => {
                             <CustomInput
                                 labelText="Citizenship1"
                                 value={props.tblPolicyMemberDetails.citizenship1}
-                               // onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 name="citizenship1"
                                 id="Citizenship1"
                                 formControlProps={{
@@ -546,7 +547,7 @@ const PartialMemberDetails = (props) => {
                             <CustomInput
                                 labelText="Citizenship2"
                                 value={props.tblPolicyMemberDetails.citizenship2}
-                                //onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                                 name="citizenship2"
 
                                 id="Citizenship2"
@@ -578,8 +579,8 @@ const PartialMemberDetails = (props) => {
                     <GridItem xs={12} sm={12} md={3}>
                         <CustomInput
                             labelText="Mobile No"
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].mobileNo :props.tblPolicyMemberDetails.mobile}
-                            onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.mobileNo :props.tblPolicyMemberDetails.mobile}
+                            onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                             name="mobile"
 
                             id="MobileNo"
@@ -591,8 +592,8 @@ const PartialMemberDetails = (props) => {
                     <GridItem xs={12} sm={12} md={3}>
                         <CustomInput
                             labelText="Home"
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].home :props.tblPolicyMemberDetails.home}
-                            onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.home :props.tblPolicyMemberDetails.home}
+                            onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                             name="home"
 
                             id="Home"
@@ -606,8 +607,8 @@ const PartialMemberDetails = (props) => {
                     <GridItem xs={12} sm={12} md={3}>
                         <CustomInput
                             labelText="Office No"
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].officeNo : props.tblPolicyMemberDetails.work}
-                            onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.officeNo : props.tblPolicyMemberDetails.work}
+                            onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                             name="work"
 
                             id="work"
@@ -623,8 +624,8 @@ const PartialMemberDetails = (props) => {
                     <GridItem xs={12} sm={12} md={3}>
                         <CustomInput
                             labelText="E-Mail"
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].email :props.tblPolicyMemberDetails.email}
-                            onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.email :props.tblPolicyMemberDetails.email}
+                            onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                             name="email"
 
                             id="Email"
@@ -658,8 +659,8 @@ const PartialMemberDetails = (props) => {
                             required={true}
                             // onChange={props.PolicyOwnerDetailsSetValue}
                             //props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].address1 :
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].address1 : props.tblPolicyMemberDetails.address1}
-                            onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.address1 : props.tblPolicyMemberDetails.address1}
+                            onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -672,8 +673,8 @@ const PartialMemberDetails = (props) => {
                             labelText="Address 2"
                             name="address2"
                             required={true}
-                            onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].address2 : props.tblPolicyMemberDetails.address2}
+                            onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.address2 : props.tblPolicyMemberDetails.address2}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -684,9 +685,9 @@ const PartialMemberDetails = (props) => {
                         <CustomInput
                             labelText="Address 3"
                             //value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].address3 : props.PolicyOwnerDetailsdataOnYesConditioinDto[0].address3}
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].address3 : props.tblPolicyMemberDetails.address3}
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.address3 : props.tblPolicyMemberDetails.address3}
                             name="address3"
-                            // onChange={props.PolicyOwnerDetailsSetValue}
+                            onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                             id="Address3"
                             formControlProps={{
                                 fullWidth: true
@@ -701,8 +702,8 @@ const PartialMemberDetails = (props) => {
                             labelText="Postal Code|City "
                             name="city"
                             required={true}
-                            onChange={(e) => props.proposalPolicyOwnerSetValue(e)}
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].postalCode : props.tblPolicyMemberDetails.city}
+                            onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.postalCode : props.tblPolicyMemberDetails.city}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -717,8 +718,8 @@ const PartialMemberDetails = (props) => {
                             labelText="District "
                             name="district"
                             required={true}
-                            // onChange={props.PolicyOwnerDetailsSetValue}
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].district : props.tblPolicyMemberDetails.district}
+                            onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.district : props.tblPolicyMemberDetails.district}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -734,7 +735,7 @@ const PartialMemberDetails = (props) => {
                             labelText="Province "
                             name="province"
                             required={true}
-                            // onChange={props.PolicyOwnerDetailsSetValue}
+                            onChange={props.singleValueSelectedProposer === "1" ? (e) => props.PolicyOwnerDetailsSetValue(e) : (e) => props.proposalPolicyOwnerSetValue(e)}
                             //value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].province : props.PolicyOwnerDetailsdataOnYesConditioinDto[0].province}
                             formControlProps={{
                                 fullWidth: true
@@ -789,7 +790,7 @@ const PartialMemberDetails = (props) => {
                             name="pAddress1"
                             required={true}
                             // onChange={props.PolicyOwnerDetailsSetValue}
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].pAddress1 : "" || props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.address1 : "" }
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.pAddress1 : "" || props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.address1 : "" }
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -805,7 +806,7 @@ const PartialMemberDetails = (props) => {
                             required={true}
                             //onChange={props.PolicyOwnerDetailsSetValue}
                             //value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].address2 : props.PolicyOwnerDetailsdataOnYesConditioinDto[0].address2}
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].pAddress2 : "" || props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.address2 : "" }
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.pAddress2 : "" || props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.address2 : "" }
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -817,7 +818,7 @@ const PartialMemberDetails = (props) => {
                             labelText="Address 3"
                             disabled={(props.singleValueCheckboxSelected === true) ? true : false}
                             //value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].address3 : props.PolicyOwnerDetailsdataOnYesConditioinDto[0].address3}
-                            value={props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.address3 : "" || props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].pAddress3 : ""}
+                            value={props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.address3 : "" || props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.pAddress3 : ""}
                             name="pAddress3"
                             //onChange={props.PolicyOwnerDetailsSetValue}
                             id="Address3"
@@ -837,7 +838,7 @@ const PartialMemberDetails = (props) => {
                             disabled={(props.singleValueCheckboxSelected === true) ? true : false}
                             //onChange={props.PolicyOwnerDetailsSetValue}
                             //value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].city : props.PolicyOwnerDetailsdataOnYesConditioinDto[0].city}
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].pPostalCode : "" || props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.city : "" }
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.pPostalCode : "" || props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.city : "" }
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -855,7 +856,7 @@ const PartialMemberDetails = (props) => {
                             disabled={(props.singleValueSelectedProposer === "1") ? false : true || (props.singleValueCheckboxSelected === true) ? true : false}
                             //onChange={props.PolicyOwnerDetailsSetValue}
                             //value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].district : props.PolicyOwnerDetailsdataOnYesConditioinDto[0].district}
-                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].pDistrict : ""  || props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.district : "" }
+                            value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.pDistrict : ""  || props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.district : "" }
                             formControlProps={{
                                 fullWidth: true
                             }}
