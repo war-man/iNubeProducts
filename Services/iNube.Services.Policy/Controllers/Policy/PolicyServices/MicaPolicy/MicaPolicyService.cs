@@ -4328,12 +4328,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         //Creating proposal 
 
         public async Task<ProposalResponse> CreateProposal(dynamic ProposalDetail, ApiContext apiContext)
-
         {
-
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-
             CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
             dbHelper._TimeZone= UserDateTime.KeyValue;
 
