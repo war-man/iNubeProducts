@@ -11348,47 +11348,49 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         public async Task<ResponseStatus> NewPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context)
         {
-            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
-
-            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerTimeZoneSettings("TimeZone", context);
-            dbHelper._TimeZone = UserDateTime.KeyValue;
-            DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
-
-            DateTime? IndianTime = null;
-            IndianTime = DatetimeNow;
-            var CurrentDay = IndianTime.Value.DayOfWeek.ToString();
-            var CurrentTimeHour = IndianTime.Value.Hour;
-            var CurrentDate = IndianTime.Value.Date;
-            string BatchName = "PremiumBooking";
-            string BatchMode = "Fresh";
-            int PolicyCount = 0;
-            List<string> FailedPolicyLst = new List<string>();
-           
-            if (dateTime != null)
-            {
-                IndianTime = dateTime;
-                CurrentDay = dateTime.Value.DayOfWeek.ToString();
-                CurrentTimeHour = dateTime.Value.Hour;
-                CurrentDate = dateTime.Value.Date;
-            }
-
-
-            string ProductCode = ModuleConstants.ProductCode;
-
             ResponseStatus Response = new ResponseStatus();
-            TblBatchJobLog BatchJobLog = new TblBatchJobLog();
-            TblBatchJobDetailsLog BatchJobDetailsLog = new TblBatchJobDetailsLog();
-
-
-            List<TblSwitchLog> SwitchLogData = new List<TblSwitchLog>();
-            List<TblSchedule> ScheduleData = new List<TblSchedule>();
-                        
-            List<string> PolicyNumberList = new List<string>();
             Response.Status = BusinessStatus.Ok;
-
 
             try
             {
+                _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+                CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerTimeZoneSettings("TimeZone", context);
+                dbHelper._TimeZone = UserDateTime.KeyValue;
+                DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+                DateTime? IndianTime = null;
+                IndianTime = DatetimeNow;
+                var CurrentDay = IndianTime.Value.DayOfWeek.ToString();
+                var CurrentTimeHour = IndianTime.Value.Hour;
+                var CurrentDate = IndianTime.Value.Date;
+                string BatchName = "PremiumBooking";
+                string BatchMode = "Fresh";
+                int PolicyCount = 0;
+                List<string> FailedPolicyLst = new List<string>();
+
+                if (dateTime != null)
+                {
+                    IndianTime = dateTime;
+                    CurrentDay = dateTime.Value.DayOfWeek.ToString();
+                    CurrentTimeHour = dateTime.Value.Hour;
+                    CurrentDate = dateTime.Value.Date;
+                }
+
+
+                string ProductCode = ModuleConstants.ProductCode;
+
+               
+                TblBatchJobLog BatchJobLog = new TblBatchJobLog();
+                TblBatchJobDetailsLog BatchJobDetailsLog = new TblBatchJobDetailsLog();
+
+
+                List<TblSwitchLog> SwitchLogData = new List<TblSwitchLog>();
+                List<TblSchedule> ScheduleData = new List<TblSchedule>();
+
+                List<string> PolicyNumberList = new List<string>();
+             
+
                 if (PolicyNoList.Count > 0)
                 {
                     PolicyNumberList = PolicyNoList;
