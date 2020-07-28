@@ -937,6 +937,13 @@ namespace iNube.Services.MicaExtension_EGI.Models
     {
         public DateTime? TxnDateTime { get; set; }
         public List<string> PolicyNumberList { get; set; }
+    }    
+
+    public partial class PBSProcessResponse
+    {
+        public bool TxnStatus { get; set; }
+        public string TxnDesc { get; set; }
+        public string TxnErrorDesc { get; set; }
     }
 
 }
