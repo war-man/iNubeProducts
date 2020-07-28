@@ -71,7 +71,9 @@ class CreateTreaty extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+         
             total: 0,
+            participantgrid:[],
             participantdto: [],
             participantdetail: {
                 "reInsurerId": "",
@@ -100,7 +102,8 @@ class CreateTreaty extends React.Component {
             surpluslist:[],
             allocationOnflag: false,
             higherflag: false,
-            allocationList:[],
+            allocationList: [],
+            allocationLogicList: [],
             allocationmasList:[],
             showPercentage: false,
             showlimit: false,
@@ -288,6 +291,21 @@ class CreateTreaty extends React.Component {
         this.handleAggrement = this.handleAggrement.bind(this);
     }
     onFormModify = (id) => {
+        debugger
+        for (var i = 0; i <= this.state.datename.length - 1; i++) {
+
+            this.state.treatyDTO[this.state.datename[i]] = this.state.datetime[i];
+        }
+        this.state.treatyDTO.tblTreatyGroup = [...this.state.treatydata];
+        console.log("Treatydto11", this.state.treatyDTO);
+        let efffrom = this.state.treatyDTO.startDate;
+        let effto = this.state.treatyDTO.endDate;
+        if (this.state.treatyDTO.startDate != "") {
+            this.state.treatyDTO.startDate = this.datechange(this.state.treatyDTO.startDate);
+        }
+        if (this.state.treatyDTO.endDate != "") {
+            this.state.treatyDTO.endDate = this.datechange(this.state.treatyDTO.endDate);
+        }
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/ModifyfTraty?treatyId=` + this.props.treatyGroupId, {
             method: 'PUT',
             headers: {
@@ -296,14 +314,21 @@ class CreateTreaty extends React.Component {
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
             body: JSON.stringify(this.state.treatyDTO)
-        }) //.then(response => response.json())
+        }).then(response => response.json())
             .then(data => {
+                swal({
+                    text: data.responseMessage,
+                    //text: "data saved successfully",
+                    icon: "success"
+                });
                 console.log("data456", data);
                 this.setState({ treatyDTO: data });
                 console.log("Treaty data:", this.state.treatyDTO);
                 this.reset(); 
                  
             });
+        this.state.treatyDTO.startDate = efffrom;
+        this.state.treatyDTO.endDate= effto;
         //let flageUpdate = this.state.flagUpdate
         //this.setState({ flageUpdate:true})
     }
@@ -319,9 +344,10 @@ class CreateTreaty extends React.Component {
         //resetDto['effectiveFrom'] = "";
         //resetDto['effectiveTo'] = "";
 
-
+        let resetdto = this.state.treatyDTO.tblTreatyGroup;
+        resetdto = [];
         this.setState({ resetDto });
-
+        this.setState({ resetdto });
         //let status = this.state;
         //status['accountNameState'] = "";
         //status['accountDescState'] = "";
@@ -430,7 +456,7 @@ class CreateTreaty extends React.Component {
         let value = event.target.value;
         //this.state.treatydata[name] = value;
         //this.setState({ treatydata})
-
+          
 
         let treatydata = this.state.treatydata;
 
@@ -457,29 +483,6 @@ class CreateTreaty extends React.Component {
 
         //this.AddTreatyRecord();
         this.onInputChange1();
-        if (this.props.showTreatyGrp != undefined) {
-            this.setState({ showTreatyGrp: false });
-
-        }
-        if (this.props.treatyGroupId != undefined) {
-            console.log(this.props.flagEdit, 'FlagEditProps');
-            this.setState({ flag: false, flagUpdate: this.props.flagUpdate });
-            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetTreatyById?treatyId=` + this.props.treatyGroupId, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                },
-            }).then(response => response.json())
-                .then(data => {
-                    this.setState({ treatyDTO: data });
-                    this.state.treatyDTO.startDate = new Date(data.startDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
-                    this.state.treatyDTO.endDate = new Date(data.endDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
-                    this.setState({})
-                    console.log("ttt", this.state.treatyDTO);
-                });
-        }
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/MastertypeData`, {
             method: 'get',
             headers: {
@@ -498,7 +501,7 @@ class CreateTreaty extends React.Component {
                 let allocationList = data.filter((e) => e.mType == 'AllocationLogic')[0].mdata;
                 this.state.surplusmaslist = data.filter((e) => e.mType == 'AllocationBasis')[0].mdata;
                 console.log("allocationList", allocationList);
-                this.setState({ newmasterList: newmasterlist, allocationmasList: allocationList });
+                this.setState({ newmasterList: newmasterlist, allocationmasList: allocationList, allocationList: allocationList });
                 this.AddTreatyTable();
 
                 console.log("masterdata", data, this.state.treatyDTO.treatyBasisIdf);
@@ -550,6 +553,108 @@ class CreateTreaty extends React.Component {
 
                 console.log("bkmasterList", this.state.bkmasterList);
             });
+       
+        if (this.props.treatyGroupId != undefined) {
+            console.log(this.props.flagEdit, 'FlagEditProps');
+            this.setState({ flag: false, flagUpdate: this.props.flagUpdate, showTreatyGrp: true});
+            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetTreatyById?treatyId=` + this.props.treatyGroupId, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+            }).then(response => response.json())
+                .then(data => {
+                    console.log("trtdata", data, data.treatyTypeId);
+                    debugger
+                    if (data != null) {
+                        //this.state.treatyDTO.tblTreatyGroup = this.state.treatydata;
+                        this.state.treatydata = data.tblTreatyGroup;
+                        this.state.participantgrid = data.tblParticipant;
+                            if (data.treatyTypeId != null) {
+                                if (data.treatyTypeId == 4) {
+                                    this.state.allocationList = this.state.allocationmasList.filter(m => m.mValue != 'Lines');
+
+                                    this.setState({ allocationbasisflag: false, allocationOnflag: true, higherflag: false });
+                                    console.log("ddlvals", this.state.allocationList);
+                                }
+                                else if (data.treatyTypeId  == 5) {
+                                    this.state.allocationList = this.state.allocationmasList.filter(m => m.mValue == 'Lines');
+                                    this.state.surpluslist = this.state.surplusmaslist.filter(m => m.mValue != 'Sum Insured');
+
+                                    this.setState({ allocationbasisflag: true, allocationOnflag: false, higherflag: false });
+                                    console.log("ddlvals", this.state.allocationList);
+                                }
+                        }
+
+                        for (let i = 0; i < data.tblTreatyGroup.length; i++) {
+                            if (data.tblTreatyGroup[i].tblArrangement[0].allocationLogicId != null) {
+                                if (data.tblTreatyGroup[i].tblArrangement[0].allocationLogicId == 20 ) {
+                                    this.setState({ showPercentage: true, showlimit: false, showperwithlimit: false, shownooflines: false })
+                                }
+                                else if (data.tblTreatyGroup[i].tblArrangement[0].allocationLogicId == 21) {
+                                    this.state.showPercentage = false;
+                                    this.state.showlimit = true;
+                                    this.state.showperwithlimit = false;
+                                    this.state.shownooflines = false;
+                                    this.state.higherflag = false;
+                                    //this.setState({ showlimit })
+
+                                    //const { showTable } = this.state.showTable;
+                                    //this.setState({ showTable: !showTable });
+                                    //const { showColumn } = this.state.showColumn;
+                                    //this.setState({ showColumn: !showColumn, [event.target.name]: event.target.value });
+
+                                }
+                                else if (data.tblTreatyGroup[i].tblArrangement[0].allocationLogicId == 22) {
+                                    this.state.showPercentage = true;
+                                    this.state.showlimit = true;
+                                    this.state.showperwithlimit = false;
+                                    this.state.shownooflines = false;
+                                    this.state.higherflag = true;
+                                    //this.setState({ showPercentage })
+                                    //this.setState({ showlimit })
+
+                                    //const { showTable } = this.state.showTable;
+                                    //this.setState({ showTable: !showTable });
+                                    //const { showColumn } = this.state.showColumn;
+                                    //this.setState({ showColumn: !showColumn, [event.target.name]: event.target.value });
+
+                                }
+                                else if (data.tblTreatyGroup[i].tblArrangement[0].allocationLogicId == 33) {
+                                    this.state.showPercentage = false;
+                                    this.state.showlimit = false;
+                                    this.state.showperwithlimit = false;
+                                    this.state.shownooflines = true;
+                                    this.state.higherflag = false;
+                                    //this.setState({ showPercentage })
+                                    //this.setState({ showlimit })
+
+                                    //const { showTable } = this.state.showTable;
+                                    //this.setState({ showTable: !showTable });
+                                    //const { showColumn } = this.state.showColumn;
+                                    //this.setState({ showColumn: !showColumn, [event.target.name]: event.target.value });
+
+                                }
+                            }
+                        }
+                        console.log("pgrid", this.state.participantgrid);
+                        this.AddTreatyTable();
+                        //this.state.treatydata = [...data.tblParticipant];
+                        this.setState({ treatyDTO: data });
+                        console.log("treatyDTO", this.state.treatyDTO);
+                        this.state.treatyDTO.startDate = new Date(data.startDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+                        this.state.treatyDTO.endDate = new Date(data.endDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+                        this.setState({})
+                        this.dataTable(this.state.participantgrid);
+                        this.setState({ showparticipantgrid: true});
+                        //this.AddTreatyTable();
+                        console.log("ttt", this.state.treatyDTO);
+                    }
+                });
+        }
+     
 
 
     }
@@ -628,13 +733,15 @@ class CreateTreaty extends React.Component {
     AddTreatyTable = () => {
 
         // if (this.state.newmasterlist.length > 0) {
-        console.log("product channel", this.state.masterList, this.state.newmasterlist);
+        console.log("product channel", this.state.masterList, this.state.treatydata, this.state.newmasterlist);
 
-        let con = this.state.newmasterlist;
+       
 
-
+        debugger;
         this.setState({
+            
             TreatytableData: this.state.treatydata.map((prop, key) => {
+                console.log("key",key,this.state.TreatytableData,this.state.treatydata);
                 //console.log("this.ProductDetails.productChannel[key].channelTypeId", key, con, this.ProductDetails.productChannel[key].channelTypeId, this.state.chindex + 1);
                 return {
                     id: key + 1,
@@ -652,6 +759,7 @@ class CreateTreaty extends React.Component {
             })
         });
         //}
+        console.log("product channel1", this.state.TreatytableData);
     }
 
     //ParticipantTable = () => {
@@ -671,9 +779,10 @@ class CreateTreaty extends React.Component {
 
 
     AddParticipant = () => {
+        debugger;
         this.state.treatyDTO.tblParticipant.push(this.state.participant);
         this.state.participantdto.push(this.state.participantdetail);
-
+     
         this.state.participant = {
             "reInsurerId": "",
             "brokername": "",
@@ -713,7 +822,96 @@ class CreateTreaty extends React.Component {
             this.setState({ showparticipantgrid: true });
         console.log("trdto", this.state.treatyDTO);
     }
+    //ViewParticipantdetails = (e, index) => {
+    //    debugger
 
+    //    this.state.participant = {};
+    //    fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetBrachCode?participantMasterId=` + this.state.participantdto[index].reInsurerId, {
+    //        method: 'get',
+    //        headers: {
+    //            'Accept': 'application/json',
+    //            'Content-Type': 'application/json',
+    //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+    //        },
+    //    })
+    //        .then(response => response.json())
+    //        .then(data => {
+    //            console.log("bcmasterList: ", data);
+    //            this.setState({ bcmasterList: data });
+
+
+    //            console.log("bcmasterList", this.state.bcmasterList);
+    //        });
+
+    //    this.state.participant = this.state.participantdto[index];
+    //    let paricipantCode1 = this.state.rimasterList[0].mdata.filter(x => x.mID == this.state.participantdto[index].reInsurerId)[0].mValue;
+    //    console.log("paricipantName", paricipantCode1);
+    //    fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetParticipantNameByCode?participantcode=` + paricipantCode1, {
+    //        method: 'get',
+    //        headers: {
+    //            'Accept': 'application/json',
+    //            'Content-Type': 'application/json',
+    //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+    //        },
+    //    })
+    //        .then(response => response.json())
+    //        .then(data => {
+    //            console.log("dataList: ", data);
+    //            if (data != null) {
+    //                this.state.participant.reinsurername = data[0].participantName;
+    //                this.state.participantdetail.reinsurername = data[0].participantName;
+    //            }
+    //            this.setState({});
+    //        });
+    //    console.log(this.state.bkmasterList, 'bkb');
+    //    let brokerid = this.state.bkmasterList[0].mdata.filter(x => x.mID == this.state.participantdto[index].brokerId)[0].mID;
+    //    fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetBrachCode?participantMasterId=` + brokerid , {
+    //        method: 'get',
+    //        headers: {
+    //            'Accept': 'application/json',
+    //            'Content-Type': 'application/json',
+    //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+    //        },
+    //    })
+    //        .then(response => response.json())
+    //        .then(data => {
+    //            console.log("bkbcmasterList: ", data);
+    //            this.setState({ bkbcmasterList: data });
+
+    //            console.log("bkbcmasterList", this.state.bkbcmasterList);
+    //            debugger
+
+    //        });
+    //    debugger;
+    //    console.log("brid", this.state.participantdto[index].brokerid, this.state.participantdto);
+    //    let bkbCode = this.state.bkmasterList[0].mdata.filter(x => x.mID == this.state.participantdto[index].brokerId)[0].mValue;
+    //    fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetParticipantNameByCode?participantcode=` + bkbCode , {
+    //        method: 'get',
+    //        headers: {
+    //            'Accept': 'application/json',
+    //            'Content-Type': 'application/json',
+    //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+    //        },
+    //    })
+    //        .then(response => response.json())
+    //        .then(data => {
+    //            console.log("dataList: ", data);
+    //            if (data != null) {
+    //                this.state.participant.brokername = data[0].participantName;
+    //                this.state.participantdetail.brokername = data[0].participantName;
+    //            }
+    //            this.setState({});
+    //        });
+    //    //this.state.participant.reInsurerId = this.state.participantdto[index].reInsurerId;
+    //    //this.state.participant.reinsurername = this.state.participantdto[index].reinsurername;
+    //    //this.state.participant.reInsurerId = this.state.participantdto[index].reInsurerId;
+    //    //this.state.participant.reInsurerId = this.state.participantdto[index].reInsurerId;
+    //    //this.state.participant.reInsurerId = this.state.participantdto[index].reInsurerId;
+    //    //this.state.participant.reInsurerId = this.state.participantdto[index].reInsurerId;
+    //    //this.state.participant.reInsurerId = this.state.participantdto[index].reInsurerId;
+    //    //this.state.participant.reInsurerId = this.state.participantdto[index].reInsurerId;
+    //    //this.state.participant.reInsurerId = this.state.participantdto[index].reInsurerId;
+    //}
     handleRadioChange = (e) => {
         let value = e.target.value;
         this.state.radioVal = e.target.value;
@@ -780,10 +978,12 @@ class CreateTreaty extends React.Component {
                 console.log("ddlvals", this.state.allocationList);
             }
             else if (evt.target.value == "5") {
+
                 this.state.allocationList = this.state.allocationmasList.filter(m => m.mValue == 'Lines');
                 this.state.surpluslist = this.state.surplusmaslist.filter(m => m.mValue != 'Sum Insured');
 
-                this.setState({ allocationbasisflag: true, allocationOnflag: false, higherflag:false });
+                this.setState({ allocationbasisflag: true, allocationOnflag: false, higherflag: false });
+               
                 console.log("ddlvals", this.state.allocationList);
             }
         }
@@ -1021,35 +1221,55 @@ class CreateTreaty extends React.Component {
             }
         }
     }
-    dataTable = () => {
-        let ParticipantList = this.state.participantdto;
-        this.setState({
-            newdata: ParticipantList.map((prop, key) => {
-                console.log("trtprop", prop, ParticipantList, this.state.ddllist, this.state.reinsurername);
-                return {
-                    id: key + 1,
-                    reinsurercodeId: prop.reInsurerId,
-                    //this.state.ddllist.filter(x => x.reinsurercodeId == ParticipantList[key].reinsurercodeId)[0].mValue,
-                    reinsurername: prop.reinsurername,
-                    brokername: prop.brokername,
-                    //this.state.reinsurername,
-                    ribranchcodeId: prop.reInsurerBranchId,
+    dataTable = (participantgrid) => {
+        debugger;
+        //let ParticipantList;
+        //if (participantgrid != null) {
+        //    ParticipantList = participantgrid
+
+        //    this.setState({ showparticipantgrid: true });
+        //} else {
+        //    ParticipantList = this.state.participantdto;
+        //}
+        if (participantgrid!=null) {
+            this.state.participantdto = [...participantgrid];
+
+        }
+        console.log("participantgrid", participantgrid, this.state.participantdto);
+            this.setState({
+
+                newdata: this.state.participantdto.map((prop, key) => {
+                    console.log("trtprop", prop, this.state.ddllist, this.state.reinsurername);
+                    return {
+                        id: key + 1,
+                        reinsurercodeId: prop.reInsurerId,
+                        //this.state.ddllist.filter(x => x.reinsurercodeId == ParticipantList[key].reinsurercodeId)[0].mValue,
+                        reinsurername: prop.reinsurername,
+                        brokername: prop.brokername,
+                        //this.state.reinsurername,
+                        ribranchcodeId: prop.reInsurerBranchId,
                         //this.state.ribranchCode,
-                    brokercode: prop.brokerId,
+                        brokercode: prop.brokerId,
                         //this.state.brokerCode,
-                    bkbranchcodeId: prop.brokerBranchId,
+                        bkbranchcodeId: prop.brokerBranchId,
                         //this.state.bkbranchCode,
-                    sharepercent: prop.sharePercentage,
-                    brokagepercent: prop.brokeragePercentage,
-                    riCommissionpercent: prop.ricommissionPercentage,
-                    bordereauxfrequencyId: prop.bordereauxFreqId,
-                    btn: <div><Button color="danger" justIcon round simple className="edit" onClick={() => this.deleteParticipantRecord(key)} ><Delete /></Button>
-                    </div>
+                        sharepercent: prop.sharePercentage,
+                        brokagepercent: prop.brokeragePercentage,
+                        riCommissionpercent: prop.ricommissionPercentage,
+                        bordereauxfrequencyId: prop.bordereauxFreqId,
+                        btn: <div><Button color="danger" justIcon round simple className="edit" onClick={() => this.deleteParticipantRecord(key)} ><Delete /></Button>
+                            {/*<Button justIcon round simple color="info" className="add" onClick={(e) => this.ViewParticipantdetails(e, key)} ><Visibility /></Button >*/}
+
+                        </div>
                         //this.state.brodreuxfreq,
 
-                };
-            })
-        });
+                    };
+                })
+
+
+            });
+        
+     
        
 
     }
@@ -1083,6 +1303,8 @@ class CreateTreaty extends React.Component {
         console.log("data", this.state.masterList);
     }
     render() {
+
+        console.log("product channel1", this.state.TreatytableData);
         const { classes } = this.props;
         return (
             <div>
@@ -1091,7 +1313,7 @@ class CreateTreaty extends React.Component {
                         <TreatyDetails
                             treatyCodeState={this.state.treatyCodeState} Treatyflag={this.state.Treatyflag} Treatymassage={this.state.Treatymassage} treatyDescriptionState={this.state.treatyDescriptionState} allocationmasList={this.state.allocationmasList} 
                             handleRadioChange={this.handleRadioChange} treatyDTO={this.state.treatyDTO} masterList={this.state.masterList} onInputChange={this.onInputChange} onInputChange1={this.onInputChange1} onBlur={this.onBlur} tblArrangement={this.state.tblArrangement} onddChange={this.onddChange} yearmasterList={this.state.yearmasterList} onDateChange={this.onDateChange} createtreatyflag={this.state.createtreatyflag} modifytreatyflag={this.state.modifytreatyflag} />
-                        {this.state.showTreatyGrp && <TPDetails TreatytableData={this.state.TreatytableData} participantstableData={this.state.participantstableData} participantdata={this.state.participantdata} bkmasterList={this.state.bkmasterList} masterList={this.state.masterList} onddlChange={this.onddlChange} participant={this.state.participant} newdata={this.state.newdata}
+                        {this.state.showTreatyGrp  && <TPDetails TreatytableData={this.state.TreatytableData} participantstableData={this.state.participantstableData} participantdata={this.state.participantdata} bkmasterList={this.state.bkmasterList} masterList={this.state.masterList} onddlChange={this.onddlChange} participant={this.state.participant} newdata={this.state.newdata}
                             onddChange={this.onddChange} onparticipantInputChange={this.onparticipantInputChange} AddParticipant={this.AddParticipant} Brokerageflag={this.state.Brokerageflag} showparticipantgrid={this.state.showparticipantgrid} treatyDTO={this.state.treatyDTO} rimasterList={this.state.rimasterList} bcmasterList={this.state.bcmasterList} bkbcmasterList={this.state.bkbcmasterList} reinsurername={this.state.reinsurername} />
 
                         }
@@ -1125,7 +1347,7 @@ class CreateTreaty extends React.Component {
                                     onClick={this.handleClose}>
                                     &times;
                                 </Button>
-                                <Arrangements handleAggrement={this.handleAggrement} handleAggrement1={this.handleAggrement1} percentageState={this.state.percentageState} amountState={this.state.amountState} plaState={this.state.plaState} claState={this.state.claState} treatydata={this.state.treatydata} index={this.state.arrViewindex} masterList={this.state.masterList} handleClose={this.handleClose} showPercentage={this.state.showPercentage} showlimit={this.state.showlimit} showperwithlimit={this.state.showperwithlimit} shownooflines={this.state.shownooflines} allocationList={this.state.allocationList} allocationbasisflag={this.state.allocationbasisflag} allocationOnflag={this.state.allocationOnflag} higherflag={this.state.higherflag} surpluslist={this.state.surpluslist}/>
+                                <Arrangements handleAggrement={this.handleAggrement} handleAggrement1={this.handleAggrement1} percentageState={this.state.percentageState} amountState={this.state.amountState} plaState={this.state.plaState} claState={this.state.claState} treatydata={this.state.treatydata} index={this.state.arrViewindex} masterList={this.state.masterList} handleClose={this.handleClose} showPercentage={this.state.showPercentage} showlimit={this.state.showlimit} showperwithlimit={this.state.showperwithlimit} shownooflines={this.state.shownooflines} allocationList={this.state.allocationList} allocationbasisflag={this.state.allocationbasisflag} allocationOnflag={this.state.allocationOnflag} higherflag={this.state.higherflag} surpluslist={this.state.surpluslist} allocationLogicList={this.state.allocationLogicList}/>
                             </div>
                         </Modal>
                     </GridItem>

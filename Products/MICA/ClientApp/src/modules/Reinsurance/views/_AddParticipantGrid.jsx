@@ -124,7 +124,7 @@ const ParticipantGrid = (props) => {
                                 headerClassName: 'react-table-center'
                             },
                             {
-                                Header: "Brokerage",
+                                Header: "Brokerage(%)",
                                 accessor: "brokagepercent",
                                 minWidth: 40,
                                 style: { textAlign: "center" },
