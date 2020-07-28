@@ -33,7 +33,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning
         [HttpGet]
         public IActionResult GetMaster(string lMasterlist, bool isFilter = true)
         {
-            var commonTypesDTOs = _customerProvisioningService.GetMaster(lMasterlist);
+            var commonTypesDTOs = _customerProvisioningService.GetMaster(lMasterlist,Context);
 
             if (isFilter)
             {

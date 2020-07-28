@@ -19,7 +19,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
 {
     public interface ICustomerProvisioningService
     {
-        IEnumerable<ddDTOs> GetMaster(string lMasterlist);
+        IEnumerable<ddDTOs> GetMaster(string lMasterlist, ApiContext apiContext);
         Task<CustomerResponse> createProvision(CustomerProvisioningDTO customerProvisioningDTO, ApiContext apiContext);
         CustomerSettingsDTO GetCustomerSettings(int customerid, string type, int envid, ApiContext apiContext);
         List<CustomerSettingsDTO> GetCustomerTypeSettings(int customerid, string type, int envid, ApiContext apiContext);
@@ -49,9 +49,9 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             _cpcontext = context;
         }
 
-        public IEnumerable<ddDTOs> GetMaster(string lMasterlist)
+        public IEnumerable<ddDTOs> GetMaster(string lMasterlist, ApiContext apiContext)
         {
-
+            _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
             IEnumerable<ddDTOs> ddDtos;
             ddDtos = _cpcontext.TblmasCpcommonTypes.
                 Select(c => new ddDTOs
@@ -66,8 +66,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
         public async Task<CustomerResponse> createProvision(CustomerProvisioningDTO customerProvisioningDTO, ApiContext apiContext)
         {
             _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
-            // _cpcontext = (MICACPContext)(DbManager.GetContext(apiContext.ProductType, apiContext.ServerType));
-
+           
             CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
             DbManager._TimeZone = UserDateTime.KeyValue;
             DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
@@ -212,6 +211,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
 
         public CustomerSettingsDTO GetCustomerSettings(int customerid, string type, int envid, ApiContext apiContext)
         {
+            _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
             var data = _cpcontext.TblCustomerSettings.FirstOrDefault(a => a.CustomerId == customerid && a.Type == type);
 
             if (envid != 0)
