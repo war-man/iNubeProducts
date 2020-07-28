@@ -161,8 +161,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             userDetailsDTO.PartnerId = 0;
             userDetailsDTO.OrganizationId = customerProvisioningDTO.CustomerId;
             userDTO.UserDetails.Add(userDetailsDTO);
-
-
+            
             UserAddressDTO userAddressDTO = new UserAddressDTO();
             userAddressDTO.UserAddressLine1 = useradress.AddressLine1;
             userAddressDTO.UserAddressLine2 = useradress.AddressLine2;
