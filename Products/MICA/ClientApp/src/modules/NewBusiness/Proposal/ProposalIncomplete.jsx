@@ -85,6 +85,8 @@ class ProposalIncomplete extends React.Component {
             singleValueSelectedProposer: "0",
             singleValueCheckboxSelected: false,
             citizenshipCheckboxSelected: false,
+            NPMcitizenshipSelected: false,
+            NPMpermanentAddSelected: false,
             singleValue: "0",
             singleValue1: "0",
             editModal: false,
@@ -100,10 +102,9 @@ class ProposalIncomplete extends React.Component {
             filterData: [],
             ProposalDto: [],
             proposalFormFlag: true,
-            //PolicyOwnerDetailsDto: {
-            //    "salutation": "",
-            //},
-            //  PolicyOwnerDetailsdata: [],
+            selectOccPNM: "0",
+            selectOccPOM: "0",
+           
             PolicyOwnerDetailsdataOnYesConditioin: [],//we dont have to send this data to next page becouse in editable fucntion i sa filtering it and storing it into its Dto object 
             //so we have to send niche vala data to next page
             //Agar Yes condition par date bind nahi hot rha hai toh data jo yes condition par aarha hia toh uske paramaeter name check karo name and all
@@ -129,9 +130,12 @@ class ProposalIncomplete extends React.Component {
                     "nationality": "",
                     "countryOfResidence": "",
                     "ageProof": "",
-                    "occupationRequireHarzasousWork": "",
+                    "occupationRequireHarzasousWork": 0,
                     "specifyOccupationWork": "",
                     "countryOfOccupation": "",
+                "citizenShip": false,
+                "citizenship1": "",
+                "citizenship2": "",
                     "mobileNo": "",
                     "home": "",
                     "officeNo": "",
@@ -139,9 +143,11 @@ class ProposalIncomplete extends React.Component {
                     "address1": "",
                     "address2": "",
                     "address3": "",
-                    "postalCode": "",
+                "postalCode": "",
+                    "city": "",
                     "district": "",
-                    "province": "",
+                "province": "",
+                    "isPermanentAddrSameasCommAddr": false,
                     "pAddress1": "",
                     "pAddress2": "",
                     "pAddress3": "",
@@ -363,6 +369,7 @@ class ProposalIncomplete extends React.Component {
                 "fullname": "",
                 "givenName": "",
                 "nameWithInitial": "",
+                "emiratesId": "",
                 "preferredName": "",
                 "dob": "",
                 "age": 0,
@@ -390,27 +397,48 @@ class ProposalIncomplete extends React.Component {
                 "address3": "",
                 "city": "",
                 "district": "",
+                "province": "",
                 "isPermanentAddrSameasCommAddr": false,
                 "permanetAddressId": 0,
                 "quoteMemberid": 0,
                 "isSameasProposerAddress": true,
                 "citizenship1": "",
                 "citizenship2": "",
-                "residentialNationality": "string",
-                "residentialNationalityStatus": "string",
-                "occupationHazardousWork": true,
+              //"residentialNationality": "string",
+             // "residentialNationalityStatus": "string",
+                "occupationHazardousWork": 0,
                 "passportNumber": "",
-                "countryOccupation": "string",
-                "specifyResidental": "string",
-                "specifyHazardousWork": "string",
-                "citizenShip": true,
+             // "countryOccupation": "string",
+             // "specifyResidental": "string",
+                "specifyHazardousWork": "",
+                "citizenShip": false,
                 "gender": "",
                 "maritialStatus": "",
+                "countryOfResidence": "",
+                "countryOfOccupation": "",
+                "ageProof": "",
+                "pAddress1": "",
+                "pAddress2": "",
+                "pAddress3": "",
+                "pPostalCode": "",
+                "pDistrict": "",
+                "pProvince": ""
 
             },
 
+            modifiedPolicyOwnerDetails: {
+                "nameWithInitial": "",
+                "passportNumber": "",
+                "nameOfTheEmp": "",
+                "nationality": "",
+                "countryOfResidence": "",
+            },
+
             "SaveModifiedProposalDetails": {
+                "quoteNo": "",  
+                "policyNo": "",
                 "policyMemberOwnerDetails": [],  // this.state.tblPolicyMemberDetails
+                "policyNewMemberDetails": [],   //this.state.PolicyOwnerDetailsdataOnNoCondition
                 "QuestioneriesDetails": [],
                 "DocumentationUpdating": [], //this.state.premiumPayingDto,this.state.preferredCommunication
                 "ProposerSignatureDetails": [], //this.state.proposerSigDetailsDTO
@@ -451,6 +479,9 @@ class ProposalIncomplete extends React.Component {
         this.setState({});
         console.log("medicalhistorydtodata", this.state.medicalHistoryDTO);
 
+        this.state.SaveModifiedProposalDetails.quoteNo = this.state.filterData.quoteNo;
+       // this.state.SaveModifiedProposalDetails.policyNo = this.state.filterData.quoteNo;
+
         this.state.SaveModifiedProposalDetails.policyMemberOwnerDetails.push(this.state.tblPolicyMemberDetails);
         this.state.SaveModifiedProposalDetails.QuestioneriesDetails.push(this.state.LifeStyleQA);
         this.state.SaveModifiedProposalDetails.QuestioneriesDetails.push(this.state.familytable);
@@ -490,11 +521,11 @@ class ProposalIncomplete extends React.Component {
 
     }
     proposalPolicyOwnerSetValue = (evt) => {
-        
+        debugger;
         let tblPolicyMemberDetails = this.state.tblPolicyMemberDetails;
         tblPolicyMemberDetails[evt.target.name] = evt.target.value;
         this.setState({ tblPolicyMemberDetails });
-        console.log("proposalPolicyOwnerSetValue", this.state.tblPolicyMemberDetails)
+        console.log("proposalPolicyOwnerSetValue", this.state.tblPolicyMemberDetails, tblPolicyMemberDetails)
 
     }
     //setting the master values  
@@ -600,9 +631,9 @@ class ProposalIncomplete extends React.Component {
         console.log("filterdata: ", this.state.PolicyOwnerDetailsdataOnNoCondition)
     }
 
-    GetmasterData = (type, event) => {
-        this.PolicyOwnerDetailsSetValue(event);
-    }
+    //GetmasterData = (type, event) => {
+    //    this.PolicyOwnerDetailsSetValue(event);
+    //}
 
     // Setting values for questinaries part
 
@@ -820,12 +851,16 @@ class ProposalIncomplete extends React.Component {
                 this.state.tblPolicyMemberDetails.dob = new Date(this.state.tblPolicyMemberDetails.dob).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 this.setState({});
 
+                console.log("PolicyOwnerDetailsDto:jdhfuwehoe", this.state.tblPolicyMemberDetails);
+
             });
         
     }
 
+    //////////////// Handling policy owner's permanent address checkbox (Is Permanent address same as communication address....?)//////////////////////////////
+
     SetPermanentAddCheckBox = (event) => {
-       // debugger;
+        debugger;
 
         let state = this.state;
         
@@ -837,7 +872,66 @@ class ProposalIncomplete extends React.Component {
             this.setState({});
         }
 
+        if (this.state.singleValueCheckboxSelected === true) {
+            this.state.tblPolicyMemberDetails.pAddress1 = this.state.tblPolicyMemberDetails.address1;
+            this.state.tblPolicyMemberDetails.pAddress2 = this.state.tblPolicyMemberDetails.address2;
+            this.state.tblPolicyMemberDetails.pAddress3 = this.state.tblPolicyMemberDetails.address3;
+            this.state.tblPolicyMemberDetails.pPostalCode = this.state.tblPolicyMemberDetails.city;
+            this.state.tblPolicyMemberDetails.pDistrict = this.state.tblPolicyMemberDetails.district;
+            this.state.tblPolicyMemberDetails.pProvince = this.state.tblPolicyMemberDetails.province;
+            this.setState({});
+        }
+
+        if (this.state.singleValueCheckboxSelected === false) {
+            this.state.tblPolicyMemberDetails.pAddress1 = "";
+            this.state.tblPolicyMemberDetails.pAddress2 = "";
+            this.state.tblPolicyMemberDetails.pAddress3 = "";
+            this.state.tblPolicyMemberDetails.pPostalCode = "";
+            this.state.tblPolicyMemberDetails.pDistrict = "";
+            this.state.tblPolicyMemberDetails.pProvince = "";
+            this.setState({});
+        }
+        console.log("policy owner details", this.state.tblPolicyMemberDetails);
     }
+
+    /////////////////////////////////////Handling New policy member permanent address checkbox (Is Permanent address same as communication address....?) ///////////////////////////////
+
+    handlePermanentAdd = (event) => {
+        debugger;
+
+        let state = this.state;
+
+        if (event.target.checked == true) {
+            state.NPMpermanentAddSelected = true;
+            this.setState({});
+        } else {
+            state.NPMpermanentAddSelected = false;
+            this.setState({});
+        }
+
+        if (this.state.NPMpermanentAddSelected === true) {
+            this.state.PolicyOwnerDetailsdataOnNoCondition.pAddress1 = this.state.PolicyOwnerDetailsdataOnNoCondition.address1;
+            this.state.PolicyOwnerDetailsdataOnNoCondition.pAddress2 = this.state.PolicyOwnerDetailsdataOnNoCondition.address2;
+            this.state.PolicyOwnerDetailsdataOnNoCondition.pAddress3 = this.state.PolicyOwnerDetailsdataOnNoCondition.address3;
+            this.state.PolicyOwnerDetailsdataOnNoCondition.pPostalCode = this.state.PolicyOwnerDetailsdataOnNoCondition.postalCode;
+            this.state.PolicyOwnerDetailsdataOnNoCondition.pDistrict = this.state.PolicyOwnerDetailsdataOnNoCondition.district;
+            this.state.PolicyOwnerDetailsdataOnNoCondition.pProvince = this.state.PolicyOwnerDetailsdataOnNoCondition.province;
+            this.setState({});
+        }
+
+        if (this.state.NPMpermanentAddSelected === false) {
+            this.state.PolicyOwnerDetailsdataOnNoCondition.pAddress1 = "";
+            this.state.PolicyOwnerDetailsdataOnNoCondition.pAddress2 = "";
+            this.state.PolicyOwnerDetailsdataOnNoCondition.pAddress3 = "";
+            this.state.PolicyOwnerDetailsdataOnNoCondition.pPostalCode = "";
+            this.state.PolicyOwnerDetailsdataOnNoCondition.pDistrict = "";
+            this.state.PolicyOwnerDetailsdataOnNoCondition.pProvince = "";
+            this.setState({});
+        }
+        console.log("policy new member details", this.state.PolicyOwnerDetailsdataOnNoCondition);
+    }
+
+    /////////////// Citizenship checkbox changes for policy owner/////////////////////
 
     SetCitizenshipCheckBox = (event) => {
         // debugger;
@@ -849,6 +943,23 @@ class ProposalIncomplete extends React.Component {
             this.setState({});
         } else {
             state.citizenshipCheckboxSelected = false;
+            this.setState({});
+        }
+
+    }
+
+    //////////////////////// Citizenship checkbox set up for new policy member//////////////////
+
+    handleCitizenshipCheckBox = (event) => {
+        // debugger;
+
+        let state = this.state;
+
+        if (event.target.checked == true) {
+            state.NPMcitizenshipSelected = true;
+            this.setState({});
+        } else {
+            state.NPMcitizenshipSelected = false;
             this.setState({});
         }
 
@@ -873,15 +984,55 @@ class ProposalIncomplete extends React.Component {
         console.log("FilterPolicyOwnerDetailsdata", this.state.PolicyOwnerDetailsdataOnYesConditioinDto)
     }
     handleRadioChange = (event) => {
-
+        debugger;
         let value = event.target.value;
 
         this.state.singleValue = event.target.value == "1" ? false : true;
         this.state.singleValueSelected = event.target.value;
         this.state.singleValueSelectedProposer = event.target.value;
+        this.state.selectOccPOM = event.target.value; 
         this.setState({ value });
         console.log("singleValueSelected", this.state.singleValueSelected);
+
+       
     }
+
+    ///////// Occupation Hazardous work set up for policy owner details//////
+
+    handlePolicyOwnerRadio = (event) => {
+        debugger;
+
+        this.state.selectOccPOM = event.target.value;    // "selectOccPOM" -> means OccupationHazardousWork selection for existing proposer when user selects Yes
+        this.setState({});
+
+        console.log("selectOccPOM", this.state.selectOccPOM)
+
+        if (this.state.selectOccPOM === "1") {
+            this.state.tblPolicyMemberDetails.occupationHazardousWork = "1"; // "1" -> means Is OccupationHazardousWork require = No
+            this.setState({});
+        }
+        if (this.state.selectOccPOM === "0") {
+            this.state.tblPolicyMemberDetails.occupationHazardousWork = "0"; // "0" -> meeans Is OccupationHazardousWork require = Yes
+            this.setState({});
+        }
+    }
+    
+    ///////// Occupation Hazardous work set up for policy new member details//////
+
+    handleNewPolicyRadio = (event) => {
+
+        this.state.selectOccPNM = event.target.value;    // "selectOccPNM" -> means OccupationHazardousWork selection for new proposer when user selects No
+        this.setState({}); 
+
+        if (this.state.selectOccPNM === "1") {
+            this.state.PolicyOwnerDetailsdataOnNoCondition.occupationRequireHarzasousWork = "1"; // "1" -> means Is OccupationHazardousWork require = No
+            this.setState({});
+        } else {
+            this.state.PolicyOwnerDetailsdataOnNoCondition.occupationRequireHarzasousWork = "0"; // "0" -> meeans Is OccupationHazardousWork require = Yes
+            this.setState({});
+        }
+    }
+
     handleRadioOnChange = (event) => {
 
         let value = event.target.value;
@@ -1064,7 +1215,7 @@ class ProposalIncomplete extends React.Component {
                                                         </Button>
                                                         */}
                         {this.state.open &&
-                            <ModifyProposal SaveModifiedProposalDetails={this.state.SaveModifiedProposalDetails} MHDetailsSetValue={this.MHDetailsSetValue} medicalHistoryDTO={this.state.medicalHistoryDTO} wealthSigDetailsDTO={this.state.wealthSigDetailsDTO} proposerSigDetailsDTO={this.state.proposerSigDetailsDTO} proposalFormFlag={this.state.proposalFormFlag} premiumPayingDto={this.state.premiumPayingDto} PremiumPaymentSetValue={this.PremiumPaymentSetValue} preferredCommunication={this.state.preferredCommunication} CommunicationSetValues={this.CommunicationSetValues} cmedicinetable={this.state.cmedicinetable} cmedicineDto={this.state.cmedicineDto} lmedicinetable={this.state.lmedicinetable} lmedicineDto={this.state.lmedicineDto} Treatmenttable={this.state.Treatmenttable} TreatmentDto={this.state.TreatmentDto}
+                            <ModifyProposal handlePolicyOwnerRadio={this.handlePolicyOwnerRadio} selectOccPOM={this.state.selectOccPOM} handlePermanentAdd={this.handlePermanentAdd} NPMpermanentAddSelected={this.state.NPMpermanentAddSelected} handleCitizenshipCheckBox={this.handleCitizenshipCheckBox} NPMcitizenshipSelected={this.state.NPMcitizenshipSelected} selectOccPNM={this.state.selectOccPNM} handleNewPolicyRadio={this.handleNewPolicyRadio} SaveModifiedProposalDetails={this.state.SaveModifiedProposalDetails} MHDetailsSetValue={this.MHDetailsSetValue} medicalHistoryDTO={this.state.medicalHistoryDTO} wealthSigDetailsDTO={this.state.wealthSigDetailsDTO} proposerSigDetailsDTO={this.state.proposerSigDetailsDTO} proposalFormFlag={this.state.proposalFormFlag} premiumPayingDto={this.state.premiumPayingDto} PremiumPaymentSetValue={this.PremiumPaymentSetValue} preferredCommunication={this.state.preferredCommunication} CommunicationSetValues={this.CommunicationSetValues} cmedicinetable={this.state.cmedicinetable} cmedicineDto={this.state.cmedicineDto} lmedicinetable={this.state.lmedicinetable} lmedicineDto={this.state.lmedicineDto} Treatmenttable={this.state.Treatmenttable} TreatmentDto={this.state.TreatmentDto}
                             DHCtable={this.state.DHCtable} DHCtDto={this.state.DHCtDto} claimedDto={this.state.claimedDto} claimedtable={this.state.claimedtable} insurancetable={this.state.insurancetable} insuranceDto={this.state.insuranceDto} handleAddButton={this.handleAddButton} familydatatable={this.state.familydatatable} familyBackground={this.state.familyBackground} FamilyDetailSetValue={this.FamilyDetailSetValue} familyBackgroundDto={this.state.familyBackgroundDto} AlcoholQuestionAddButton={this.AlcoholQuestionAddButton} alcoholdata={this.state.alcoholdata}
                             TobaccoQuestionAddButton={this.TobaccoQuestionAddButton} tobaccodata={this.state.tobaccodata} handlePolicyOwnerData={this.handlePolicyOwnerData} DateChange={this.DateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails}
                             SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer}

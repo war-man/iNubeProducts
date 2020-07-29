@@ -99,6 +99,8 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
             policyOwnerDetails.MaritialStatus = tblPolicyMemberDetails.MaritialStatus;
             policyOwnerDetails.PassportNumber = tblPolicyMemberDetails.PassportNumber;
             policyOwnerDetails.Nationality = tblPolicyMemberDetails.Nationality;
+            policyOwnerDetails.CountryOfResidence = tblPolicyMemberDetails.Nationality;
+            policyOwnerDetails.CountryOfOccupation = tblPolicyMemberDetails.Nationality;
             policyOwnerDetails.Mobile = tblPolicyMemberDetails.Mobile;
             policyOwnerDetails.Home = tblPolicyMemberDetails.Home;
             policyOwnerDetails.Email = tblPolicyMemberDetails.Email;

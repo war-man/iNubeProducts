@@ -787,6 +787,8 @@ namespace iNube.Services.Policy.Models
             public DateTime? Dob { get; set; }
             public int? Age { get; set; }
             public string Nationality { get; set; }
+            public string CountryOfResidence { get; set; }
+            public string CountryOfOccupation { get; set; }
             public string Mobile { get; set; }
             public string Email { get; set; }
             public string Gender { get; set; }
