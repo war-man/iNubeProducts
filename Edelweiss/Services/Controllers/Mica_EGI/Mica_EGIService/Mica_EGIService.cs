@@ -11355,12 +11355,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
-                CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerTimeZoneSettings("TimeZone", context);
-                dbHelper._TimeZone = UserDateTime.KeyValue;
-                DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+                //CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerTimeZoneSettings("TimeZone", context);
+                //dbHelper._TimeZone = UserDateTime.KeyValue;
+                //DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
 
                 DateTime? IndianTime = null;
-                IndianTime = DatetimeNow;
+                IndianTime = System.DateTime.UtcNow.AddMinutes(330); 
                 var CurrentDay = IndianTime.Value.DayOfWeek.ToString();
                 var CurrentTimeHour = IndianTime.Value.Hour;
                 var CurrentDate = IndianTime.Value.Date;
