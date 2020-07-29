@@ -125,7 +125,7 @@ namespace iNube.Services.UserManagement
                 c.SwaggerEndpoint("/" + Configuration["Swagger:Url"].ToString() + "/" + Configuration["Swagger:Version"].ToString() + "/swagger.json", Configuration["Swagger:Name"].ToString());
                 c.RoutePrefix = Configuration["Swagger:Url"].ToString();
             });
-            app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+           
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -135,6 +135,7 @@ namespace iNube.Services.UserManagement
              // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.ConfigureExceptionHandler(new LoggerManager(Configuration));
             app.UseEndpointRouting();
             app.UseAuthentication();
             app.UseHttpsRedirection();
