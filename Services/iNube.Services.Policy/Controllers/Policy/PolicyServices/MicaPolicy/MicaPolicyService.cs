@@ -7589,52 +7589,323 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             AddProperty(policyDetail, "InsurableItem", insurableItems);
         }
 
-        public Task<FinalPremiumResponse> GetPremiumCalculation(dynamic policyRequest, ApiContext apiContext)
+       
+        public async Task<FinalPremiumResponse> GetPremiumCalculation(dynamic policyRequest, ApiContext apiContext)
         {
-            throw new NotImplementedException();
+
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+
+            var productCode = policyRequest["Product Code"].ToString();
+            ProductDTO productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
+            if (productDetails.ProductId <= 0)
+            {
+                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductCode", PropertyName = "Product Code", ErrorMessage = $"ProductCode : {productCode} Not Found" };
+                Errors.Add(errorInfo);
+                return new FinalPremiumResponse { Status = BusinessStatus.NotFound, Errors = Errors };
+            }
+            RateResult rateResult = new RateResult();
+            rateResult.entity = "FinalPremium";
+            List<object> list = new List<object>();
+            foreach (var item in productDetails.ProductPremium)
+            {
+                if (item.RatingId > 0)
+                {
+
+                    DispatcherEventRequest dispatcherEventRequest = new DispatcherEventRequest();
+                    dispatcherEventRequest.TxnObject = policyRequest;
+                    var Data = await _integrationService.GetDispatcherEventTask(dispatcherEventRequest, item.DispatcherId, item.MapperId, apiContext);
+                    var Obj = JsonConvert.DeserializeObject<dynamic>(Data.ToString());
+
+                    if (Obj["FinalPremium"] != null)
+                    {
+                        var total = Convert.ToDecimal(rateResult.eValue) + Convert.ToDecimal(Obj["FinalPremium"]);
+                        rateResult.eValue = total.ToString();
+                    }
+                }
+                else
+                {
+                    var total = Convert.ToDecimal(rateResult.eValue) + item.PremiumAmount;
+                    rateResult.eValue = total.ToString();
+                }
+            }
+
+            return new FinalPremiumResponse { Status = BusinessStatus.Ok, FinalPremium = rateResult };
         }
 
-        //public async Task<FinalPremiumResponse> GetPremiumCalculation(dynamic policyRequest, ApiContext apiContext)
-        //{
+        public async Task<object> GetDynamicProperty(dynamic Request, ApiContext apiContext)
+        {
+            //  _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var jsonObj = JsonConvert.DeserializeObject<dynamic>(Request.ToString());
+            DynamicDTO dynamicDTO = new DynamicDTO();
+            List<DynamicDTO> dynamicList = new List<DynamicDTO>();
+            ExpandoObject ExpandoObj = new ExpandoObject();
+            int count = 0;
+            int loopCount = 1;
+            List<List<DynamicDTO>> mainList = new List<List<DynamicDTO>>();
+            List<DynamicDTO> ParentList = new List<DynamicDTO>();
+            foreach (var item in jsonObj)
+            {
 
-        //    _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-        //    List<ErrorInfo> Errors = new List<ErrorInfo>();
+                dynamicDTO = new DynamicDTO();
+                dynamicDTO.mID = count;
+                dynamicDTO.mValue = item.Name;
+                dynamicDTO.mType = "";
 
-        //    var productCode=policyRequest["Product Code"].ToString();
-        //    ProductDTO productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
-        //    if (productDetails.ProductId <= 0)
-        //    {
-        //        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductCode", PropertyName = "Product Code", ErrorMessage = $"ProductCode : {productCode} Not Found" };
-        //        Errors.Add(errorInfo);
-        //        return new FinalPremiumResponse { Status = BusinessStatus.NotFound, Errors = Errors };
-        //    }
-        //    RateResult rateResult = new RateResult();
-        //    rateResult.entity= "FinalPremium";
-        //    List<object> list = new List<object>();
-        //    foreach (var item in productDetails.ProductPremium)
-        //    {
-        //        if (item.RatingId > 0) {
+                if (item.HasValues)
+                {
+                    var hh = item.HasValues;
+                    var hw = item.GetType().Name;
+                    var hs = item.Value.Type;
+                    var ht = item.Type;
+                    if (hs != null)
+                    {
+                        dynamicDTO.mDataType = hs.ToString();
 
-        //            DispatcherEventRequest dispatcherEventRequest = new DispatcherEventRequest();
-        //            dispatcherEventRequest.TxnObject = policyRequest;
-        //            var Data = await _integrationService.GetDispatcherEventTask(dispatcherEventRequest, item.DispatcherId,item.MapperId, apiContext);
-        //            var Obj = JsonConvert.DeserializeObject<dynamic>(Data.ToString());
+                    }
 
-        //            if (Obj["FinalPremium"] != null)
-        //            {
-        //                var total = Convert.ToDecimal(rateResult.eValue) + Convert.ToDecimal(Obj["FinalPremium"]);
-        //                rateResult.eValue = total.ToString();
-        //            }
-        //        }
-        //        else
-        //        {
-        //            var total = Convert.ToDecimal(rateResult.eValue) + item.PremiumAmount;
-        //            rateResult.eValue = total.ToString();
-        //        }
-        //    }
+                    if (hs != null && hs.ToString() == "Array")
+                    {
+                        ChildProperty(dynamicList, ExpandoObj, item, loopCount, mainList, apiContext);
+                    }
 
-        //    return new FinalPremiumResponse{Status=BusinessStatus.Ok,FinalPremium=rateResult};
-        //}
+                    if (hs == null)
+                    {
+                        dynamicDTO.mDataType = "Object";
+                        ChildObjProperty(dynamicList, ExpandoObj, item, loopCount, mainList, apiContext);
+                    }
+
+                }
+                ParentList.Add(dynamicDTO);
+                count++;
+            }
+            AddNewProperty(ExpandoObj, "List1", ParentList);
+            var finalresult = dynamicList.Distinct().ToList();
+            var mainList1 = mainList;
+            var masterdata = finalresult.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
+            var Tempobj = JsonConvert.SerializeObject(jsonObj);
+            var dynamicObj = JsonConvert.DeserializeObject<dynamic>(Tempobj.ToString());
+
+            return ExpandoObj;
+        }
+        private void ChildProperty(List<DynamicDTO> dynamicList, ExpandoObject ExpandoObj, dynamic Request, int loopCount, List<List<DynamicDTO>> mainList, ApiContext apiContext)
+        {
+            DynamicDTO dynamicDTO = new DynamicDTO();
+            List<DynamicDTO> ChildList = new List<DynamicDTO>();
+            loopCount++;
+            foreach (var item in Request.Value)
+            {
+                int count = 0;
+                foreach (var items in item)
+                {
+                    dynamicDTO = new DynamicDTO();
+                    dynamicDTO.mID = count;
+                    dynamicDTO.mValue = items.Name;
+                    dynamicDTO.mType = Request.Name;
+                    dynamicList.Add(dynamicDTO);
+
+
+                    if (items.HasValues)
+                    {
+                        var hh = items.HasValues;
+                        var hw = items.GetType().Name;
+                        var hs = items.Value.Type;
+                        var ht = items.Type;
+                        if (hs != null)
+                        {
+                            dynamicDTO.mDataType = hs.ToString();
+
+                        }
+                        if (item.Value != null && item.Value.Type != null)
+                        {
+                            dynamicDTO.mParentDataType = item.Value.Type.ToString();
+                        }
+
+                        if (hs != null && hs.ToString() == "Array")
+                        {
+                            ChildProperty(dynamicList, ExpandoObj, items, loopCount, mainList, apiContext);
+
+                        }
+
+                        if (hs == null)
+                        {
+                            dynamicDTO.mDataType = "Object";
+                            ChildObjProperty(dynamicList, ExpandoObj, item, loopCount, mainList, apiContext);
+                        }
+                    }
+                    ChildList.Add(dynamicDTO);
+                    count++;
+                }
+
+            }
+            mainList.Add(ChildList);
+            AddNewProperty(ExpandoObj, "List" + loopCount, ChildList);
+        }
+        private void ChildObjProperty(List<DynamicDTO> dynamicList, ExpandoObject ExpandoObj, dynamic Request, int loopCount, List<List<DynamicDTO>> mainList, ApiContext apiContext)
+        {
+            DynamicDTO dynamicDTO = new DynamicDTO();
+            List<DynamicDTO> ChildList = new List<DynamicDTO>();
+            loopCount++;
+
+            foreach (var item in Request.Value)
+            {
+                int count = 0;
+
+                dynamicDTO = new DynamicDTO();
+                dynamicDTO.mID = count;
+                dynamicDTO.mValue = item.Name;
+                dynamicDTO.mType = Request.Name;
+                dynamicList.Add(dynamicDTO);
+
+
+                if (item.HasValues)
+                {
+                    var hh = item.HasValues;
+                    var hw = item.GetType().Name;
+                    var hs = item.Value.Type;
+                    var ht = item.Type;
+                    if (hs != null)
+                    {
+                        dynamicDTO.mDataType = hs.ToString();
+                    }
+                    if (item.Value.Type != null)
+                    {
+                        dynamicDTO.mParentDataType = "Object";
+                    }
+                    if (hs != null && hs.ToString() == "Array")
+                    {
+                        ChildProperty(dynamicList, ExpandoObj, item, loopCount, mainList, apiContext);
+
+                    }
+                    if (hs == null)
+                    {
+                        dynamicDTO.mDataType = "Object";
+                        ChildObjProperty(dynamicList, ExpandoObj, item, loopCount, mainList, apiContext);
+                    }
+                }
+                ChildList.Add(dynamicDTO);
+                count++;
+
+
+            }
+            mainList.Add(ChildList);
+            AddNewProperty(ExpandoObj, "List" + loopCount, ChildList);
+        }
+
+        public void AddNewProperty(ExpandoObject expando, string propertyName, object propertyValue)
+
+        {
+
+            // ExpandoObject supports IDictionary so we can extend it like this
+
+            var expandoDict = expando as IDictionary<string, object>;
+
+            if (expandoDict.ContainsKey(propertyName))
+
+                expandoDict[propertyName] = propertyValue;
+
+            else
+
+                expandoDict.Add(propertyName, propertyValue);
+
+        }
+
+
+
+        public async Task<object> GetDynamicTargetProperty(dynamic Request, ApiContext apiContext)
+        {
+            var jsonObj = JsonConvert.DeserializeObject<dynamic>(Request.ToString());
+            DynamicDTO dynamicDTO = new DynamicDTO();
+            List<DynamicDTO> dynamicList = new List<DynamicDTO>();
+            string parentName = "";
+            int count = 0;
+            int loopCount = 0;
+            List<List<DynamicDTO>> mainList = new List<List<DynamicDTO>>();
+            List<DynamicDTO> ParentList = new List<DynamicDTO>();
+            foreach (var item in jsonObj)
+            {
+
+                if (item.HasValues)
+                {
+                    var hh = item.HasValues;
+                    var hw = item.GetType().Name;
+                    var hs = item.Value.Type;
+                    var ht = item.Type;
+                    if (hs != null)
+                    {
+                        dynamicDTO = new DynamicDTO();
+                        dynamicDTO.mID = loopCount;
+                        dynamicDTO.mValue = item.Name;
+                        dynamicDTO.mType = "";
+                        dynamicList.Add(dynamicDTO);
+
+                    }
+
+                    if (hs == null)
+                    {
+                        dynamicDTO.mDataType = "Object";
+                        parentName = item.Name;
+                        ChildTargetObjProperty(dynamicList, item, ref loopCount, mainList, parentName, apiContext);
+                    }
+                }
+                loopCount++;
+            }
+            var finalresult = dynamicList.Distinct().ToList();
+            return finalresult;
+
+        }
+
+
+        private void ChildTargetObjProperty(List<DynamicDTO> dynamicList, dynamic Request, ref int loopCount, List<List<DynamicDTO>> mainList, string parentName, ApiContext apiContext)
+        {
+            DynamicDTO dynamicDTO = new DynamicDTO();
+            List<DynamicDTO> ChildList = new List<DynamicDTO>();
+
+
+            foreach (var item in Request.Value)
+            {
+
+
+                dynamicDTO = new DynamicDTO();
+                dynamicDTO.mID = loopCount;
+                dynamicDTO.mValue = parentName + "." + item.Name;
+                dynamicDTO.mType = parentName;
+
+                dynamicDTO.mData = item.Name;
+
+                dynamicList.Add(dynamicDTO);
+                loopCount++;
+
+                if (item.HasValues)
+                {
+                    var hh = item.HasValues;
+                    var hw = item.GetType().Name;
+                    var hs = item.Value.Type;
+                    var ht = item.Type;
+                    if (hs != null)
+                    {
+                        dynamicDTO.mDataType = hs.ToString();
+                    }
+
+                    if (item.Value.Type != null)
+                    {
+                        dynamicDTO.mParentDataType = "Object";
+                    }
+                    if (hs == null)
+                    {
+                        dynamicDTO.mDataType = "Object";
+                        parentName = dynamicDTO.mValue;
+                        ChildTargetObjProperty(dynamicList, item, ref loopCount, mainList, parentName, apiContext);
+                    }
+                }
+                ChildList.Add(dynamicDTO);
+
+
+
+            }
+            mainList.Add(ChildList);
+
+        }
 
 
     }

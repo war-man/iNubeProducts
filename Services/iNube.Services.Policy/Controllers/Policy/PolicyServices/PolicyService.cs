@@ -93,6 +93,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<ResponseStatus> UpdateCardDetails(UpdateCardDetails updateCardDetails, ApiContext apiContext);
         Task<PolicyResponse> LeadPolicy(LeadInfoDTO leadInfo, ApiContext apiContext);
         Task<FinalPremiumResponse> GetPremiumCalculation(dynamic policyRequest, ApiContext apiContext);
+        Task<object> GetDynamicProperty(dynamic Request, ApiContext apiContext);
+        Task<object> GetDynamicTargetProperty(dynamic Request, ApiContext apiContext);
     }
     public class PolicyService : IPolicyService
     {
@@ -826,6 +828,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<FinalPremiumResponse> GetPremiumCalculation(dynamic policyRequest, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).GetPremiumCalculation(policyRequest, apiContext);
+        }
+        public async Task<object> GetDynamicProperty(dynamic Request, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetDynamicProperty(Request, apiContext);
+        }
+        public async Task<object> GetDynamicTargetProperty(dynamic Request, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetDynamicTargetProperty(Request, apiContext);
         }
     }
 }

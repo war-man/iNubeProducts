@@ -388,5 +388,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<object> GetDynamicProperty(dynamic Request, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<object> GetDynamicTargetProperty(dynamic Request, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

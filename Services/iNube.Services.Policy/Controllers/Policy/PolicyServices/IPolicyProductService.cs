@@ -83,5 +83,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<PolicyResponse> LeadPolicy(LeadInfoDTO leadInfo, ApiContext apiContext);
         Task<PolicyDetailsDTOResponse> InternalGetPolicyDetailsByPolicyNumber(string policyNumber, ApiContext apiContext);
         Task<FinalPremiumResponse> GetPremiumCalculation(dynamic policyRequest, ApiContext apiContext);
+        Task<object> GetDynamicProperty(dynamic Request, ApiContext apiContext);
+        Task<object> GetDynamicTargetProperty(dynamic Request, ApiContext apiContext);
     }
 }

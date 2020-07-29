@@ -762,5 +762,20 @@ namespace iNube.Services.Policy.Controllers.Policy
             var response = await _policyService.GetPremiumCalculation(policyRequest, Context);
             return Ok(response);
         }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetDynamicProperty([FromBody]dynamic Request)
+        {
+            var response = await _policyService.GetDynamicProperty(Request, Context);
+            return Ok(response);
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetDynamicTargetProperty([FromBody]dynamic Request)
+        {
+            var response = await _policyService.GetDynamicTargetProperty(Request, Context);
+            return Ok(response);
+        }
     }
 }

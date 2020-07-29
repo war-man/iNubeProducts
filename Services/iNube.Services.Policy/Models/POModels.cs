@@ -500,6 +500,8 @@ namespace iNube.Services.Policy.Models
         public string SubLevelName { get; set; }
         public string CurrencyName { get; set; }
         public decimal RatingId { get; set; }
+        public decimal DispatcherId { get; set; }
+        public decimal MapperId { get; set; }
     }
     public class PolicyBookingTransaction
     {
@@ -1825,24 +1827,28 @@ namespace iNube.Services.Policy.Models
         public dynamic PolicyDetails { get; set; }
     }
 
-    public class FinalPremiumResponse
+    public class FinalPremiumResponse : ResponseStatus
     {
-        public string paymentGatewayRefrenceid { get; set; }
-        //public string ErrorDescription { get; set; }
-        public int ErroRowNo { get; set; }
-      
-        public DateTime? EndorsementEffectiveDate { get; set; }
-        public List<Dictionary<string, string>> ErrorDescription { get; set; }
-
+        public RateResult FinalPremium { get; set; }
+    }
+    public partial class RateResult
+    {
+        public string entity { get; set; }
+        public string eValue { get; set; }
     }
     public class DispatcherEventRequest
     {
-        public string paymentGatewayRefrenceid { get; set; }
-        //public string ErrorDescription { get; set; }
-        public int ErroRowNo { get; set; }
-
-        public DateTime? EndorsementEffectiveDate { get; set; }
-        public List<Dictionary<string, string>> ErrorDescription { get; set; }
+        
+        public dynamic TxnObject { get; set; }
+    }
+    public partial class DynamicDTO
+    {
+        public int mID { get; set; }
+        public string mValue { get; set; }
+        public string mType { get; set; }
+        public string mDataType { get; set; }
+        public string mParentDataType { get; set; }
+        public string mData { get; set; }
 
     }
 }
