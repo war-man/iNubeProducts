@@ -184,5 +184,14 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mic
             var result = await DispatcherEvent(DispatcherEventObject, EventType.DispatcherTaskName, apiContext);
             return result;
         }
+
+        public async Task<MapperResponse> SaveDynamicMapper(List<MapperDTO> mapperDTOs, ApiContext Context) {
+            _context = (MICADTContext)(await DbManager.GetContextAsync(Context.ProductType, Context.ServerType, _configuration));
+            var mapperList=_mapper.Map<IEnumerable<TblMapper>>(mapperDTOs);
+            _context.TblMapper.AddRange(mapperList);
+             var Result = _mapper.Map<List<MapperDTO>>(mapperDTOs);
+            //_context.SaveChanges();
+            return new MapperResponse { Status = BusinessStatus.Ok, MapperList = Result };
+        }
     }
 }

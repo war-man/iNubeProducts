@@ -30,5 +30,10 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mot
         {
             throw new NotImplementedException();
         }
+
+        public async Task<MapperResponse> SaveDynamicMapper(List<MapperDTO> mapperDTOs, ApiContext Context)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

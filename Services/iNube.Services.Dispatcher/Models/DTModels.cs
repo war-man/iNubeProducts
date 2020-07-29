@@ -123,4 +123,8 @@ namespace iNube.Services.Dispatcher.Models
         public decimal TaskId { get; set; }
         public string Value { get; set; }
     }
+    public class MapperResponse : ResponseStatus
+    {
+        public List<MapperDTO> MapperList { get; set; }
+    }
 }
