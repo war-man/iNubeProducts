@@ -33,8 +33,8 @@ import Modal from '@material-ui/core/Modal';
 import withStyles from "@material-ui/core/styles/withStyles";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import Accordion from "components/Accordion/AccordianWithoutLoop.jsx";
-
-
+import DynamicMapping from "./Others/_DynamicMapping";
+import RateConfig from "modules/Rating/RateConfig.js";
 
 const style = {
     infoText: {
@@ -67,11 +67,37 @@ const searchClose = {
 }
 
 
-//import { content } from "html2canvas/dist/types/css/property-descriptors/content";
+
 class ProductConfig extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            DispatcherMasterList: [],
+            MapperMasterList: [],
+            newRCBList: [],
+            insurableMasterList: [],
+            "mapperDetailsDTO":
+            {
+                "sourceParameter": "",
+                "targetParameter": "",
+                "isActive": true,
+                "createdDate": "",
+                "targetParameterPath": "",
+                "targetValue": ""
+            },
+            sourceValue:"",
+            sourceResponse:[],
+            targetValue:"",
+            RequestModel: [],
+            mapindex:0,
+            targetResponse:[],
+            rulename: [],
+            fields: {
+            },
+            rate: {
+            },
+            CheckBoxList: [],
+            CalConfigList: [],
             ClaimSIlabel:"Sum Insured",
             PaymentList:[],
             CoverEventShow:false,
@@ -366,7 +392,11 @@ class ProductConfig extends React.Component {
                     "coverId": 0,
                     "levelId": 0,
                     "subLevelId": 0,
-                    "description": ""
+                    "description": "",
+                    "ratingId": 0,
+                    "mapperId": 0,
+                    "dispatcherId": 0
+                    
                 }
             ],
             // insurableRcbdetailsDTO: [],
@@ -446,7 +476,8 @@ class ProductConfig extends React.Component {
                 "productSwitchOnProperty": [],
                 "CalculateConfig": [],
                 "ProductBasicConfigurationDetails": [],
-                "ProductBasicConfiguration ":[]
+                "ProductBasicConfiguration ": [],
+                "MapperDTO":[]
             },
             ProductDTOs: {},
             description: "",
@@ -824,7 +855,7 @@ class ProductConfig extends React.Component {
             console.log("last productDTO", this.state.ProductDTO)
 
 
-            //fetch(`https://localhost:44347/api/Product/CreateProduct`, {
+           // fetch(`https://localhost:59968/api/Product/CreateProduct`, {
             fetch(`${productConfig.productConfigUrl}/api/Product/CreateProduct`, {
                 method: 'POST',
                 headers: {
@@ -1179,7 +1210,7 @@ class ProductConfig extends React.Component {
         this.state.CustomClause.typeName = "";
         this.state.CustomClause.description = "";
         this.state.CustomClause.cwetypeId = "";
-        this.setState({ open: false, mshow: false, opendescription: false, mappingPop: false});
+        this.setState({ open: false, mshow: false, opendescription: false, mappingPop: false, sourceValue: "", targetValue:""});
      
     };
     handleCloseCWE(level, Iindex, Cindex) {
@@ -1350,6 +1381,12 @@ class ProductConfig extends React.Component {
                 Productpremium[index][name] = value;
 
                 this.setState({ Productpremium });
+
+                if (name == "mapperId") {
+                    let resModel = this.state.RequestModel;
+                    resModel[index].mapperId = value;
+                    this.setState({ resModel });
+                }
             }
             else {
                 let ProductCover = this.ProductDetails.productInsurableItem[Iindex][callcomponent][index];
@@ -1914,7 +1951,7 @@ class ProductConfig extends React.Component {
     //        }
     //    }
     //}
-
+   
     GetRiskClaimMaster = (type, typeId, pID) => {
 
         //fetch(`https://localhost:44347/api/Product/GetRiskClaimMaster?masterType=` + type + `&parentID=` + pID)
@@ -1969,6 +2006,7 @@ class ProductConfig extends React.Component {
                     if (typeId == "55") {
 
                         this.state.InsurableRiskLIst = data;
+                        this.state.insurableMasterList = this.state.insurableMasterList.concat(data);
                         this.setState({});
                     }
                 }
@@ -2580,7 +2618,47 @@ class ProductConfig extends React.Component {
         this.GetMasterService('ClaimSI', 0);
         this.GetMasterService('ProductType', 0);
 
-
+        //DispatcherMaster
+        fetch(`${productConfig.DispatcherConfigUrl}/api/ObjectMapper/GetMasterDynamicMapper`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ MapperMasterList: data });
+                console.log(this.state.MapperMasterList, 'MapperMasterList');
+            });
+        fetch(`${productConfig.DispatcherConfigUrl}/api/Dispatcher/GetMasterDispatcher`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ DispatcherMasterList: data });
+                console.log(this.state.DispatcherMasterList, 'DispatcherMasterList');
+            });
+     
+        fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/GetCalculationConfig`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ CalConfigList: data });
+                console.log(this.state.CalConfigList, 'CheckData');
+            });
         this.setState({ btnhide: true });
         fetch(`${productConfig.productConfigUrl}/api/Product/GetMasterData?sMasterlist=das`, {
             method: 'GET',
@@ -3374,62 +3452,7 @@ class ProductConfig extends React.Component {
             this.setState({});
         }
 
-        //if (level === "Cover") {
-
-
-        //    this.state.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Cindex].CoversTableDataList = this.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].CoversTableList.map((prop, key) => {
-
-        //        return {
-        //            id: key + 1,
-        //            typeName: prop.typeName,
-        //            cwetypes: prop.cwetypes,
-        //            isPrint: <CustomCheckbox key={key}
-        //                name="isPrint"
-        //                value={prop.isPrint}
-        //                onChange={(e) => this.SetclauseValue(key, e)}
-        //                disabled={this.state.viewdisable}
-        //                formControlProps={{
-        //                    fullWidth: true
-        //                }}
-
-        //            />,
-        //            btn: <div><Button color="info" justIcon round simple className="view" onClick={this.handleOpenCWE.bind(this, level, Iindex, Cindex, key)}><Visibility /></Button>
-        //                {!this.state.viewdisable && <Button color="info" justIcon round simple className="edit" onClick={this.handleEditCWE.bind(this, level, Iindex, Cindex, key)}><Edit /></Button>}
-        //            </div>
-        //        };
-
-        //    })
-
-        //    this.setState({});
-        //}
-        //if (level === "Benefit") {
-
-
-        //    this.state.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Cindex].tableBenefitdata.BenefitTableDataList = this.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].BenefitTable.BenefitTableList.map((prop, key) => {
-
-        //        return {
-        //            id: key + 1,
-        //            typeName: prop.typeName,
-        //            cwetypes: prop.cwetypes,
-        //            isPrint: <CustomCheckbox key={key}
-        //                name="isPrint"
-        //                value={prop.isPrint}
-        //                onChange={(e) => this.SetclauseValue(key, e)}
-        //                disabled={this.state.viewdisable}
-        //                formControlProps={{
-        //                    fullWidth: true
-        //                }}
-
-        //            />,
-        //            btn: <div><Button color="info" justIcon round simple className="view" onClick={this.handleOpenCWE.bind(this, level, Iindex, Cindex, key)}><Visibility /></Button>
-        //                {!this.state.viewdisable && <Button color="info" justIcon round simple className="edit" onClick={this.handleEditCWE.bind(this, level, Iindex, Cindex, key)}><Edit /></Button>}
-        //            </div>
-        //        };
-
-        //    })
-
-        //    this.setState({});
-        //}
+       
     }
     /////////////////////////////////////////////////////////////////////////////////////
     callchannel = (data) => {
@@ -3591,6 +3614,11 @@ class ProductConfig extends React.Component {
             }
 
             this.ProductDetails.productPremium = [];
+            this.state.CheckBoxList = [];
+            this.state.rulename = [];
+            this.state.RequestModel = [];
+            this.state.targetResponse = [];
+            this.state.sourceResponse = [];
             if (name === "Product") {
                 this.setState({ hideRatingCheckBox: true });
                 this.addPremiumFun(1, checkedRadio[0].mID, name);
@@ -3789,8 +3817,32 @@ class ProductConfig extends React.Component {
                     "premiumAmount": "",
                     "currencyId": "",
                     "levelId": Lid,
+                    "subLevelId": "",
+                    "ratingId": 0,
+                    "mapperId": 0,
+                    "dispatcherId": 0
+                });
+                this.state.CheckBoxList = this.state.CheckBoxList.concat({
+                    "IsActive": false,
+                    "levelId": Lid,
                     "subLevelId": ""
                 });
+                this.state.rulename = this.state.rulename.concat({
+                    CalConfigName: "",
+                });
+
+                this.state.RequestModel = this.state.RequestModel.concat({
+                    "mapperId": 0,
+                    "mapperName": "",
+                    "sourceComponent": "",
+                    "targetComponent": "",
+                    "isActive": true,
+                    "createdDate": "",
+                    "mapperDetailsDTO": []
+                });
+
+                this.state.targetResponse = this.state.targetResponse.concat({ "Id": i, "Value": [] });
+                this.state.sourceResponse = this.state.sourceResponse.concat({ "Id": i, "Value": [...this.state.MasterDTO['Risk'], ...this.state.InsurableRiskLIst.filter(s => s.subLevelId == this.ProductDetails.cobid)] });
             }
         }
         if (name === "Insurable Item") {
@@ -3803,11 +3855,41 @@ class ProductConfig extends React.Component {
                     "premiumAmount": "",
                     "currencyId": "",
                     "levelId": Lid,
+                    "subLevelId": this.ProductDetails.productInsurableItem[i].insurableItemTypeId,
+                    "ratingId": 0,
+                    "mapperId": 0,
+                    "dispatcherId": 0
+                });
+                this.state.CheckBoxList = this.state.CheckBoxList.concat({
+                    "IsActive": false,
+                    "levelId": Lid,
                     "subLevelId": this.ProductDetails.productInsurableItem[i].insurableItemTypeId
                 });
+                this.state.rulename = this.state.rulename.concat({
+                    CalConfigName: "",
+                });
+                this.state.RequestModel = this.state.RequestModel.concat({
+                    "mapperId": 0,
+                    "mapperName": "",
+                    "sourceComponent": "",
+                    "targetComponent": "",
+                    "isActive": true,
+                    "createdDate": "",
+                    "mapperDetailsDTO": []
+                });
+                this.state.targetResponse = this.state.targetResponse.concat({ "Id": i, "Value": [] });
+                let selectedinsurablelist = this.state.insurableMasterList.filter(s => s.subLevelId == this.ProductDetails.productInsurableItem[i].insurableItemTypeId);
+                let Data = JSON.parse(JSON.stringify(selectedinsurablelist));
+                for (var k = 0; k < Data.length; k++) {
+                   
+                    Data[k].mValue = "InsurableItem." + i.toString() +"."+ Data[k].mValue;
+                }
+                this.state.sourceResponse = this.state.sourceResponse.concat({ "Id": i, "Value": [...this.state.MasterDTO['Risk'], ...Data.concat({ mID: 1000, mValue: 'InsurableItem.' + i + '.InsurableName', mType: '' }, { mID: 1000, mValue: 'InsurableItem.' + i +'.RiskCount', mType: '' })] });
             }
-        }
 
+        }
+        let count = 0;
+        console.log("cover inside model", this.ProductDetails.productInsurableItem, this.ProductDetails.insurableRcbdetails);
         if (name === "Cover") {
 
             const Ilen = this.ProductDetails.productInsurableItem.length;
@@ -3823,9 +3905,45 @@ class ProductConfig extends React.Component {
                         "premiumAmount": "",
                         "currencyId": "",
                         "levelId": Lid,
+                        "subLevelId": this.ProductDetails.productInsurableItem[i].productCovers[j].coverTypeId,
+                        "ratingId": 0,
+                        "mapperId": 0,
+                        "dispatcherId": 0
+                    });
+                    this.state.CheckBoxList = this.state.CheckBoxList.concat({
+                        "IsActive": false,
+                        "levelId": Lid,
                         "subLevelId": this.ProductDetails.productInsurableItem[i].productCovers[j].coverTypeId
                     });
+                    this.state.rulename = this.state.rulename.concat({
+                        CalConfigName: "",
+                    });
+                    this.state.RequestModel = this.state.RequestModel.concat({
+                        "mapperId":0,
+                        "mapperName": "",
+                        "sourceComponent": "",
+                        "targetComponent": "",
+                        "isActive": true,
+                        "createdDate": "",
+                        "mapperDetailsDTO": []
+                    });
+                    this.state.targetResponse = this.state.targetResponse.concat({ "Id": count, "Value": [] });
+                
+                    let selectedinsurablelist = this.state.insurableMasterList.filter(s => s.subLevelId == this.ProductDetails.productInsurableItem[i].insurableItemTypeId);
+                    let Data = JSON.parse(JSON.stringify(selectedinsurablelist));
+                    for (var k = 0; k < Data.length; k++) {
 
+                        Data[k].mValue = "InsurableItem." + i.toString() + "." + Data[k].mValue;
+                    }
+                    let selectedCoverlist = this.ProductDetails.insurableRcbdetails[i].coverRcbdetails.filter(s => s.subLevelId == this.ProductDetails.productInsurableItem[i].productCovers[j].coverTypeId);
+                    let CoverData = JSON.parse(JSON.stringify(selectedCoverlist));
+                    for (var m = 0; m < CoverData.length; m++) {
+
+                        CoverData[m].mValue = "InsurableItem." + i.toString() + "." + "Cover" + m.toString() + CoverData[m].mValue;
+                    }
+                    this.state.sourceResponse = this.state.sourceResponse.concat({ "Id": count, "Value": [...this.state.MasterDTO['Risk'], ...Data.concat({ mID: 1000, mValue: 'InsurableItem.' + i + '.InsurableName', mType: '' }, { mID: 1000, mValue: 'InsurableItem.' + i + '.RiskCount', mType: '' }), ...CoverData] });
+
+                    count++;
                 }
             }
         }
@@ -3846,13 +3964,16 @@ class ProductConfig extends React.Component {
                         "flag": false,
                         "currencyId": "",
                         "levelId": Lid,
-                        "subLevelId": ""
+                        "subLevelId": "",
+                        "ratingId": 0,
+                        "mapperId": 0,
+                        "dispatcherId": 0
                     });
 
         //        }
         //    }
        }
-        console.log("List Premium", this.ProductDetails.productPremium, len);
+        console.log("List Premium", this.ProductDetails.productPremium, len, this.state.sourceResponse );
     }
 
     CheckCoverEventFun = (e) => {
@@ -3871,10 +3992,13 @@ class ProductConfig extends React.Component {
         }
 
     }
-    SetRatingCheckBox = (event) => {
+    SetRatingCheckBox = (event,index) => {
         if (event.target.checked != undefined) {
             //let pDTO = this.ProductDetails.ProductDTO;
-            this.setState({ RatingCheckBox: event.target.checked });
+
+            let checkbox = this.state.CheckBoxList
+            checkbox[index].IsActive = event.target.checked;
+            this.setState({ checkbox, RatingCheckBox: event.target.checked });
             let proPremium = this.ProductDetails.productPremium[0];
             if (event.target.checked == true) {
 
@@ -3903,9 +4027,7 @@ class ProductConfig extends React.Component {
 
 
     }
-    mappingPopUp = () => {
-        this.setState({ mappingPop: true });
-    }
+
     //handleClose = () => {
       
     //};
@@ -3913,24 +4035,24 @@ class ProductConfig extends React.Component {
 
         console.log("mapdata", mapdata, this.state.ProductDTO);
 
-        let map=mapdata.mapping.map((m, i) => {
+      //  let map=mapdata.mapping.map((m, i) => {
 
-            return ({
+      //      return ({
 
-                "rateParameterName" : m.rateName,
-                "riskParameterName" : m.riskName,
-                "isActive":true,
-                "ratingConfigId":m.RateParameter
+      //          "rateParameterName" : m.rateName,
+      //          "riskParameterName" : m.riskName,
+      //          "isActive":true,
+      //          "ratingConfigId":m.RateParameter
 
-            })
-        })
+      //      })
+      //  })
 
 
 
-      let pDTO=this.state.ProductDTO;
-        pDTO.CalculateConfig = map;
-        this.setState({ pDTO });
-        console.log("mapdata", mapdata, map, this.state.ProductDTO);
+      //let pDTO=this.state.ProductDTO;
+      //  pDTO.CalculateConfig = map;
+      //  this.setState({ pDTO });
+      //  console.log("mapdata", mapdata, map, this.state.ProductDTO);
         this.handleClose();
     }
 
@@ -4183,7 +4305,148 @@ class ProductConfig extends React.Component {
         console.log("Risk index check", uniqueindex,index, this.ProductDetails.insurableRcbdetails[i].insurableChildRcbdetails);
         
     }
+    //Rating
+    handleStateCheck = (event,index) => {
+      
+        const rulename = this.state.rulename;
+        rulename[index][event.target.name] = event.target.value;
+        if (this.state.CheckBoxList[index].IsActive == true) {
+            const PremiumRate = this.ProductDetails.productPremium;
+            PremiumRate[index].ratingId = event.target.value;
+            this.setState({ PremiumRate });
+        }
+        this.setState({ rulename });
 
+
+        console.log("SSSS", this.state.rulename);
+        this.setState({ flagParam: true });
+
+        let targetRes = this.state.targetResponse;
+        targetRes[index].Value = [];
+        this.state.fields = {};
+        this.state.rate = {};
+        this.setState({ targetRes });
+        fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/GetHandleEvents?EventId=` + event.target.value, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                //this.state.CheckCondition = data;
+                this.setState({ CheckCondition: data });
+
+                if (data.parameterList.length > 0) {
+                    for (var i = 0; i < data.parameterList.length; i++) {
+                        const fields = this.state.fields;
+                        fields[data.parameterList[i]] = "";
+                        this.setState({ fields });
+                    }
+                }
+
+                if (data.rateList.length > 0) {
+                    for (var i = 0; i < data.rateList.length; i++) {
+                        const rate = this.state.rate;
+                        rate[data.rateList[i]] = "";
+                        this.setState({ rate });
+                    }
+                }
+                var data = {
+                    'dictionary_rule': this.state.fields, 'dictionary_rate': this.state.rate,
+                };
+                this.GetDynamicTargetProperty(data, index);
+                console.log(this.state.CheckCondition, 'CheckConditions');
+            });
+    }
+
+
+    GetDynamicTargetProperty = (data,index) => {
+
+        fetch(`${productConfig.PolicyconfigUrl}/api/Policy/GetDynamicTargetProperty`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(data)
+        }).then(response => response.json())
+            .then(data => {
+                let targetRes=this.state.targetResponse;
+                targetRes[index].Value = data;
+                this.setState({ targetRes });
+                console.log("taregtResponse obj", data, this.state.targetResponse)
+
+            });
+    }
+    SetMapperValue = (e,index) => {
+        let requestModel = this.state.RequestModel;
+        requestModel[index][e.target.name] = e.target.value;
+        this.setState({ requestModel });
+        console.log("Mapper Data", this.state.RequestModel);
+    }
+
+    mappingPopUp = (index) => {
+        this.setState({ mappingPop: true, mapindex: index });
+    }
+    onTargetChange = (e,index) => {
+
+        this.setState({ targetValue: e.target.value });
+        let MapperDetailsDTO = this.state.mapperDetailsDTO;
+        let filterdata = this.state.targetResponse[index].Value.filter(s => s.mID == e.target.value);
+        if (filterdata.length > 0) {
+            MapperDetailsDTO.targetParameterPath = filterdata[0].mType;
+            MapperDetailsDTO.targetParameter = filterdata[0].mData;
+            MapperDetailsDTO.targetValue = filterdata[0].mValue;
+        }
+        this.setState({ MapperDetailsDTO });
+        console.log("Mapper", this.state.RequestModel);
+    }
+    onSourceChange = (e,index) => {
+
+        this.setState({ sourceValue: e.target.value });
+        let MapperDetailsDTO = this.state.mapperDetailsDTO;
+        let filterdata = this.state.sourceResponse[index].Value.filter(s => s.mID == e.target.value);
+        if (filterdata.length > 0) {
+            MapperDetailsDTO.sourceParameter = filterdata[0].mValue;
+        }
+        this.setState({ MapperDetailsDTO });
+    }
+    onADD = (index) => {
+
+        let mapDetails = Object.assign({}, this.state.mapperDetailsDTO);
+        let maplist = this.state.mapperList;
+        this.state.RequestModel[index].mapperDetailsDTO.push(mapDetails);
+        this.setState({ maplist, sourceValue: "", targetValue: "" });
+        console.log("RequestModel", this.state.RequestModel);
+    }
+    onSubmit = () => {
+       
+        console.log("RequestModel final", this.state.RequestModel);
+        let productdto=this.state.ProductDTO;
+        productdto.MapperDTO = this.state.RequestModel;
+        this.setState({ productdto });
+        this.handleClose();
+        //fetch(`http://localhost:58593/api/ObjectMapper/SaveDynamicMapper`, {
+        //    // fetch(`${productConfig.productConfigUrl}/api/Policy/GetDynamicProperty`, {
+        //    method: 'POST',
+        //    headers: {
+        //        'Accept': 'application/json',
+        //        'Content-Type': 'application/json',
+        //        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+        //    },
+        //    body: JSON.stringify(this.state.RequestModel)
+        //}).then(response => response.json())
+        //    .then(data => {
+
+        //        console.log("dynamic obj", data)
+        //    });
+
+    }
+  
     render() {
         const { classes } = this.props;
         return (
@@ -4196,7 +4459,7 @@ class ProductConfig extends React.Component {
                             <ProductBasic SetMasterPolicyCheckBox={this.SetMasterPolicyCheckBox} ProductDTO={this.state.ProductDTO} ValidationUI={this.state.ValidationUI} errormessage={this.state.errormessage} onClick={this.onDateClick} message={this.state.message} servermessage={this.state.servermessage} onDateChange={this.onDateChange} MasterDTO={this.state.MasterDTO} GetMasterData={this.GetMasterData} masterList={this.state.masterList} SetValue={this.SetValue} classes={this.classes} activeToState={this.state.activeToState} activeFromState={this.state.activeFromState} productNameState={this.state.productNameState} productCodeState={this.state.productCodeState} productStatusIdState={this.state.productStatusIdState} message={this.state.message} validdate={this.state.validdate} datediff={this.state.datediff} viewdisable={this.state.viewdisable} />
                             : <PageContentLoader />}
                         {this.state.pageloader ?
-                            <ProductDetails CDRadio={this.state.CDRadio} SetIdentification={this.SetIdentification} PaymentList={this.state.PaymentList} ClaimSIlabel={this.state.ClaimSIlabel} onChangePaymentradio={this.onChangePaymentradio} premiumerror={this.state.premiumerror} onBlur={this.onBlur} AccordianFunction={this.AccordianFunction}SetRatingCheckBox={this.SetRatingCheckBox} hideRatingCheckBox={this.state.hideRatingCheckBox} RatingCheckBox={this.state.RatingCheckBox} hidepremiumAmount={this.state.hidepremiumAmount} checkBox={this.state.checkBox} RiskList={this.state.RiskList} SetCWEValue={this.SetCWEValue} SetCoverRiskClaimsDetailsValue={this.SetCoverRiskClaimsDetailsValue} SetInsurableRiskClaimsDetailsValue={this.SetInsurableRiskClaimsDetailsValue} insurableRcbdetails={this.ProductDetails.insurableRcbdetails} InitialInsurable={this.state.InitialInsurable} ClaimList={this.state.ClaimList} GetClausesMasterData={this.GetClausesMasterData} TypeList={this.state.TypeList} tableInsurabledata={this.state.tableInsurabledata} SetValueCWE={this.SetValueCWE} handleCloseCWE={this.handleCloseCWE} handleShowCWE={this.handleShowCWE} handleEditCWE={this.handleEditCWE} handleOpenCWE={this.handleOpenCWE} handledescriptionCWE={this.handledescriptionCWE} SetCoverEventValue={this.SetCoverEventValue} Covertitle={this.state.Covertitle} CheckCoverEventFun={this.CheckCoverEventFun} handleTreeChange={this.handleTreeChange} addInsurableFun={this.addInsurableCWEFun} GetClausesData={this.GetClausesData} Insurabletitle={this.state.Insurabletitle} radiolist1={this.state.radiolist1} radiolist={this.state.radiolist} onChangeradio={this.onChangeradio} MasterDTOlist={this.state.MasterDTOlist} addinurablelist={this.addinurablelist} SetCoverProductDetailsValue={this.SetCoverProductDetailsValue} GetInusrableMasterData={this.GetInusrableMasterData} insurablecollapeslist={this.state.insurablecollapeslist} addbtnfun={this.addbtnfun} addbtnshow={this.state.addbtnshow} benefitinputdisable={this.state.benefitinputdisable} maxbenefitinputdisable={this.state.maxbenefitinputdisable} channelstableData={this.state.channelstableData} ValidationUI={this.state.ValidationUI} benifittabledata={this.state.benifittabledata} Columns={this.state.Columns} addRow={this.addRow} changeRow={this.changeRow} removeRow={this.removeRow} errormessage={this.state.errormessage} ProductDTO={this.ProductDetails} setBenifitValue={this.setBenifitValue} ctable={this.state.ctable} onInputChange={this.onInputChange} onInsurableChange={this.onInsurableChange} addRecord={this.addRecord} SetclauseValue={this.SetclauseValue} handledescription={this.handledescription} description={this.state.description} opendescription={this.state.opendescription} open={this.state.open} clauseName={this.state.clauseName} CustomClause={this.state.CustomClause} handleShow={this.handleShow} mshow={this.state.mshow} handledata={this.handledata} handleOpen={this.handleOpen} handleClose={this.handleClose} viewdisable={this.state.viewdisable} handleEdit={this.handleEdit} resultclauses={this.state.resultclauses} AddClauses={this.AddClauses} clauses={this.state.clauses} onDateChange={this.onDateChange} MasterDTO={this.state.MasterDTO} GetMasterData={this.GetMasterData} masterList={this.state.masterList} SetValue={this.SetProductDetailsValue} classes={this.classes} handleRadioChange={this.handleRadioChange} AddDetails={this.addDetails} SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} masClausesWarrentiesExclusionsDTO={this.state.masClausesWarrentiesExclusionsDTO} show={this.state.show} onDateChange={this.onDateChange} handleddlChange={this.handleddlChange} benefitCriteriaValueState={this.state.benefitCriteriaValueState} premiumAmountState={this.state.premiumAmountState} tabledata={this.state.tabledata} tablelength={this.state.tabledata.length} setbool={this.setbool} boolValue={this.state.boolValue} disabled={this.state.disabled} mappingPop={this.state.mappingPop} mappingPopUp={this.mappingPopUp} />
+                            <ProductDetails CheckBoxList={this.state.CheckBoxList} RequestModel={this.state.RequestModel} CalConfigList={this.state.CalConfigList} rulename={this.state.rulename} handleStateCheck={this.handleStateCheck}  CDRadio={this.state.CDRadio} SetIdentification={this.SetIdentification} PaymentList={this.state.PaymentList} ClaimSIlabel={this.state.ClaimSIlabel} onChangePaymentradio={this.onChangePaymentradio} premiumerror={this.state.premiumerror} onBlur={this.onBlur} AccordianFunction={this.AccordianFunction}SetRatingCheckBox={this.SetRatingCheckBox} hideRatingCheckBox={this.state.hideRatingCheckBox} RatingCheckBox={this.state.RatingCheckBox} hidepremiumAmount={this.state.hidepremiumAmount} checkBox={this.state.checkBox} RiskList={this.state.RiskList} SetCWEValue={this.SetCWEValue} SetCoverRiskClaimsDetailsValue={this.SetCoverRiskClaimsDetailsValue} SetInsurableRiskClaimsDetailsValue={this.SetInsurableRiskClaimsDetailsValue} insurableRcbdetails={this.ProductDetails.insurableRcbdetails} InitialInsurable={this.state.InitialInsurable} ClaimList={this.state.ClaimList} GetClausesMasterData={this.GetClausesMasterData} TypeList={this.state.TypeList} tableInsurabledata={this.state.tableInsurabledata} SetValueCWE={this.SetValueCWE} handleCloseCWE={this.handleCloseCWE} handleShowCWE={this.handleShowCWE} handleEditCWE={this.handleEditCWE} handleOpenCWE={this.handleOpenCWE} handledescriptionCWE={this.handledescriptionCWE} SetCoverEventValue={this.SetCoverEventValue} Covertitle={this.state.Covertitle} CheckCoverEventFun={this.CheckCoverEventFun} handleTreeChange={this.handleTreeChange} addInsurableFun={this.addInsurableCWEFun} GetClausesData={this.GetClausesData} Insurabletitle={this.state.Insurabletitle} radiolist1={this.state.radiolist1} radiolist={this.state.radiolist} onChangeradio={this.onChangeradio} MasterDTOlist={this.state.MasterDTOlist} addinurablelist={this.addinurablelist} SetCoverProductDetailsValue={this.SetCoverProductDetailsValue} GetInusrableMasterData={this.GetInusrableMasterData} insurablecollapeslist={this.state.insurablecollapeslist} addbtnfun={this.addbtnfun} addbtnshow={this.state.addbtnshow} benefitinputdisable={this.state.benefitinputdisable} maxbenefitinputdisable={this.state.maxbenefitinputdisable} channelstableData={this.state.channelstableData} ValidationUI={this.state.ValidationUI} benifittabledata={this.state.benifittabledata} Columns={this.state.Columns} addRow={this.addRow} changeRow={this.changeRow} removeRow={this.removeRow} errormessage={this.state.errormessage} ProductDTO={this.ProductDetails} setBenifitValue={this.setBenifitValue} ctable={this.state.ctable} onInputChange={this.onInputChange} onInsurableChange={this.onInsurableChange} addRecord={this.addRecord} SetclauseValue={this.SetclauseValue} handledescription={this.handledescription} description={this.state.description} opendescription={this.state.opendescription} open={this.state.open} clauseName={this.state.clauseName} CustomClause={this.state.CustomClause} handleShow={this.handleShow} mshow={this.state.mshow} handledata={this.handledata} handleOpen={this.handleOpen} handleClose={this.handleClose} viewdisable={this.state.viewdisable} handleEdit={this.handleEdit} resultclauses={this.state.resultclauses} AddClauses={this.AddClauses} clauses={this.state.clauses} onDateChange={this.onDateChange} MasterDTO={this.state.MasterDTO} GetMasterData={this.GetMasterData} masterList={this.state.masterList} SetValue={this.SetProductDetailsValue} classes={classes} handleRadioChange={this.handleRadioChange} AddDetails={this.addDetails} SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} masClausesWarrentiesExclusionsDTO={this.state.masClausesWarrentiesExclusionsDTO} show={this.state.show} onDateChange={this.onDateChange} handleddlChange={this.handleddlChange} benefitCriteriaValueState={this.state.benefitCriteriaValueState} premiumAmountState={this.state.premiumAmountState} tabledata={this.state.tabledata} tablelength={this.state.tabledata.length} setbool={this.setbool} boolValue={this.state.boolValue} disabled={this.state.disabled} mappingPop={this.state.mappingPop} mappingPopUp={this.mappingPopUp} />
                             : <PageContentLoader />}
                         {this.state.pageloader ?
                             <ProductSave onSave={this.handleSubmit} onCancel={this.reset} btnhide={this.state.btnhide} />
@@ -4222,8 +4485,8 @@ class ProductConfig extends React.Component {
                             &times;
                                                         </Button>
                         <h4><small className="center-text"> Mapping </small></h4>
-
-                        <Mapping savemappingFun={this.savemappingFun}/>
+                      
+                        <DynamicMapping SetCoverProductDetailsValue={this.SetCoverProductDetailsValue} DispatcherMasterList={this.state.DispatcherMasterList} MapperMasterList={this.state.MapperMasterList} productPremium={this.ProductDetails.productPremium}savemappingFun={this.savemappingFun} SetMapperValue={this.SetMapperValue} mapindex={this.state.mapindex} RequestModel={this.state.RequestModel} targetResponse={this.state.targetResponse} onTargetChange={this.onTargetChange} targetValue={this.state.targetValue} sourceResponse={this.state.sourceResponse} sourceValue={this.state.sourceValue} onSourceChange={this.onSourceChange} onADD={this.onADD} onSubmit={this.onSubmit}/>
                     </div>
                 </Modal>
             </div>

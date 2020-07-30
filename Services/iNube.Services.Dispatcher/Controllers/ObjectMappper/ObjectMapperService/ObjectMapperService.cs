@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using iNube.Services.Dispatcher.Entities;
 using iNube.Services.Dispatcher.Helpers;
+using iNube.Services.Dispatcher.Models;
 using iNube.Utility.Framework.Model;
 using Microsoft.Extensions.Options;
 using System;
@@ -14,6 +15,7 @@ namespace iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService
     {
         Task<dynamic> DynamicMapper(dynamic inputModel, string mappingname, ApiContext apiContext);
         //Task<dynamic> DynamicMapperCheck(dynamic Obj, string mapName, ApiContext apiContext);
+        Task<List<DDTO>> GetMasterDynamicMapper(ApiContext apiContext);
     }
 
     public class ObjectMapperService : IDTObjectMapperService
@@ -39,6 +41,11 @@ namespace iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService
         //{
         //    return await _objectService(apiContext.ProductType).DynamicMapperCheck(Obj, mapName, apiContext);
         //}
+        
+        public async Task<List<DDTO>> GetMasterDynamicMapper(ApiContext apiContext)
+        {
+            return await _objectService(apiContext.ProductType).GetMasterDynamicMapper(apiContext);
+        }
     }
 }
 

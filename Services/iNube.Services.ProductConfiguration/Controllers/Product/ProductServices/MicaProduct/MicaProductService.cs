@@ -50,15 +50,19 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
-                productDTO = await UpdateProductModel(productDTO, apiContext);
-                var product = _mapper.Map<TblProducts>(productDTO);
-                product.PartnerId = apiContext.PartnerId;
-                _context.TblProducts.Add(product);
-                _context.SaveChanges();
-                // productDTO = _mapper.Map<ProductDTO>(product);
-                var products = await ReUpdateProductModel(product, apiContext);
-                productDTO = _mapper.Map<ProductDTO>(products);
-                return new ProductResponse { Status = BusinessStatus.Created, product = productDTO, ResponseMessage = $"Product successfully created! \n Product Name: {productDTO.ProductName} & Product Code: {productDTO.ProductCode}" };
+                var response = await _integrationService.SaveDynamicMapper(productDTO.MapperDTO, apiContext);
+               
+                    productDTO = await UpdateProductModel(productDTO, apiContext);
+                    var product = _mapper.Map<TblProducts>(productDTO);
+                    product.PartnerId = apiContext.PartnerId;
+                    _context.TblProducts.Add(product);
+                    _context.SaveChanges();
+                    // productDTO = _mapper.Map<ProductDTO>(product);
+                    var products = await ReUpdateProductModel(product, apiContext);
+                    productDTO = _mapper.Map<ProductDTO>(products);
+                    return new ProductResponse { Status = BusinessStatus.Created, product = productDTO, ResponseMessage = $"Product successfully created! \n Product Name: {productDTO.ProductName} & Product Code: {productDTO.ProductCode}" };
+              
+               
             }
 
             catch (Exception)
@@ -99,8 +103,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _context.TblProductClausesWarrentiesExclusions.UpdateRange(objProductmodel.TblProductClausesWarrentiesExclusions);
             //  _context.SaveChanges();
             //var id = 0;
+            //var count = 0;
             foreach (var item in objProductmodel.TblProductPremium)
             {
+                //if (item.RatingId != null && item.RatingId>0)
+                //{
+                //    item.MapperId = mapperList[count].MapperId;
+                //}
+                // count++;
                 if (item.LevelId == 51)
                 {
                     item.RefId = objProductmodel.ProductId;
@@ -123,7 +133,8 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
                 }
             }
-            _context.TblProductPremium.UpdateRange(objProductmodel.TblProductPremium);
+         
+                _context.TblProductPremium.UpdateRange(objProductmodel.TblProductPremium);
             //  _context.SaveChanges();
 
             foreach (var item in objProductmodel.TblProductRatingMapping)

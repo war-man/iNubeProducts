@@ -74,7 +74,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
     public class IntegrationService : IIntegrationService
     {
         private IConfiguration _configuration;
-        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl, DispatcherUrl;
         private static readonly HttpClient _httpClient = new HttpClient();
         private ILoggerManager _logger;
         public IntegrationService(IConfiguration configuration, ILoggerManager logger)
@@ -92,6 +92,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
             RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
+            DispatcherUrl = _configuration["Integration_Url:Dispatcher:DispatcherUrl"];
 
         }
 
@@ -433,8 +434,8 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         }
         public async Task<object> GetDispatcherEventTask(DispatcherEventRequest SourceRequest,decimal DispatcherId,decimal MapperId, ApiContext apiContext)
         {
-            var DispatcherURL = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com";
-            var uri = DispatcherURL + "/api/Dispatcher/DispatcherEventTask?dispatcherId="+ DispatcherId + "&mapperId="+ MapperId;
+          //  var DispatcherURL = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com";
+            var uri = DispatcherUrl + "/api/Dispatcher/DispatcherEventTask?dispatcherId="+ DispatcherId + "&mapperId="+ MapperId;
 
             return await PostApiInvoke<DispatcherEventRequest, object>(uri, apiContext, SourceRequest);
 

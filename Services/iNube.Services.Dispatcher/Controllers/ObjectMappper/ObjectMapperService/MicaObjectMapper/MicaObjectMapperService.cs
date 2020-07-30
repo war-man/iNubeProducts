@@ -422,5 +422,19 @@ namespace iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService
             }
             return finalArrayObj;
         }
+        public async Task<List<DDTO>> GetMasterDynamicMapper(ApiContext apiContext) {
+          _context = (MICADTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var ddtos = _context.TblMapper.OrderByDescending(s => s.CreatedDate);
+            List<DDTO> List = new List<DDTO>();
+            DDTO dDTO = new DDTO();
+            foreach (var item in ddtos)
+            {
+                dDTO = new DDTO();
+                dDTO.mID = item.MapperId;
+                dDTO.mValue = item.MapperName;
+                List.Add(dDTO);
+            }
+            return List;
+        }
     }
 }

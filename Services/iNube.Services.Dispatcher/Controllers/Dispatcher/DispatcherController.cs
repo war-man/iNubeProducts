@@ -89,7 +89,12 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher
             var response = await _dispatcherService.SaveDynamicMapper(mapperDTOs,Context);
             return Ok(response);
         }
-
+        [HttpGet]
+        public async Task<IActionResult> GetMasterDispatcher()
+        {
+            var response = await _dispatcherService.GetMasterDispatcher(Context);
+            return Ok(response);
+        }
         [HttpGet]
         [AllowAnonymous]
         public IActionResult HC()

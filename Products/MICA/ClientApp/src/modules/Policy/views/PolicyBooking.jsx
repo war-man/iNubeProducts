@@ -503,10 +503,10 @@ class PolicyBooking extends React.Component {
                     this.setState({ result: data });
                     this.setState({ loader: false });
                     let fields = this.state.fields;
-                    fields["permiumamount"] = data.eValue;
+                    fields["permiumamount"] = data.finalPremium.eValue;
                     this.setState({ fields });
 
-                    this.setState({ RatingDetails: data, finalPremiumFlag: true, Generateflag: true });
+                    this.setState({ RatingDetails: data.finalPremium, finalPremiumFlag: true, Generateflag: true });
                   
                 }
                 else {

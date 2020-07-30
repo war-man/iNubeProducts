@@ -1,4 +1,5 @@
 ﻿
+using iNube.Services.Dispatcher.Models;
 using iNube.Utility.Framework.Model;
 using System;
 using System.Collections.Generic;
@@ -18,5 +19,11 @@ namespace iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService
         //{
         //    throw new NotImplementedException();
         //}
+       
+
+        public async Task<List<DDTO>> GetMasterDynamicMapper(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

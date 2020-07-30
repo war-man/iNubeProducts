@@ -127,4 +127,10 @@ namespace iNube.Services.Dispatcher.Models
     {
         public List<MapperDTO> MapperList { get; set; }
     }
+    public partial class DDTO
+    {
+        public decimal mID { get; set; }
+        public string mValue { get; set; }
+        public string mType { get; set; }
+    }
 }

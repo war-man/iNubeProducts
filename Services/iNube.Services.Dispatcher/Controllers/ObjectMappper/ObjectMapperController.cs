@@ -60,5 +60,12 @@ namespace iNube.Services.Dispatcher.Controllers.ObjectMapper
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetMasterDynamicMapper()
+        {
+            var response = await _objectService.GetMasterDynamicMapper(Context);
+            return Ok(response);
+        }
+      
     }
 }

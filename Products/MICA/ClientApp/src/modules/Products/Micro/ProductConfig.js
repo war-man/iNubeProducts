@@ -5,9 +5,10 @@
 //productConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9007';
 //let productConfigUrl = "http://localhost:59968";
 let productConfigUrl = config.productConfigUrl;
-
+let DispatcherConfigUrl = config.DispatcherConfig;
+let PolicyconfigUrl = config.policyconfigUrl;
 export const productConfig = {
-    productConfigUrl
+    productConfigUrl, DispatcherConfigUrl, PolicyconfigUrl
 }
 
 export default productConfig

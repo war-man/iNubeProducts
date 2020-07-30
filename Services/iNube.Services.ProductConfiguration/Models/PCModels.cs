@@ -541,6 +541,7 @@ namespace iNube.Services.ProductConfiguration.Models
             InsurableRcbdetails = new List<InsurableRcbdetailsDTO>();
             ProductSwitchOnDetails = new List<ProductSwitchOnDetailsDTO>();
             ProductBasicConfiguration = new List<ProductBasicConfigurationDTO>();
+            MapperDTO = new List<MapperDTO>();
         }
         public int ProductId { get; set; }
         public decimal RatingId { get; set; }
@@ -584,6 +585,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public virtual ICollection<ProductSwitchOnDetailsDTO> ProductSwitchOnDetails { get; set; }
         public virtual ICollection<ProductRatingMapping> CalculateConfig { get; set; }
         public virtual ICollection<ProductBasicConfigurationDTO> ProductBasicConfiguration { get; set; }
+        public virtual List<MapperDTO> MapperDTO { get; set; }
     }
 
     public partial class ProductBasicConfigurationDTO
@@ -1165,5 +1167,37 @@ namespace iNube.Services.ProductConfiguration.Models
             policy = new Dictionary<string, string>();
         }
         public Dictionary<string, string> policy { get; set; }
+    }
+    public partial class MapperDTO
+    {
+        public MapperDTO()
+        {
+            MapperDetailsDTO = new HashSet<MapperDetailsDTO>();
+        }
+
+        public decimal MapperId { get; set; }
+        public string MapperName { get; set; }
+        public string SourceComponent { get; set; }
+        public string TargetComponent { get; set; }
+        public bool? IsActive { get; set; }
+        public DateTime? CreatedDate { get; set; }
+
+        public virtual ICollection<MapperDetailsDTO> MapperDetailsDTO { get; set; }
+    }
+    public partial class MapperDetailsDTO
+    {
+        public decimal MapperDetailsId { get; set; }
+        public decimal? MapperId { get; set; }
+        public string SourceParameter { get; set; }
+        public string TargetParameter { get; set; }
+        public bool? IsActive { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string TargetParameterPath { get; set; }
+
+        public virtual MapperDTO Mapper { get; set; }
+    }
+    public class MapperResponse : ResponseStatus
+    {
+        public List<MapperDTO> MapperList { get; set; }
     }
 }

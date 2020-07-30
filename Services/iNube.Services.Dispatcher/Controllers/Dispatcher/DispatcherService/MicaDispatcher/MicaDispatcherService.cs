@@ -187,11 +187,43 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mic
 
         public async Task<MapperResponse> SaveDynamicMapper(List<MapperDTO> mapperDTOs, ApiContext Context) {
             _context = (MICADTContext)(await DbManager.GetContextAsync(Context.ProductType, Context.ServerType, _configuration));
-            var mapperList=_mapper.Map<IEnumerable<TblMapper>>(mapperDTOs);
-            _context.TblMapper.AddRange(mapperList);
-             var Result = _mapper.Map<List<MapperDTO>>(mapperDTOs);
-            //_context.SaveChanges();
+           // var mapperList=_mapper.Map<IEnumerable<TblMapper>>(mapperDTOs);
+
+            //_context.TblMapper.AddRange(mapperList);
+            // var Result = _mapper.Map<List<MapperDTO>>(mapperDTOs);
+            ////_context.SaveChanges();
+            //return new MapperResponse { Status = BusinessStatus.Ok, MapperList = Result };
+
+           
+            foreach (var item in mapperDTOs) {
+               var mapperdata=_context.TblMapper.FirstOrDefault(s => s.MapperId == item.MapperId);
+                mapperdata.SourceComponent = item.SourceComponent;
+                mapperdata.TargetComponent = item.TargetComponent;
+                _context.TblMapper.UpdateRange(mapperdata);
+                foreach (var temp in item.MapperDetailsDTO) {
+                    temp.MapperId = item.MapperId;
+                }
+                var mapperList = _mapper.Map<IEnumerable<TblMapperDetails>>(item.MapperDetailsDTO);
+               _context.TblMapperDetails.AddRange(mapperList);
+               }
+            _context.SaveChanges();
+            var Result = _mapper.Map<List<MapperDTO>>(mapperDTOs);
+          
             return new MapperResponse { Status = BusinessStatus.Ok, MapperList = Result };
+        }
+        public async Task<List<DDTO>> GetMasterDispatcher(ApiContext Context)
+        {
+            _context = (MICADTContext)(await DbManager.GetContextAsync(Context.ProductType, Context.ServerType, _configuration));
+           var ddtos=_context.TblDispatcher.OrderByDescending(s => s.CreatedDate);
+            List<DDTO> List = new List<DDTO>();
+            DDTO dDTO = new DDTO();
+            foreach (var item in ddtos) {
+                dDTO = new DDTO();
+                dDTO.mID = item.DispatcherId;
+                dDTO.mValue = item.DispatcherTaskName;
+                List.Add(dDTO);
+            }
+            return List;
         }
     }
 }

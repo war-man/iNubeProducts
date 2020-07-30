@@ -13,10 +13,15 @@ import CalCulationResult from "./CalCulationResult.jsx"
 import Button from "components/CustomButtons/Button.jsx";
 
 
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
+import InputLabel from "@material-ui/core/InputLabel";
+
 const Premium = (props) => {
     // const { classes } = this.props;
     const premiumData = props.componentData;
-    console.log("premiumData", props, premiumData.ProductDTO.productPremium);
+    console.log("premiumData", props, premiumData.rulename, premiumData.ProductDTO.productPremium);
     console.log("Insurabletitle P", premiumData.Insurabletitle);
     var currencylist = JSON.parse(localStorage.getItem('listdata'));
     //const category = premiumData.MasterDTO.InsurableCategory.filter(item => item.mID === data.productInsurableItems[i].insurableCategoryId)[0].mValue;
@@ -33,24 +38,9 @@ const Premium = (props) => {
                 <MasterDropdown required={true} labelText="Currency" disabled={premiumData.viewdisable} lstObject={premiumData.MasterDTOlist} filterName='Currency' value={(premiumData.ProductDTO.productPremium.length>0)?premiumData.ProductDTO.productPremium[0].currencyId:null} name='currencyId' onChange={(e) => premiumData.SetCoverProductDetailsValue('productPremium', e, 0, 0)} formControlProps={{ fullWidth: true }} />
                 {premiumData.errormessage && (premiumData.ProductDTO.productPremium[0].currencyId === "") ? <p className="error">This Field is Required</p> : null}
             </GridItem>
-            {premiumData.hideRatingCheckBox && !premiumData.viewdisable &&
-                <CustomCheckbox
-                    name="RatingCheckBox"
-                    labelText="Rating"
-                    value={premiumData.RatingCheckBox}
-                    onChange={(e) => premiumData.SetRatingCheckBox(e)}
-                    //disabled={(coversProductDetails.ProductDTO.ProductDTO.isCoverEvent === false) ? coversData.viewdisable : coversProductDetails.ProductDTO.ProductDTO.isCoverEvent}
-                    checked={premiumData.RatingCheckBox}
+          
 
-                    formControlProps={{
-                        fullWidth: true
-                    }}
-
-                />
-
-            }
-
-            {!premiumData.RatingCheckBox && premiumData.radiolist.map((data, index) => (
+            {premiumData.radiolist.map((data, index) => (
 
                 premiumData.ProductDTO.productPremium.length > 0 && data.mIsRequired && premiumData.ProductDTO.productPremium.map((item, i) => (<GridContainer lg={12} >
                     <GridItem xs={2} sm={2} md={3}>
@@ -69,7 +59,22 @@ const Premium = (props) => {
                         {premiumData.errormessage && (premiumData.ProductDTO.productPremium[i].currencyId === "") ? <p className="error">This Field is Required</p> : null}
                     </GridItem>
                     */}
-                    {!premiumData.hidepremiumAmount && <GridItem xs={12} sm={12} md={5}>
+                    {
+                        <CustomCheckbox
+                            name="RatingCheckBox"
+                            labelText="Rating"
+                            value={premiumData.CheckBoxList[i].IsActive}
+                            onChange={(e) => premiumData.SetRatingCheckBox(e,i)}
+                            //disabled={(coversProductDetails.ProductDTO.ProductDTO.isCoverEvent === false) ? coversData.viewdisable : coversProductDetails.ProductDTO.ProductDTO.isCoverEvent}
+                            checked={premiumData.CheckBoxList[i].IsActive}
+
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+
+                        />
+                    }
+                    {!premiumData.CheckBoxList[i].IsActive && !premiumData.hidepremiumAmount && <GridItem xs={12} sm={12} md={5}>
                         <CustomInput
                             labelText="Premium Amount"
                             required={true}
@@ -90,18 +95,63 @@ const Premium = (props) => {
                         {(premiumData.ProductDTO.productPremium[i].flag ) && <p className="error">Premium Amount can not more then Benefit Amount</p>}
                     </GridItem>
                     }
+                    {premiumData.CheckBoxList[i].IsActive && <GridItem xs={12} sm={12} md={5}>
+
+                        <FormControl
+                            fullWidth
+                            className={premiumData.classes.selectFormControl}
+                        >
+                            <InputLabel
+                                htmlFor="simple-select"
+                                className={premiumData.classes.selectLabel}
+                            >
+                                CalConfig Name
+                          </InputLabel>
+                            <Select
+                                value={premiumData.rulename[i].CalConfigName}
+                                onChange={(e)=>premiumData.handleStateCheck(e,i)}
+                                MenuProps={{
+                                    className: premiumData.classes.selectMenu
+                                }}
+                                classes={{
+                                    select: premiumData.classes.select
+                                }}
+                                inputProps={{
+                                    name: "CalConfigName",
+                                    id: "simple-select"
+                                }}
+                            >
+                                {
+                                    premiumData.CalConfigList.map(item =>
+                                        <MenuItem
+                                            value={item.calculationConfigId}
+                                            classes={{
+                                                root: premiumData.classes.selectMenuItem,
+                                                selected: premiumData.classes.selectMenuItemSelected
+                                            }}
+                                        >
+                                            {item.calculationConfigName}
+                                        </MenuItem>
+                                    )
+                                }
+                            </Select>
+                        </FormControl>
+                    </GridItem>}
+                    {premiumData.CheckBoxList[i].IsActive && <GridItem xs={12} sm={12} md={2}>
+                        <Button id="submitBtn" color="info" round onClick={() => premiumData.mappingPopUp(i)}> Mapping  </Button>
+
+                    </GridItem>}
+                  
+                    
                 </GridContainer>
                 ))
             ))}
             {(premiumData.hidepremiumAmount && !premiumData.viewdisable) ? <p className="error">*Please fill Premium Amount in Benefit Level</p> : ""}
-            {premiumData.RatingCheckBox && premiumData.hideRatingCheckBox && <GridItem xs={12} >
-                <CalCulationResult />
+            {premiumData.RatingCheckBox && premiumData.hideRatingCheckBox && <GridContainer xs={12} >
 
-
-                {premiumData.hideRatingCheckBox && <GridContainer>
-                    <Button id="submitBtn" color="info" round onClick={premiumData.mappingPopUp}> Mapping  </Button>
-                </GridContainer>}
-            </GridItem>}
+         
+            
+             </GridContainer>}
            
 
             </GridContainer>

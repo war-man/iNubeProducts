@@ -20,11 +20,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
         Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
         Task<PolicyResponse> LeadPolicyAsync(LeadInfoDTO lead, ApiContext apiContext);
+        Task<MapperResponse> SaveDynamicMapper(List<MapperDTO> MapperDTO, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
         private IConfiguration _configuration;
-        readonly string PartnerUrl, UserUrl, RatingUrl, PolicyUrl;
+        readonly string PartnerUrl, UserUrl, RatingUrl, PolicyUrl, DispatcherUrl;
+
+        readonly string DispatureUrl = "http://localhost:58593";
 
         // readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
         ////readonly string partnerUrl = "https://localhost:44315";
@@ -45,7 +48,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
             PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
             UserUrl = _configuration["Integration_Url:User:UserUrl"];
             //UserUrl = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com";
-
+            DispatcherUrl = _configuration["Integration_Url:Dispatcher:DispatcherUrl"];
             PolicyUrl = _configuration["Integration_Url:Policy:PolicyUrl"];
         }
 
@@ -134,6 +137,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
             var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerSettings?customerid=" + apiContext.OrgId + "&type=" + TimeZone;//+"&envid="+apiContext.ServerType;
 
             return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+
+        }
+        public async Task<MapperResponse> SaveDynamicMapper(List<MapperDTO> MapperDTO, ApiContext apiContext)
+        {
+            var uri = DispatureUrl + "/api/ObjectMapper/SaveDynamicMapper";
+            return await PostApiInvoke<List<MapperDTO>, MapperResponse>(uri, apiContext, MapperDTO); ;
 
         }
         private async Task<TResponse> PostApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
