@@ -56,7 +56,7 @@ namespace iNube.Services.UserManagement
             ////services.AddDbContext<MICAUMContext>(x => x.UseSqlServer(connectionstring));
 
             //////AVO
-            var avoConnectionstring = Configuration.GetConnectionString("AVOUMConnection");
+            var avoConnectionstring = Configuration.GetConnectionString("UMConnection");
             services.AddDbContext<AVOUMContext>(x => x.UseSqlServer(avoConnectionstring));
 
             // configure strongly typed settings objects
