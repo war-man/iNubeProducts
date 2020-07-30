@@ -138,7 +138,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices
 
         public EnvironmentResponse GetEnvironmentConnection(string product,decimal EnvId, ApiContext apiContext)
         {
-            return _loginService(apiContext.ProductType).GetEnvironmentConnection(product,EnvId);
+            return _loginService(product).GetEnvironmentConnection(product,EnvId);
         }
     }
 }
