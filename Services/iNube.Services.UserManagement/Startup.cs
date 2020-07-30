@@ -75,18 +75,9 @@ namespace iNube.Services.UserManagement
                options.RegisterValidatorsFromAssemblyContaining<Startup>();
            });
 
-            //services.AddMvcCore()
-            //.AddAuthorization() // Note - this is on the IMvcBuilder, not the service collection
-            //.AddJsonFormatters(options => options.ContractResolver = new CamelCasePropertyNamesContractResolver())
-            //.AddFluentValidation(options =>
-            // {
-            //     options.RegisterValidatorsFromAssemblyContaining<Startup>();
-            // });
-
             var connectionstring = Configuration.GetConnectionString("UMConnection");
             services.AddHealthChecks().AddSqlServer(connectionstring);
             services.AddAutoMapper(typeof(Startup));
-
             services.AddHsts(options =>
             {
                 options.Preload = true;
