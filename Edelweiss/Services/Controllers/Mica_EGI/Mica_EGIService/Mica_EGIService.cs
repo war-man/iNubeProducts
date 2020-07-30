@@ -9824,7 +9824,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     return response;
                 }
 
-                var GetPolicyData = await GetPolicyDetails(PolicyNumber,"ExceptionCheck",context);
+                var GetPolicyData = await GetPolicyDetails(PolicyNumber,"ExceptionCheck",null,context);
 
                 if(GetPolicyData.Status != BusinessStatus.Ok)
                 {
@@ -10459,7 +10459,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
 
 
-                var PolicyVerify = await GetPolicyDetails(scheduleDTO.PolicyNo,"CreateUpdateSchedule" ,context);
+                var PolicyVerify = await GetPolicyDetails(scheduleDTO.PolicyNo,"CreateUpdateSchedule", null,context);
 
                 if (PolicyVerify.Status != BusinessStatus.Ok)
                 {
@@ -10820,7 +10820,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        private async Task<GenericDTO> GetPolicyDetails(string PolicyNumber,string CallType,ApiContext context)
+        private async Task<GenericDTO> GetPolicyDetails(string PolicyNumber,string CallType,DateTime? Date,ApiContext context)
         {
             GenericDTO response = new GenericDTO();
             ErrorInfo errorInfo = new ErrorInfo();
@@ -10828,7 +10828,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             try
             {
                 //Call the Policy Service to Get Policy Details.
-                var PolicyResponse = await _integrationService.NewGetPolicyDetails(PolicyNumber, context);
+                var PolicyResponse = await _integrationService.NewGetPolicyDetails(PolicyNumber, Date,context);
 
                 dynamic PolicyData = null;
 
@@ -11355,12 +11355,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
-                //CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerTimeZoneSettings("TimeZone", context);
-                //dbHelper._TimeZone = UserDateTime.KeyValue;
-                //DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+                CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerTimeZoneSettings("TimeZone", context);
+                dbHelper._TimeZone = UserDateTime.KeyValue;
+                DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
 
                 DateTime? IndianTime = null;
-                IndianTime = System.DateTime.UtcNow.AddMinutes(330); 
+                IndianTime = DatetimeNow; 
                 var CurrentDay = IndianTime.Value.DayOfWeek.ToString();
                 var CurrentTimeHour = IndianTime.Value.Hour;
                 var CurrentDate = IndianTime.Value.Date;
@@ -11792,7 +11792,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
             
                 BatchSteps = "GetPolicyDetails";
-                var PolicyResponse = await GetPolicyDetails(PolicyNumber, "PBS", context);
+                var PolicyResponse = await GetPolicyDetails(PolicyNumber, "PBS",IndianTime,context);
 
 
                 if (PolicyResponse.Status != BusinessStatus.Ok)

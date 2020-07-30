@@ -68,7 +68,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         Task<dynamic> NewRatingCalculator(SchedulerPremiumDTO dynamicData, ApiContext apiContext);
 
         //InternalGetPolicyDetailsByPolicyNumber - New Method with response status updated
-        Task<PolicyDetailsDTOResponse> NewGetPolicyDetails(string PolicyNo, ApiContext apiContext);
+        Task<PolicyDetailsDTOResponse> NewGetPolicyDetails(string PolicyNo, DateTime? Date, ApiContext apiContext);
 
         Task<CustomerSettingsDTO> GetCustomerTimeZoneSettings(string TimeZone, ApiContext apiContext);
 
@@ -288,9 +288,9 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         }
 
-        public async Task<PolicyDetailsDTOResponse> NewGetPolicyDetails (string PolicyNo, ApiContext apiContext)
+        public async Task<PolicyDetailsDTOResponse> NewGetPolicyDetails (string PolicyNo, DateTime? Date, ApiContext apiContext)
         {
-            var uri = PolicyUrl + "/api/Policy/InternalGetPolicyDetailsByPolicyNumber?policyNumber=" + PolicyNo;
+            var uri = PolicyUrl + "/api/Policy/InternalGetPolicyDetailsByPolicyNumber?policyNumber=" + PolicyNo +"&date=" + Date;
             return await GetApiInvoke<PolicyDetailsDTOResponse>(uri, apiContext);
         }
 
