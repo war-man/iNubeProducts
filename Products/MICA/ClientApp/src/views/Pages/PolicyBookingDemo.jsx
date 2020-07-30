@@ -301,7 +301,7 @@ class PolicyBookingDemo extends React.Component {
             //}
 
             //fetch(`https://localhost:44351/api/Policy/CreatePolicyWithPayment  `, {
-            fetch(`${policyConfig.policyConfigUrl}/api/Policy/CreatePolicyWithPayment`, {
+            fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/CreatePolicyWithPayment`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -510,7 +510,7 @@ class PolicyBookingDemo extends React.Component {
        if (res !== "") {
           
         
-            fetch(`${policyConfig.policyConfigUrl}/api/Policy/CustomerPolicy?CustomerId=` + res, {
+            fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/CustomerPolicy?CustomerId=` + res, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -558,7 +558,7 @@ class PolicyBookingDemo extends React.Component {
 
     componentDidMount() {
         
-        localStorage.setItem('userToken1','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI5NTc4NmM2OS0xNjAxLTQzMGQtODM1Ni01M2RlNDUyZjUxZTYiLCJFbWFpbCI6InZpdGFsQGludWJlc29sdXRpb25zLmNvbSIsIk9yZ0lkIjoiMTEyIiwiUGFydG5lcklkIjoiMCIsIlJvbGUiOiJEZW1vIFJvbGUiLCJOYW1lIjoidml0aGFsIiwiVXNlck5hbWUiOiJ2aXRhbEBpbnViZXNvbHV0aW9ucy5jb20iLCJQcm9kdWN0VHlwZSI6Ik1pY2EiLCJTZXJ2ZXJUeXBlIjoiMSIsImV4cCI6MTY3MDY1NDMzMCwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.nZsItQ97TGtSZ-IrZ8SlDeOCIKnaCI4tmeLC953z9qA');
+        localStorage.setItem('userToken1', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI1Y2M0ZTFjZi04MzYxLTQwY2QtODVjMC1hMjE3YThiZGEwYTYiLCJFbWFpbCI6Im1vaGFuQGludWJlc29sdXRpb25zLmNvbSIsIk9yZ0lkIjoiMTEyIiwiUGFydG5lcklkIjoiMCIsIlJvbGUiOiJpTnViZSBBZG1pbiIsIk5hbWUiOiJJbnViZSIsIlVzZXJOYW1lIjoiZWludWJlYWRtaW4iLCJQcm9kdWN0VHlwZSI6Ik1pY2EiLCJTZXJ2ZXJUeXBlIjoiMjk3IiwiZXhwIjoxNjkwNzI0NDcxLCJpc3MiOiJJbnViZSIsImF1ZCI6IkludWJlTUlDQSJ9.LuEF1rBwpwUXiGJDJ0wYKZoCHd6a-3lghqi7tHHourM');
         this.timeOutFunction = setTimeout(
             function () {
                 this.setState({ cardAnimaton: "" });
