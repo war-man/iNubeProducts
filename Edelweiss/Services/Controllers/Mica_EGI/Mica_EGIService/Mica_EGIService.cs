@@ -108,6 +108,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             _emailService = emailService;
             _integrationService = integrationService;
             _configuration = configuration;
+            dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration)));
         }
 
 
