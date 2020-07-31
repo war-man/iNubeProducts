@@ -38,7 +38,10 @@ import SignaturePad from 'react-signature-canvas';
 import Popup from 'reactjs-popup';
 import styles from './sigCanvas.css';
 import ProposalApp from "./ProposalApp.css";
-
+import NewBusinessConfig from 'modules/NewBusiness/NewBusinessConfig.js';
+import Radio from "@material-ui/core/Radio";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FiberManualRecord from "@material-ui/icons/FiberManualRecord";
 
 import CloudUpload from "@material-ui/icons/CloudUpload";
 
@@ -84,6 +87,18 @@ class DocumentUpdating extends React.Component {
         this.state = {
             ProposerPlace: "",
             ProposerCountry: "",
+            MasQuesDTO: [],
+            openpop: false,
+            radioVal: "",
+            selectedValue: null,
+            wealthPlannerDTO: {
+                "otherCircumstances": false,
+                "IsPolicy": false,
+                "date": "",
+                "wprComments": "",
+                "checkbox": false
+            },
+            showMQ2: false,
             openProposerpop: false,
             openSpousepop: false,
             openWPpop: false,
@@ -123,6 +138,30 @@ class DocumentUpdating extends React.Component {
 
     }
 
+    componentDidMount() {
+        debugger
+        fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/GetmasQuestions` + ``, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+
+            .then(response => response.json())
+            .then(data => {
+                this.state.MasQuesDTO.push(data[728]);
+                this.state.MasQuesDTO.push(data[729]);
+                this.state.MasQuesDTO.push(data[730]);
+                this.setState({});
+                console.log("wealthPlannerQuestions", this.state.MasQuesDTO);
+            });
+        
+    }
+
+
+    /********************* Signature Pad Clearing ********************/
 
     clear = () => {
         this.sigPad.clear()
@@ -260,6 +299,99 @@ class DocumentUpdating extends React.Component {
         this.setState({ proposerSigDetailsDTO });
 
         console.log("sampledate", proposerSigDetailsDTO )
+    }
+
+    handleWealthReport = () => {
+        this.setState({ openpop: true });
+    }
+
+    handleRadioChangeWP = (e) => {
+        this.state.radioVal = e.target.value;
+        this.state.selectedValue = e.target.value;
+
+        if (this.state.selectedValue === "WPMQ1Yes") {
+
+            this.state.wealthPlannerDTO.otherCircumstances = true;
+            this.setState({});
+
+        } else if (this.state.selectedValue === "WPMQ1No") {
+
+            this.state.wealthPlannerDTO.otherCircumstances = false;
+            this.setState({});
+
+        } if (this.state.selectedValue === "WPMQ2Yes") {
+
+            this.setState({ showMQ2: true });
+            this.state.wealthPlannerDTO.IsPolicy = true;
+            this.setState({});
+
+        } else if (this.state.selectedValue === "WPMQ2No") {
+
+            this.setState({ showMQ2: false });
+            this.state.wealthPlannerDTO.IsPolicy = false;
+            this.setState({});
+        }
+    }
+
+    handleWPRSetValues = (event) => {
+        debugger;
+        let wealthPlannerDTO = this.state.wealthPlannerDTO;
+        let name = event.target.name;
+        let value = event.target.value;
+        wealthPlannerDTO[name] = [value];
+        this.setState({ wealthPlannerDTO });
+    }
+
+    handleWPRSave = () => {
+        debugger;
+        this.props.wealthSigDetailsDTO.otherCircumstances = this.state.wealthPlannerDTO.otherCircumstances;
+        this.props.wealthSigDetailsDTO.IsPolicy = this.state.wealthPlannerDTO.IsPolicy;
+        this.props.wealthSigDetailsDTO.date = this.state.wealthPlannerDTO.date;
+        this.props.wealthSigDetailsDTO.wprComments = this.state.wealthPlannerDTO.wprComments;
+        this.props.wealthSigDetailsDTO.checkbox = this.state.wealthPlannerDTO.checkbox;
+        this.setState({});
+
+        console.log("wealthSigDetailsDTO", this.props.wealthSigDetailsDTO);
+    }
+
+    handleWPRCheckbox = (event) => {
+        let state = this.state;
+
+        if (event.target.checked == true) {
+            state.wealthPlannerDTO.checkbox = true;
+            this.setState({});
+        } else {
+            state.wealthPlannerDTO.checkbox = false;
+            this.setState({});
+        }
+    }
+
+    handleWPRClose = () => {
+        this.setState({ openpop: false });
+    };
+
+    onWPRdateChange = (name, evt) => {
+        var today = evt.toDate();
+
+        var day = today.getDate();
+        var month = today.getMonth() + 1;
+
+        if (month < 10) {
+            month = '0' + month;
+
+        }
+        if (day < 10) {
+            day = '0' + day;
+        }
+
+        var date = day + '/' + month + '/' + today.getFullYear();
+
+        let wealthPlannerDate = this.state.wealthPlannerDTO;
+        wealthPlannerDate[name] = date;
+
+        this.setState({ wealthPlannerDate });
+
+        console.log("wealthPlannerDate", wealthPlannerDate);
     }
    
     render() {
@@ -646,14 +778,217 @@ class DocumentUpdating extends React.Component {
                                 <div className="actions-right">
                                     <Button color="info"
                                         round className={this.props.classes.marginRight}
-                                        // onClick={this.handleLeadSave}
+                                        onClick={this.handleWealthReport}
                                         id="saveBtn" >
                                         WP/FPE Report
                                 </Button>
                                 </div>
                             </GridItem>
                        
-                    
+                            <Modal
+                                aria-labelledby="simple-modal-title"
+                                aria-describedby="simple-modal-description"
+                                open={this.state.openpop}
+                                onClose={this.handleWPRClose}>
+                                <div className={classes.paper} id="modal">
+                                    <h4><small className="center-text">Wealth Planner's Confidential Report</small></h4>
+                                    <Button color="info"
+                                        round
+                                        className={classes.marginRight}
+                                        id="close-bnt"
+                                        onClick={this.handleWPRClose}>
+                                        &times;
+                                    </Button>
+                                    <div id="disp">
+                                        <GridItem>
+
+                                            <p>   1. {(this.state.MasQuesDTO[0] !== undefined) ? this.state.MasQuesDTO[0].questionText : ""}</p>
+
+                                        </GridItem>
+
+                                        <GridItem xs={12}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Radio
+                                                        checked={this.state.selectedValue === "WPMQ1Yes"}
+                                                        onChange={this.handleRadioChangeWP}
+                                                        value="WPMQ1Yes"
+                                                        name="radio1"
+                                                        aria-label="B"
+                                                        icon={
+                                                            <FiberManualRecord
+                                                                className={classes.radioUnchecked}
+                                                            />
+                                                        }
+                                                        checkedIcon={
+                                                            <FiberManualRecord
+                                                                className={classes.radioChecked}
+                                                            />
+                                                        }
+                                                        classes={{
+                                                            checked: classes.radio,
+                                                            root: classes.radioRoot
+                                                        }}
+                                                    />
+                                                }
+                                                classes={{
+                                                    label: classes.label
+                                                }}
+                                                label="Yes"
+                                            />
+
+                                            <FormControlLabel
+                                                control={
+                                                    <Radio
+                                                        checked={this.state.selectedValue === "WPMQ1No"}
+                                                        onChange={this.handleRadioChangeWP}
+                                                        value="WPMQ1No"
+                                                        name="radio1"
+                                                        aria-label="B"
+                                                        icon={
+                                                            <FiberManualRecord
+                                                                className={classes.radioUnchecked}
+                                                            />
+                                                        }
+                                                        checkedIcon={
+                                                            <FiberManualRecord
+                                                                className={classes.radioChecked}
+                                                            />
+                                                        }
+                                                        classes={{
+                                                            checked: classes.radio,
+                                                            root: classes.radioRoot
+                                                        }}
+                                                    />
+                                                }
+                                                classes={{
+                                                    label: classes.label
+                                                }}
+                                                label="No"
+                                            />
+                                        </GridItem>
+
+                                        <GridItem>
+
+                                            <p>   2. {(this.state.MasQuesDTO[1] !== undefined) ? this.state.MasQuesDTO[1].questionText : ""}</p>
+
+                                        </GridItem>
+                                        <GridItem xs={12}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Radio
+                                                        checked={this.state.selectedValue === "WPMQ2Yes"}
+                                                        onChange={this.handleRadioChangeWP}
+                                                        value="WPMQ2Yes"
+                                                        name="radio1"
+                                                        aria-label="B"
+                                                        icon={
+                                                            <FiberManualRecord
+                                                                className={classes.radioUnchecked}
+                                                            />
+                                                        }
+                                                        checkedIcon={
+                                                            <FiberManualRecord
+                                                                className={classes.radioChecked}
+                                                            />
+                                                        }
+                                                        classes={{
+                                                            checked: classes.radio,
+                                                            root: classes.radioRoot
+                                                        }}
+                                                    />
+                                                }
+                                                classes={{
+                                                    label: classes.label
+                                                }}
+                                                label="Yes"
+                                            />
+
+                                            <FormControlLabel
+                                                control={
+                                                    <Radio
+                                                        checked={this.state.selectedValue === "WPMQ2No"}
+                                                        onChange={this.handleRadioChangeWP}
+                                                        value="WPMQ2No"
+                                                        name="radio1"
+                                                        aria-label="B"
+                                                        icon={
+                                                            <FiberManualRecord
+                                                                className={classes.radioUnchecked}
+                                                            />
+                                                        }
+                                                        checkedIcon={
+                                                            <FiberManualRecord
+                                                                className={classes.radioChecked}
+                                                            />
+                                                        }
+                                                        classes={{
+                                                            checked: classes.radio,
+                                                            root: classes.radioRoot
+                                                        }}
+                                                    />
+                                                }
+                                                classes={{
+                                                    label: classes.label
+                                                }}
+                                                label="No"
+                                            />
+                                        </GridItem>
+                                        {this.state.showMQ2 &&
+                                            <GridItem xs={3}>
+                                                <CustomDatetime
+                                                    labelText={(this.state.MasQuesDTO[2] !== undefined) ? this.state.MasQuesDTO[2].questionText : ""}
+                                                    value={this.state.wealthPlannerDTO.date}
+                                                    name='date'
+                                                    onChange={(e) => this.onWPRdateChange('date', e)}
+                                                    formControlProps={{
+                                                        fullWidth: true
+                                                    }}
+                                                />
+                                            </GridItem>
+                                        }
+
+                                        <GridItem xs={12} sm={12} md={12}>
+                                            <CustomInput
+                                                //success={props.EmiratesId === "success"}
+                                                //error={props.EmiratesId === "error"}
+                                                labelText="Comments"
+                                                name="comments"
+                                                value={this.state.wealthPlannerDTO.wprComments }
+                                                onChange={(e) => this.handleWPRSetValues(e)}
+                                                formControlProps={{
+                                                    fullWidth: true
+                                                }}
+                                            />
+                                        </GridItem>
+
+                                        <GridItem xs={12} sm={12} md={12} className="downlevel">
+                                            <CustomCheckbox
+                                                name="checkbox"
+                                                value={this.state.wealthPlannerDTO.checkbox}
+                                                onChange={(e) => this.handleWPRCheckbox(e)}
+                                                formControlProps={{
+                                                    fullWidth: true
+                                                }}
+
+                                            />
+                                            I here by confirm that the signature of the policy owner / life assured was placed in my presence on the date specified below.
+                                        </GridItem>
+
+                                        <GridItem >
+                                            <div>
+                                                <Button color="info"
+                                                    round className={this.props.classes.marginRight}
+                                                    onClick={this.handleWPRSave}
+                                                    id="saveBtn" >
+                                                    Save
+                                                </Button>
+                                            </div>
+                                        </GridItem>
+                                    </div>
+
+                                </div>
+                            </Modal>
                    
                         <h6>Signature:</h6>
 

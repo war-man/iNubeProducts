@@ -330,7 +330,7 @@ class ProposalIncomplete extends React.Component {
             },
 
             proposerSigDetailsDTO: {
-                //"proposerSignaturedoc": "",
+                "proposerSignaturedoc": "",
                 "proposerDate": "",
                 "proposerPlace": "",
                 "proposerCountry": ""
@@ -343,11 +343,12 @@ class ProposalIncomplete extends React.Component {
             },
 
             wealthSigDetailsDTO: {
-                // "wealthSignaturedoc": "",
-                "otherCircumstances": "",
-                "IsPolicy": "",
-                "comments": "",
-                "checkbox": ""
+                "wealthSignaturedoc": "",
+                "otherCircumstances": false,
+                "IsPolicy": false,
+                "date": "",
+                "wprComments": "",
+                "checkbox": false
             },
 
             SaveProposalDto: {
