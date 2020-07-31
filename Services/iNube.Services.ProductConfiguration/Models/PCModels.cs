@@ -1195,7 +1195,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public DateTime? CreatedDate { get; set; }
         public string TargetParameterPath { get; set; }
 
-        public virtual MapperDTO Mapper { get; set; }
+        //public virtual MapperDTO Mapper { get; set; }
     }
     public class MapperResponse : ResponseStatus
     {
