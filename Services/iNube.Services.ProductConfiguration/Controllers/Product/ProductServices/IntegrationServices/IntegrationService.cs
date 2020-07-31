@@ -20,14 +20,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
         Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
         Task<PolicyResponse> LeadPolicyAsync(LeadInfoDTO lead, ApiContext apiContext);
-        Task<MapperResponse> SaveDynamicMapper(List<MapperDTO> MapperDTO, ApiContext apiContext);
+        Task<MapperResponse> SaveDynamicMapper(MapperDTO MapperDTO, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
         private IConfiguration _configuration;
         readonly string PartnerUrl, UserUrl, RatingUrl, PolicyUrl, DispatcherUrl;
 
-        readonly string DispatureUrl = "http://localhost:58593";
+        // readonly string DispatcherUrl = "http://localhost:58593";
 
         // readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
         ////readonly string partnerUrl = "https://localhost:44315";
@@ -139,10 +139,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
             return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
 
         }
-        public async Task<MapperResponse> SaveDynamicMapper(List<MapperDTO> MapperDTO, ApiContext apiContext)
+        public async Task<MapperResponse> SaveDynamicMapper(MapperDTO MapperDTO, ApiContext apiContext)
         {
-            var uri = DispatureUrl + "/api/ObjectMapper/SaveDynamicMapper";
-            return await PostApiInvoke<List<MapperDTO>, MapperResponse>(uri, apiContext, MapperDTO); ;
+            var uri = DispatcherUrl + "/api/ObjectMapper/SaveDynamicMapper";
+            return await PostApiInvoke<MapperDTO, MapperResponse>(uri, apiContext, MapperDTO); ;
 
         }
         private async Task<TResponse> PostApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()

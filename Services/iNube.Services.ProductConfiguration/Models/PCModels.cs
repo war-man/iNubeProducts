@@ -541,7 +541,7 @@ namespace iNube.Services.ProductConfiguration.Models
             InsurableRcbdetails = new List<InsurableRcbdetailsDTO>();
             ProductSwitchOnDetails = new List<ProductSwitchOnDetailsDTO>();
             ProductBasicConfiguration = new List<ProductBasicConfigurationDTO>();
-            MapperDTO = new List<MapperDTO>();
+           // MapperDTO = new List<MapperDTO>();
         }
         public int ProductId { get; set; }
         public decimal RatingId { get; set; }
@@ -585,7 +585,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public virtual ICollection<ProductSwitchOnDetailsDTO> ProductSwitchOnDetails { get; set; }
         public virtual ICollection<ProductRatingMapping> CalculateConfig { get; set; }
         public virtual ICollection<ProductBasicConfigurationDTO> ProductBasicConfiguration { get; set; }
-        public virtual List<MapperDTO> MapperDTO { get; set; }
+       // public virtual List<MapperDTO> MapperDTO { get; set; }
     }
 
     public partial class ProductBasicConfigurationDTO
@@ -915,6 +915,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public decimal? RatingId { get; set; }
         public decimal? MapperId { get; set; }
         public decimal? DispatcherId { get; set; }
+        public MapperDTO mapperDTO { get; set; }
     }
 
     /// <summary>
@@ -1198,6 +1199,6 @@ namespace iNube.Services.ProductConfiguration.Models
     }
     public class MapperResponse : ResponseStatus
     {
-        public List<MapperDTO> MapperList { get; set; }
+        public MapperDTO Mapper { get; set; }
     }
 }

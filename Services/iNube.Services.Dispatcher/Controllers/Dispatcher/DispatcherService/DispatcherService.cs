@@ -19,7 +19,7 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService
         Task<DispatcherResponse> CreateDispatcherTask(DispatcherDTO dispatcherDto, ApiContext apiContext);
         Task<object> DispatcherEventTask(dynamic DispatcherEventObject, decimal dispatcherId, decimal mapperId, ApiContext Context);
         Task<IEnumerable<DispatcherDTO>> GetDispatcherTask(ApiContext Context);
-        Task<MapperResponse> SaveDynamicMapper(List<MapperDTO> mapperDTOs, ApiContext Context);
+        Task<MapperResponse> SaveDynamicMapper(MapperDTO mapperDTOs, ApiContext Context);
         Task<List<DDTO>> GetMasterDispatcher(ApiContext Context);
     }
 
@@ -60,7 +60,7 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService
         {
             return await _objectService(Context.ProductType).GetDispatcherTask(Context);
         }
-         public async Task<MapperResponse> SaveDynamicMapper(List<MapperDTO> mapperDTOs, ApiContext Context)
+         public async Task<MapperResponse> SaveDynamicMapper(MapperDTO mapperDTOs, ApiContext Context)
         {
             return await _objectService(Context.ProductType).SaveDynamicMapper(mapperDTOs,Context);
         }

@@ -9,6 +9,7 @@ namespace iNube.Services.Dispatcher.Helpers
     {
         public AutoMapperProfile()
         {
+            CreateMap<TblMapper, MapperDTO>().ReverseMap();
             CreateMap<TblMapper, MapperDTO>()
                 .ForMember(dest => dest.MapperDetailsDTO, opt => opt.MapFrom(src => src.TblMapperDetails)).ReverseMap();
 
@@ -17,7 +18,7 @@ namespace iNube.Services.Dispatcher.Helpers
 
             CreateMap<TblMapperDetails, MapperDetailsDTO>().ReverseMap();
 
-            
+        
 
         }
     }

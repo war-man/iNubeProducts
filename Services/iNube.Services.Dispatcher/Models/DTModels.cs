@@ -125,7 +125,7 @@ namespace iNube.Services.Dispatcher.Models
     }
     public class MapperResponse : ResponseStatus
     {
-        public List<MapperDTO> MapperList { get; set; }
+        public MapperDTO Mapper { get; set; }
     }
     public partial class DDTO
     {

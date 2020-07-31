@@ -50,7 +50,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
-                var response = await _integrationService.SaveDynamicMapper(productDTO.MapperDTO, apiContext);
+                foreach (var item in productDTO.ProductPremium.Where(s=>s.RatingId>0 && s.mapperDTO!=null))
+                {
+                    var response = await _integrationService.SaveDynamicMapper(item.mapperDTO, apiContext);
+                    if (response != null && response.Status == BusinessStatus.Created)
+                    {
+                        item.MapperId = response.Mapper.MapperId;
+                    }
+                }
                
                     productDTO = await UpdateProductModel(productDTO, apiContext);
                     var product = _mapper.Map<TblProducts>(productDTO);

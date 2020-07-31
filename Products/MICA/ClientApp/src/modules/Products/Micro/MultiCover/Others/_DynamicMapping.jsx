@@ -12,6 +12,8 @@ import Dropdown from "components/Dropdown/Dropdown.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import ReactTable from 'components/MuiTable/MuiTable.jsx';
+import CustomRadioButton from "components/CustomRadiobutton/CustomRadiobutton.jsx";
+
 const style = {
     infoText: {
         fontWeight: "300",
@@ -28,20 +30,27 @@ const style = {
         return (
             <GridContainer>
                
-                <GridItem xs={12} sm={12} md={4}>
-                    <Dropdown required={true} labelText="Dispatcher Task Name" lstObject={props.DispatcherMasterList} value={props.productPremium[props.mapindex].dispatcherId} name='dispatcherId' onChange={(e) => props.SetCoverProductDetailsValue('productPremium', e, props.mapindex, 0)} formControlProps={{ fullWidth: true }} />
-
-      
+                <GridItem>
+                    <CustomRadioButton radiolist={props.RadioMapper[props.mapindex]} onChange={(e) => props.onChangeRadioMapper(e, props.mapindex)} />
                 </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                    <Dropdown required={true} labelText="Mapper Name" lstObject={props.MapperMasterList} value={props.productPremium[props.mapindex].mapperId} name='mapperId' onChange={(e) => props.SetCoverProductDetailsValue('productPremium', e, props.mapindex, 0)} formControlProps={{ fullWidth: true }} />
-               
-                    {/*<CustomInput
+
+                
+            
+                {props.RadioMapperFlag ? <GridContainer xs={12} sm={12} md={12}>
+                    <GridItem xs={12} sm={12} md={4}>
+                        <Dropdown required={true} labelText="Dispatcher Task Name" lstObject={props.DispatcherMasterList} value={props.productPremium[props.mapindex].dispatcherId} name='dispatcherId' onChange={(e) => props.SetCoverProductDetailsValue('productPremium', e, props.mapindex, 0)} formControlProps={{ fullWidth: true }} />
+
+
+                    </GridItem>
+                   <GridItem xs={12} sm={12} md={4}>
+                        {/*   <Dropdown required={true} labelText="Mapper Name" lstObject={props.MapperMasterList} value={props.productPremium[props.mapindex].mapperId} name='mapperId' onChange={(e) => props.SetCoverProductDetailsValue('productPremium', e, props.mapindex, 0)} formControlProps={{ fullWidth: true }} />
+                */}
+                <CustomInput
                         // disabled={this.state.disabledflag}
 
                         labelText="Mapper Name"
                         required={true}
-                        value={props.RequestModel[props.mapindex].mapperName}
+                            value={props.productPremium[props.mapindex].mapperDTO.mapperName}
                         name="mapperName"
 
                         onChange={(event) => props.SetMapperValue(event, props.mapindex)}
@@ -50,7 +59,7 @@ const style = {
                             fullWidth: true
                         }}
                     />
-                    */}
+                   
                 </GridItem>
 
                 <GridItem xs={12} sm={12} md={4}>
@@ -59,7 +68,7 @@ const style = {
 
                         labelText="Source Component"
                         required={true}
-                        value={props.RequestModel[props.mapindex].sourceComponent}
+                            value={props.productPremium[props.mapindex].mapperDTO.sourceComponent}
                         name="sourceComponent"
 
                         onChange={(event) => props.SetMapperValue(event, props.mapindex)}
@@ -75,7 +84,7 @@ const style = {
 
                         labelText="Target Component"
                         required={true}
-                        value={props.RequestModel[props.mapindex].targetComponent}
+                            value={props.productPremium[props.mapindex].mapperDTOtargetComponent}
                         name="targetComponent"
 
                         onChange={(event) => props.SetMapperValue(event, props.mapindex)}
@@ -111,13 +120,13 @@ const style = {
                     </Button>
                 </GridItem>
 
-                {props.RequestModel[props.mapindex].mapperDetailsDTO.length > 0 && 
+                    {props.productPremium[props.mapindex].mapperDTO.mapperDetailsDTO.length > 0 && 
 
 
 
                     <GridItem xs={12}>
                         <ReactTable
-                    data={props.RequestModel[props.mapindex].mapperDetailsDTO}//this.state.mapperList}
+                     data={props.productPremium[props.mapindex].mapperDTO.mapperDetailsDTO}//this.state.mapperList}
                     filterable
                     columns={[
                         {
@@ -145,13 +154,32 @@ const style = {
 
                         />
                     </GridItem>
-                        }
-                {props.RequestModel[props.mapindex].mapperDetailsDTO.length > 0 && <Button style={{'left':'44%'}} color="info" round
-                    onClick={() => props.onSubmit()}
-                >
-                    SAVE
+
+                    }
+                    {props.productPremium[props.mapindex].mapperDTO.mapperDetailsDTO.length > 0 && <Button style={{ 'left': '44%' }} color="info" round
+                        onClick={() => props.onSubmit()}
+                    >
+                        SAVE
                     </Button>
-                }
+                    }
+                </GridContainer> : 
+                    <GridItem xs={12} sm={12} md={8}>
+                    <GridItem xs={12} sm={12} md={4}>
+                        <Dropdown required={true} labelText="Dispatcher Task Name" lstObject={props.DispatcherMasterList} value={props.productPremium[props.mapindex].dispatcherId} name='dispatcherId' onChange={(e) => props.SetCoverProductDetailsValue('productPremium', e, props.mapindex, 0)} formControlProps={{ fullWidth: true }} />
+
+
+                    </GridItem>
+                        <GridItem xs={12} sm={12} md={4}>
+                            <Dropdown required={true} labelText="Mapper Name" lstObject={props.MapperMasterList} value={props.productPremium[props.mapindex].mapperId} name='mapperId' onChange={(e) => props.SetCoverProductDetailsValue('productPremium', e, props.mapindex, 0)} formControlProps={{ fullWidth: true }} />
+                        </GridItem>
+                        <Button style={{ 'left': '44%' }} color="info" round
+                            onClick={() => props.onSubmit()}
+                        >
+                            SAVE
+                    </Button>
+                    </GridItem>
+                    }
+               
                 {/*
                    <GridItem xs={12} sm={12} md={4}>
                     <Dropdown required={true} labelText="List2" lstObject={this.state.childList} value="" name='List3' onChange={(e) => this.onChange(e, "List3")} formControlProps={{ fullWidth: true }} />

@@ -185,31 +185,30 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mic
             return result;
         }
 
-        public async Task<MapperResponse> SaveDynamicMapper(List<MapperDTO> mapperDTOs, ApiContext Context) {
+        public async Task<MapperResponse> SaveDynamicMapper(MapperDTO mapperDTOs, ApiContext Context) {
             _context = (MICADTContext)(await DbManager.GetContextAsync(Context.ProductType, Context.ServerType, _configuration));
-           // var mapperList=_mapper.Map<IEnumerable<TblMapper>>(mapperDTOs);
-
-            //_context.TblMapper.AddRange(mapperList);
-            // var Result = _mapper.Map<List<MapperDTO>>(mapperDTOs);
-            ////_context.SaveChanges();
-            //return new MapperResponse { Status = BusinessStatus.Ok, MapperList = Result };
-
-           
-            foreach (var item in mapperDTOs) {
-               var mapperdata=_context.TblMapper.FirstOrDefault(s => s.MapperId == item.MapperId);
-                mapperdata.SourceComponent = item.SourceComponent;
-                mapperdata.TargetComponent = item.TargetComponent;
-                _context.TblMapper.UpdateRange(mapperdata);
-                foreach (var temp in item.MapperDetailsDTO) {
-                    temp.MapperId = item.MapperId;
-                }
-                var mapperList = _mapper.Map<IEnumerable<TblMapperDetails>>(item.MapperDetailsDTO);
-               _context.TblMapperDetails.AddRange(mapperList);
-               }
+            var mapperObj = _mapper.Map<TblMapper>(mapperDTOs);
+            _context.TblMapper.Add(mapperObj);
             _context.SaveChanges();
-            var Result = _mapper.Map<List<MapperDTO>>(mapperDTOs);
-          
-            return new MapperResponse { Status = BusinessStatus.Ok, MapperList = Result };
+            var MapObj = _mapper.Map<MapperDTO>(mapperObj);
+            return new MapperResponse { Status = BusinessStatus.Created, Mapper = MapObj };
+
+
+            //foreach (var item in mapperDTOs) {
+            //   var mapperdata=_context.TblMapper.FirstOrDefault(s => s.MapperId == item.MapperId);
+            //    mapperdata.SourceComponent = item.SourceComponent;
+            //    mapperdata.TargetComponent = item.TargetComponent;
+            //    _context.TblMapper.UpdateRange(mapperdata);
+            //    foreach (var temp in item.MapperDetailsDTO) {
+            //        temp.MapperId = item.MapperId;
+            //    }
+            //    var mapperList = _mapper.Map<IEnumerable<TblMapperDetails>>(item.MapperDetailsDTO);
+            //   _context.TblMapperDetails.AddRange(mapperList);
+            //   }
+            //_context.SaveChanges();
+            //var Result = _mapper.Map<List<MapperDTO>>(mapperDTOs);
+
+           // return new MapperResponse { Status = BusinessStatus.Ok, MapperList = Result };
         }
         public async Task<List<DDTO>> GetMasterDispatcher(ApiContext Context)
         {

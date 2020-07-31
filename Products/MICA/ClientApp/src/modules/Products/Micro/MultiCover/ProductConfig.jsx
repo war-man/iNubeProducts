@@ -72,6 +72,8 @@ class ProductConfig extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            RadioMapperFlag:true,
+            RadioMapper:[],
             DispatcherMasterList: [],
             MapperMasterList: [],
             newRCBList: [],
@@ -845,7 +847,7 @@ class ProductConfig extends React.Component {
                 }
             }
             console.log("last productDTO", this.state.ProductDTO)
-            productDTOs['productInsurableItems'] = FilterDTO;
+            productDTOs['productInsurableItems'] = FiltSetRatingCheckBoxerDTO;
             productDTOs['insurableRcbdetails'] = FilterinsurableRcbdetails;
             this.setState({ productDTOs });
             console.log("last productDTO", this.state.ProductDTOs)
@@ -855,7 +857,7 @@ class ProductConfig extends React.Component {
             console.log("last productDTO", this.state.ProductDTO)
 
 
-           // fetch(`https://localhost:59968/api/Product/CreateProduct`, {
+          // fetch(`https://localhost:59968/api/Product/CreateProduct`, {
             fetch(`${productConfig.productConfigUrl}/api/Product/CreateProduct`, {
                 method: 'POST',
                 headers: {
@@ -1382,11 +1384,11 @@ class ProductConfig extends React.Component {
 
                 this.setState({ Productpremium });
 
-                if (name == "mapperId") {
-                    let resModel = this.state.RequestModel;
-                    resModel[index].mapperId = value;
-                    this.setState({ resModel });
-                }
+                //if (name == "mapperId") {
+                //    let resModel = this.state.RequestModel;
+                //    resModel[index].mapperId = value;
+                //    this.setState({ resModel });
+                //}
             }
             else {
                 let ProductCover = this.ProductDetails.productInsurableItem[Iindex][callcomponent][index];
@@ -3813,14 +3815,15 @@ class ProductConfig extends React.Component {
             for (var i = 0; i < len; i++) {
                 this.ProductDetails.productPremium = this.ProductDetails.productPremium.concat({
                     "productId": 0,
-                    "flag":false,
+                    "flag": false,
                     "premiumAmount": "",
                     "currencyId": "",
                     "levelId": Lid,
                     "subLevelId": "",
                     "ratingId": 0,
-                    "mapperId": 0,
-                    "dispatcherId": 0
+                    "mapperId": null,
+                    "dispatcherId": null,
+                    "mapperDTO": {}
                 });
                 this.state.CheckBoxList = this.state.CheckBoxList.concat({
                     "IsActive": false,
@@ -3843,6 +3846,8 @@ class ProductConfig extends React.Component {
 
                 this.state.targetResponse = this.state.targetResponse.concat({ "Id": i, "Value": [] });
                 this.state.sourceResponse = this.state.sourceResponse.concat({ "Id": i, "Value": [...this.state.MasterDTO['Risk'], ...this.state.InsurableRiskLIst.filter(s => s.subLevelId == this.ProductDetails.cobid)] });
+                let RDList = [{ cob: null, disable: false, label: null, lob: null, mID: 1, mIsRequired: false, mType: "Type", mValue: "NEW MAPPER", planCode: null, selectedValue: 1, value: null }, { cob: null, disable: false, label: null, lob: null, mID: 0, mIsRequired: false, mType: "Type", mValue: "EXISTING MAPPER", planCode: null, selectedValue: 1, value: null }];
+                this.state.RadioMapper.push(RDList);
             }
         }
         if (name === "Insurable Item") {
@@ -3857,8 +3862,9 @@ class ProductConfig extends React.Component {
                     "levelId": Lid,
                     "subLevelId": this.ProductDetails.productInsurableItem[i].insurableItemTypeId,
                     "ratingId": 0,
-                    "mapperId": 0,
-                    "dispatcherId": 0
+                    "mapperId": null,
+                    "dispatcherId": null,
+                    "mapperDTO": {}
                 });
                 this.state.CheckBoxList = this.state.CheckBoxList.concat({
                     "IsActive": false,
@@ -3878,6 +3884,7 @@ class ProductConfig extends React.Component {
                     "mapperDetailsDTO": []
                 });
                 this.state.targetResponse = this.state.targetResponse.concat({ "Id": i, "Value": [] });
+             
                 let selectedinsurablelist = this.state.insurableMasterList.filter(s => s.subLevelId == this.ProductDetails.productInsurableItem[i].insurableItemTypeId);
                 let Data = JSON.parse(JSON.stringify(selectedinsurablelist));
                 for (var k = 0; k < Data.length; k++) {
@@ -3885,6 +3892,8 @@ class ProductConfig extends React.Component {
                     Data[k].mValue = "InsurableItem." + i.toString() +"."+ Data[k].mValue;
                 }
                 this.state.sourceResponse = this.state.sourceResponse.concat({ "Id": i, "Value": [...this.state.MasterDTO['Risk'], ...Data.concat({ mID: 1000, mValue: 'InsurableItem.' + i + '.InsurableName', mType: '' }, { mID: 1000, mValue: 'InsurableItem.' + i +'.RiskCount', mType: '' })] });
+                let RDList = [{ cob: null, disable: false, label: null, lob: null, mID: 1, mIsRequired: false, mType: "Type", mValue: "NEW MAPPER", planCode: null, selectedValue: 1, value: null }, { cob: null, disable: false, label: null, lob: null, mID: 0, mIsRequired: false, mType: "Type", mValue: "EXISTING MAPPER", planCode: null, selectedValue: 1, value: null }];
+                this.state.RadioMapper.push(RDList);
             }
 
         }
@@ -3907,8 +3916,9 @@ class ProductConfig extends React.Component {
                         "levelId": Lid,
                         "subLevelId": this.ProductDetails.productInsurableItem[i].productCovers[j].coverTypeId,
                         "ratingId": 0,
-                        "mapperId": 0,
-                        "dispatcherId": 0
+                        "mapperId": null,
+                        "dispatcherId": null,
+                        "mapperDTO": {}
                     });
                     this.state.CheckBoxList = this.state.CheckBoxList.concat({
                         "IsActive": false,
@@ -3942,7 +3952,8 @@ class ProductConfig extends React.Component {
                         CoverData[m].mValue = "InsurableItem." + i.toString() + "." + "Cover" + m.toString() + CoverData[m].mValue;
                     }
                     this.state.sourceResponse = this.state.sourceResponse.concat({ "Id": count, "Value": [...this.state.MasterDTO['Risk'], ...Data.concat({ mID: 1000, mValue: 'InsurableItem.' + i + '.InsurableName', mType: '' }, { mID: 1000, mValue: 'InsurableItem.' + i + '.RiskCount', mType: '' }), ...CoverData] });
-
+                    let RDList = [{ cob: null, disable: false, label: null, lob: null, mID: 1, mIsRequired: false, mType: "Type", mValue: "NEW MAPPER", planCode: null, selectedValue: 1, value: null }, { cob: null, disable: false, label: null, lob: null, mID: 0, mIsRequired: false, mType: "Type", mValue: "EXISTING MAPPER", planCode: null, selectedValue: 1, value: null }];
+                    this.state.RadioMapper.push(RDList);
                     count++;
                 }
             }
@@ -3966,8 +3977,9 @@ class ProductConfig extends React.Component {
                         "levelId": Lid,
                         "subLevelId": "",
                         "ratingId": 0,
-                        "mapperId": 0,
-                        "dispatcherId": 0
+                        "mapperId": null,
+                        "dispatcherId": null,
+                        "mapperDTO": {}
                     });
 
         //        }
@@ -4000,6 +4012,7 @@ class ProductConfig extends React.Component {
             checkbox[index].IsActive = event.target.checked;
             this.setState({ checkbox, RatingCheckBox: event.target.checked });
             let proPremium = this.ProductDetails.productPremium[0];
+            proPremium.ratingId =0;
             if (event.target.checked == true) {
 
 
@@ -4383,13 +4396,22 @@ class ProductConfig extends React.Component {
             });
     }
     SetMapperValue = (e,index) => {
-        let requestModel = this.state.RequestModel;
-        requestModel[index][e.target.name] = e.target.value;
+        let requestModel = this.ProductDetails.productPremium;
+        requestModel[index].mapperDTO[e.target.name] = e.target.value;
         this.setState({ requestModel });
         console.log("Mapper Data", this.state.RequestModel);
     }
 
     mappingPopUp = (index) => {
+        this.ProductDetails.productPremium[index].mapperDTO = Object.assign({}, {
+            "mapperId": 0,
+            "mapperName": "",
+            "sourceComponent": "",
+            "targetComponent": "",
+            "isActive": true,
+            "createdDate": "",
+            "mapperDetailsDTO": []
+        });
         this.setState({ mappingPop: true, mapindex: index });
     }
     onTargetChange = (e,index) => {
@@ -4419,16 +4441,17 @@ class ProductConfig extends React.Component {
 
         let mapDetails = Object.assign({}, this.state.mapperDetailsDTO);
         let maplist = this.state.mapperList;
-        this.state.RequestModel[index].mapperDetailsDTO.push(mapDetails);
+        //this.state.RequestModel[index].mapperDetailsDTO.push(mapDetails);
+        this.ProductDetails.productPremium[index].mapperDTO.mapperDetailsDTO.push(mapDetails);
         this.setState({ maplist, sourceValue: "", targetValue: "" });
-        console.log("RequestModel", this.state.RequestModel);
+        console.log("RequestModel", this.ProductDetails.productPremium);
     }
     onSubmit = () => {
        
-        console.log("RequestModel final", this.state.RequestModel);
-        let productdto=this.state.ProductDTO;
-        productdto.MapperDTO = this.state.RequestModel;
-        this.setState({ productdto });
+        console.log("RequestModel final", this.ProductDetails.productPremium);
+        //let productdto=this.state.ProductDTO;
+        //productdto.MapperDTO = this.state.RequestModel;
+        //this.setState({ productdto });
         this.handleClose();
         //fetch(`http://localhost:58593/api/ObjectMapper/SaveDynamicMapper`, {
         //    // fetch(`${productConfig.productConfigUrl}/api/Policy/GetDynamicProperty`, {
@@ -4446,7 +4469,36 @@ class ProductConfig extends React.Component {
         //    });
 
     }
-  
+    onChangeRadioMapper = (e, index) => {
+ 
+        let checkedRadio = this.state.RadioMapper[index].filter(item => item.mValue === e.target.name);
+        if (checkedRadio.length > 0) {
+            checkedRadio[0].selectedValue = checkedRadio[0].mID;
+            checkedRadio[0].mIsRequired = true;
+            this.ProductDetails.productPremium[index].mapperId = null;
+            this.ProductDetails.productPremium[index].dispatcherId = null;
+
+            if (checkedRadio[0].mID === 1) {
+                this.state.RadioMapperFlag = true;
+                this.ProductDetails.productPremium[index].mapperDTO = Object.assign({}, {
+                    "mapperId": 0,
+                    "mapperName": "",
+                    "sourceComponent": "",
+                    "targetComponent": "",
+                    "isActive": true,
+                    "createdDate": "",
+                    "mapperDetailsDTO": []
+                });
+            } else {
+                this.ProductDetails.productPremium[index].mapperDTO = {};
+                this.state.RadioMapperFlag = false;
+            }
+            let uncheckedRadio = this.state.RadioMapper[index].filter(item => item.mValue !== e.target.name);
+            uncheckedRadio.map((item) => item.selectedValue = "0");
+            uncheckedRadio.map((item) => item.mIsRequired = false);
+            this.setState({ checkedRadio, uncheckedRadio });
+        }
+    }
     render() {
         const { classes } = this.props;
         return (
@@ -4486,7 +4538,7 @@ class ProductConfig extends React.Component {
                                                         </Button>
                         <h4><small className="center-text"> Mapping </small></h4>
                       
-                        <DynamicMapping SetCoverProductDetailsValue={this.SetCoverProductDetailsValue} DispatcherMasterList={this.state.DispatcherMasterList} MapperMasterList={this.state.MapperMasterList} productPremium={this.ProductDetails.productPremium}savemappingFun={this.savemappingFun} SetMapperValue={this.SetMapperValue} mapindex={this.state.mapindex} RequestModel={this.state.RequestModel} targetResponse={this.state.targetResponse} onTargetChange={this.onTargetChange} targetValue={this.state.targetValue} sourceResponse={this.state.sourceResponse} sourceValue={this.state.sourceValue} onSourceChange={this.onSourceChange} onADD={this.onADD} onSubmit={this.onSubmit}/>
+                        <DynamicMapping RadioMapper={this.state.RadioMapper} RadioMapperFlag={this.state.RadioMapperFlag} onChangeRadioMapper={this.onChangeRadioMapper} SetCoverProductDetailsValue={this.SetCoverProductDetailsValue} DispatcherMasterList={this.state.DispatcherMasterList} MapperMasterList={this.state.MapperMasterList} productPremium={this.ProductDetails.productPremium}savemappingFun={this.savemappingFun} SetMapperValue={this.SetMapperValue} mapindex={this.state.mapindex} RequestModel={this.state.RequestModel} targetResponse={this.state.targetResponse} onTargetChange={this.onTargetChange} targetValue={this.state.targetValue} sourceResponse={this.state.sourceResponse} sourceValue={this.state.sourceValue} onSourceChange={this.onSourceChange} onADD={this.onADD} onSubmit={this.onSubmit}/>
                     </div>
                 </Modal>
             </div>
