@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -112,7 +113,6 @@ namespace iNube.Services.Policy
                 c.SwaggerEndpoint("/" + Configuration["Swagger:Url"].ToString() + "/" + Configuration["Swagger:Version"].ToString() + "/swagger.json", Configuration["Swagger:Name"].ToString());
                 c.RoutePrefix = Configuration["Swagger:Url"].ToString();
             });
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -123,6 +123,7 @@ namespace iNube.Services.Policy
                 app.UseHsts();
             }
             app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+            app.UseEndpointRouting();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
