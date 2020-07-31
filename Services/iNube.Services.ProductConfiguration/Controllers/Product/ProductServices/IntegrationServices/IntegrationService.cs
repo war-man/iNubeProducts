@@ -141,7 +141,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
         }
         public async Task<MapperResponse> SaveDynamicMapper(MapperDTO MapperDTO, ApiContext apiContext)
         {
-            var uri = DispatcherUrl + "/api/ObjectMapper/SaveDynamicMapper";
+            var uri = DispatcherUrl + "/api/Dispatcher/SaveDynamicMapper";
             return await PostApiInvoke<MapperDTO, MapperResponse>(uri, apiContext, MapperDTO); ;
 
         }

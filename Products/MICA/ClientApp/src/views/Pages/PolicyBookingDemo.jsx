@@ -26,7 +26,7 @@ import extendedFormsStyle from "assets/jss/material-dashboard-pro-react/views/ex
 import withStyles from "@material-ui/core/styles/withStyles";
 import ruleconfig from 'modules/RuleEngine/RuleConfig.js';
 //import config from '../../../../config.js';
-import CustomDatetime from "components/CustomComponent/CustomDatetimeFormate.jsx";
+import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 import $ from 'jquery';
 import loginPageStyle from "assets/jss/material-dashboard-pro-react/views/loginPageStyle.jsx";
 import policyConfig from 'modules/Policy/PolicyConfig.js';
@@ -111,7 +111,7 @@ class PolicyBookingDemo extends React.Component {
     onInputParamChangeInsurableFields = (evt, index, insIndex) => {
         console.log('Event', evt);
         //  debugger;
-        let field = this.state.fields.InsurableItem[index].InsurableFields[insIndex];
+        let field = this.state.fields.InsurableItem[index].RiskItems[insIndex];
         field[evt.target.name] = evt.target.value;
         this.setState({ field });
         console.log("fieldsdata", field);
@@ -206,8 +206,8 @@ class PolicyBookingDemo extends React.Component {
 
     onFormSubmit = (evt) => {
         if (this.state.IsCheck==true) {
-        //const pstartdate =this.state.fields['Policy Start Date'];
-        //const penddate = this.state.fields['Policy End Date'];
+        const pstartdate =this.state.fields['Policy Start Date'];
+        const penddate = this.state.fields['Policy End Date'];
 
         //for (var i = 0; i <= this.state.datename.length - 1; i++) {
 
@@ -215,10 +215,12 @@ class PolicyBookingDemo extends React.Component {
         //}
         console.log("submittested", this.state.fields);
         //   console.log("submitJSON", this.state.fields.JSON());
-        //if (this.state.fields['Policy Start Date'] != "" && this.state.fields['Policy End Date']!="") {
-        //    this.state.fields['Policy Start Date'] = this.datechange(this.state.fields['Policy Start Date']);
-        //    this.state.fields['Policy End Date'] = this.datechange(this.state.fields['Policy End Date']);
-        //}
+            if (this.state.fields['Policy Start Date'] != "") {
+                this.state.fields['Policy Start Date'] = this.datechange(this.state.fields['Policy Start Date']);
+            }
+            if (this.state.fields['Policy End Date'] != "") {
+                this.state.fields['Policy End Date'] = this.datechange(this.state.fields['Policy End Date']);
+            }
 
         //fetch(`http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com/api/Policy/CreateMultiCoverPolicy  `, {
             fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/CreateMultiCoverPolicy`, {
@@ -278,27 +280,31 @@ class PolicyBookingDemo extends React.Component {
         //    this.state.datetemp[i] = "";
         //    console.log("submit2", this.state.datetemp[i]);
         //}
-        //this.state.fields['Policy Start Date'] = pstartdate;
-        //this.state.fields['Policy End Date'] = penddate;
+        this.state.fields['Policy Start Date'] = pstartdate;
+        this.state.fields['Policy End Date'] = penddate;
     } else {
     swal({ text: "Please Opt for Insurance", icon: "info" });
 }
     };
     onPaymentSubmit = (evt) => {
         if (this.state.IsCheck == true) {
-          //  const pstartdate = this.state.fields['Policy Start Date'];
-           // const penddate = this.state.fields['Policy End Date'];
-
+            const pstartdate = this.state.fields['Policy Start Date'];
+            const penddate = this.state.fields['Policy End Date'];
+           
             //for (var i = 0; i <= this.state.datename.length - 1; i++) {
 
             //    this.state.fields[this.state.datename[i]] = this.state.datetime[i];
             //}
             console.log("submittested", this.state.fields);
+          
             //   console.log("submitJSON", this.state.fields.JSON());
-            //if (this.state.fields['Policy Start Date'] != "" && this.state.fields['Policy End Date'] != "") {
-            //    this.state.fields['Policy Start Date'] = this.datechange(this.state.fields['Policy Start Date']);
-            //    this.state.fields['Policy End Date'] = this.datechange(this.state.fields['Policy End Date']);
-            //}
+            if (this.state.fields['Policy Start Date'] != "") {
+                this.state.fields['Policy Start Date'] = this.datechange(this.state.fields['Policy Start Date']);
+            }
+                if (this.state.fields['Policy End Date'] != "") {
+                    this.state.fields['Policy End Date'] = this.datechange(this.state.fields['Policy End Date']);
+                }
+            
 
             //fetch(`https://localhost:44351/api/Policy/CreatePolicyWithPayment  `, {
             fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/CreatePolicyWithPayment`, {
@@ -361,8 +367,8 @@ class PolicyBookingDemo extends React.Component {
             //    this.state.datetemp[i] = "";
             //    console.log("submit2", this.state.datetemp[i]);
             //}
-          //  this.state.fields['Policy Start Date'] = pstartdate;
-            //this.state.fields['Policy End Date'] = penddate;
+            this.state.fields['Policy Start Date'] = pstartdate;
+            this.state.fields['Policy End Date'] = penddate;
         } else {
             swal({ text: "Please Opt for Insurance",icon: "info" });
         }
@@ -436,7 +442,7 @@ class PolicyBookingDemo extends React.Component {
         console.log("name", name);
         var today = event.toDate();
        // var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
-        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+        var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();//+ ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
 
         console.log("today", today);
         console.log("date", date);
@@ -492,7 +498,7 @@ class PolicyBookingDemo extends React.Component {
                         // Object for Cover
                         this.state.fields.InsurableItem = this.state.fields.InsurableItem.concat({
                             InsurableName: "",
-                            InsurableFields: [{}],
+                            RiskItems: [{}],
                             Covers: [{}],
                         });
                     }
@@ -588,15 +594,17 @@ class PolicyBookingDemo extends React.Component {
        
         const today = new Date();
         var nextDay = new Date();
-        nextDay.setDate(new Date().getDate() + 1);
+        nextDay.setDate(new Date().getDate()+1);
         //const nextDay = today.add(1).day();
         
-        const date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
-        const date1 = (nextDay.getDate()) + '/' + (nextDay.getMonth() + 1) + '/' + nextDay.getFullYear();
-        this.state.fields['Policy Start Date'] = date;
-        this.state.fields['Policy End Date'] = date1;
-        this.state.fields['No. Of Risks'] = "1";
-        this.state.fields['Identification Number'] = "123";
+        var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();// + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+        var date1 = nextDay.getDate() + '/' + (nextDay.getMonth() + 1) + '/' + nextDay.getFullYear();//+ ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+        let fieldobj=this.state.fields;
+        fieldobj['Policy Start Date'] = date;
+        fieldobj['Policy End Date'] = date1;
+        fieldobj['No. Of Risks'] = "1";
+        fieldobj['Identification Number'] = "123";
+        this.setState({ fieldobj });
         console.log(" this.state.fields", this.state.fields);
     }
 
@@ -708,8 +716,8 @@ class PolicyBookingDemo extends React.Component {
                 for (var i = 0; i < len; i++) {
                     // Object for Cover
                     this.state.fields.InsurableItem = this.state.fields.InsurableItem.concat({
-                        InsurableName: "",
-                        InsurableFields: [{}],
+                        InsurableName: this.state.PolicyData1[0].productRcbInsurableDetails[i].inputType,
+                        RiskItems: [{}],
                         Covers: [],
                     });
                 }
@@ -719,7 +727,7 @@ class PolicyBookingDemo extends React.Component {
                     for (var j = 0; j < Coverlen; j++) {
 
                         this.state.fields.InsurableItem[i].Covers = this.state.fields.InsurableItem[i].Covers.concat({
-                            CoverName: "",
+                            CoverName: this.state.PolicyData1[0].productRcbInsurableDetails[i].coverRcbdetails[j].inputType,
                             CoverFields: [{ "Cover Name": this.state.PolicyData1[0].productRcbInsurableDetails[i].coverRcbdetails[j].inputType }],
 
                         });
@@ -835,7 +843,7 @@ class PolicyBookingDemo extends React.Component {
                                                         //type: "number"
                                                     }}
                                                     formControlProps={{ fullWidth: true }} /> :
-                                                <CustomDatetime labelText={item.inputType} name={item.inputType} time={true} value={this.state.fields[item.inputType]} onChange={(evt) => this.onDateChange('Datetime', item.inputType, evt)} value={this.state.fields[item.inputType]} formControlProps={{ fullWidth: true }} />
+                                                <CustomDatetime labelText={item.inputType} name={item.inputType} time={false} value={this.state.fields[item.inputType]} onChange={(evt) => this.onDateChange('Datetime', item.inputType, evt)} value={this.state.fields[item.inputType]} IsValid={true} formControlProps={{ fullWidth: true }} />
                                             }
                                         </GridItem>
                                     )}
@@ -869,7 +877,7 @@ class PolicyBookingDemo extends React.Component {
                                                                 //type: "number"
                                                             }}
                                                             formControlProps={{ fullWidth: true }} /> :
-                                                        <CustomDatetime labelText={prop.inputType} name={prop.inputType} time={true} value={this.state.fields[prop.inputType]} onChange={(evt) => this.onDateChange('Datetime', item.inputType, evt)} value={this.state.fields[prop.inputType]} formControlProps={{ fullWidth: true }} />
+                                                        <CustomDatetime labelText={prop.inputType} name={prop.inputType} time={false} value={this.state.fields[prop.inputType]} onChange={(evt) => this.onDateChange('Datetime', item.inputType, evt)} IsValid={true}  formControlProps={{ fullWidth: true }} />
                                                     }
 
                                                 </GridItem>
@@ -908,7 +916,7 @@ class PolicyBookingDemo extends React.Component {
                                                                             //type: "number"
                                                                         }}
                                                                         formControlProps={{ fullWidth: true }} /> :
-                                                                    <CustomDatetime labelText={prop2.inputType} time={true} name={prop2.inputType} value={this.state.fields[prop2.inputType]} onChange={(evt) => this.onDateChange('Datetime', item.inputType, evt)} value={this.state.fields[prop2.inputType]} formControlProps={{ fullWidth: true }} />
+                                                                    <CustomDatetime labelText={prop2.inputType} time={false} name={prop2.inputType} value={this.state.fields[prop2.inputType]} onChange={(evt) => this.onDateChange('Datetime', item.inputType, evt)} IsValid={true} formControlProps={{ fullWidth: true }} />
                                                                 }
 
                                                             </GridItem>
