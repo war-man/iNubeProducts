@@ -15,10 +15,11 @@ import Icon from "@material-ui/core/Icon";
 import ReactTable from "react-table";
 import user from "assets/img/user.png";
 import Modify from "./Modify.jsx";
+import Select from "@material-ui/core/Select";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Switch from "@material-ui/core/Switch";
-import Select from "@material-ui/core/Select";
+import extendedFormsStyle from "assets/jss/material-dashboard-pro-react/views/extendedFormsStyle.jsx";
 import MenuItem from "@material-ui/core/MenuItem";
 import Edit from "@material-ui/icons/Edit";
 import ProspectScreen from './ProspectScreen.jsx';
@@ -26,6 +27,7 @@ import NeedIdentification from './NeedIdentification.jsx';
 import NeedAnalysis from './NeedAnalysis.jsx';
 import PersonalInformation from './PersonalInformation.jsx';
 import swal from 'sweetalert';
+import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 import NewBusinessConfig from 'modules/NewBusiness/NewBusinessConfig.js';
 import RegularForms from 'modules/NewBusiness/Prospect/NeedAnalysisCompleted.jsx';
 import { Redirect } from 'react-router-dom';
@@ -37,6 +39,8 @@ import Health from "./Health.jsx";
 import Education from "./Education.jsx";
 import HumanValue from "./HumanValues.jsx";
 import Savings from "./Savings.jsx";
+import Dropdown from "components/Dropdown/Dropdown.jsx";
+import validationPage from "components/Validation/Validation.jsx";
 
 //const dataTable = {
 //    headerRow: ["Type", "Lead Number", "Lead Date", "Proposer Name", "dob", "Place", "Actions"],
@@ -90,6 +94,10 @@ class NeedAnalysisCompleted extends React.Component {
         super(props);
 
         this.state = {
+            datename: [],
+            datetime: [],
+            datetemp: [],
+            newChildData: [],
             calcObj: {
                 interval: "",
                 redirect: false,
@@ -118,7 +126,7 @@ class NeedAnalysisCompleted extends React.Component {
             showCalc: false,
             showFNA: false,
             contactId: 0,
-            Policydetailsdata: ["pks"],
+            
             editModal: false,
             btnvisibility: false,
             disabled: false,
@@ -265,6 +273,28 @@ class NeedAnalysisCompleted extends React.Component {
 
             //prospect pool data
             ProspectDTO: [],
+            //ChildDTO: [],
+            //childObj: {
+            //   // "NoOfchild": "",
+            //    "childName": "",
+            //    "childDob": "",
+            //    "childAge": 0,
+            //    "Relationship": "",
+
+            //},
+            //NoChild: {
+            //    "NoOfchild": "",
+               
+            //},
+            ChildDTO: [{
+                "NoOfchild": "",
+                "childName": "",
+                "childDob": "",
+                "childAge": 0,
+                "Relationship": "",
+
+            }],
+          // RelationshipList: [],
            Relationship: [
 
                 { mID: 1, mValue: "DAUGHTER", mType: 1 },
@@ -404,6 +434,234 @@ class NeedAnalysisCompleted extends React.Component {
             fundbalflag: false
         })
     }
+
+    change(event, stateName, type, date, maxValue) {
+
+        switch (type) {
+
+            case "string":
+                if (validationPage.verifyName(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+
+
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+
+
+                }
+                break;
+            case "datetime":
+                if (validationPage.verifydatetime(date)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            case "productBenefit":
+                if (validationPage.verifydecimal(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            case "number":
+                if (validationPage.verifyNumeric(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            case "email":
+                if (validationPage.verifyEmail(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            case "passportNo":
+                if (validationPage.verifyPassportNo(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                    // console.log("passport", this.state.passportNoState)
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+
+            default:
+                break;
+        }
+
+
+    }
+
+    onDateChange = (format, name, event) => {
+        debugger
+        var today = event.toDate();
+        // var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+        var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
+        var date2 = new Date();
+        var date1 = new Date(today);
+        let ChildDt = this.state.ChildDTO[0];
+        ChildDt[name] = date;
+        if (name == "childDob") {
+
+            var ageDifMs = Date.now() - date1.getTime();
+            var ageDate = new Date(ageDifMs);
+            var childAge = Math.abs(ageDate.getUTCFullYear() - 1970);
+            const Childdto = this.state.ChildDTO[0];
+            Childdto['childAge'] = childAge;
+            this.setState({ Childdto });
+            console.log("datediffChild", childAge, ageDate);
+        }
+        this.setState({ ChildDt });
+        const ChildDateDTO = this.state.ChildDTO[0];
+        ChildDateDTO[name] = date;
+        this.setState({ ChildDateDTO });
+        if (this.state.datename.length == 0) {
+            this.state.datename.push(name);
+            this.state.datetemp.push(date);
+            this.state.datetime.push(this.datechange(date));
+        } else {
+            for (var i = 0; i <= this.state.datetime.length - 1; i++) {
+                if (this.state.datename[i] !== name) {
+                    this.state.datename.push(name);
+                    this.state.datetemp.push(date);
+                    this.state.datetime.push(this.datechange(date));
+                }
+            }
+        }
+
+    }
+
+
+    datechange = (date) => {
+        const _date = date.split('/');
+        const dateObj = { month: _date[1], year: _date[2], day: _date[0] };
+
+        return dateObj.year + '-' + dateObj.month + '-' + dateObj.day;
+    }
+    onInputChange = (type, event) => {
+        debugger
+        let ChildDTO = this.state.ChildDTO;
+        let name = event.target.name;
+        let value = event.target.value;
+        ChildDTO[0][name] = value;
+        this.setState({ ChildDTO });
+
+     
+        console.log("HandleChildDTO", this.state.ChildDTO)
+    }
+   
+    
+    handleFamilySetValues = (event, index) => {
+        let familytabledto = this.state.familytable;
+        let name = event.target.name;
+        let value = event.target.value;
+        familytabledto[index][name] = value;
+        this.setState({ familytabledto });
+
+        console.log("dssythfkgui", this.state.familytable);
+        this.handleFamilydatatable();
+    }
+ //onHandleChange1 = (type, event) => {
+    //    debugger
+    //    let ChildDTO = this.state.ChildDTO;
+    //    let name = event.target.name;
+    //    let value = event.target.value;
+    //    ChildDTO[0][name] = value;
+    //    this.setState({ ChildDTO });
+
+    //    console.log("HandleChildDTO1", this.state.ChildDTO)
+    //}
+
+
+    onHandleChange = ( event, index) => {
+        debugger
+        let ChildDTO = this.state.ChildDTO;
+        let name = event.target.name;
+        let value = event.target.value;
+        ChildDTO[index][name] = value;
+        this.setState({ ChildDTO });
+
+        console.log("HandleChildDTO", this.state.ChildDTO, index)
+    }
+   
+    //SetValueChild = (type, event) => {
+    //    debugger
+
+    //    let NoChild = this.state.NoChild;
+    //    let name = event.target.name;
+    //    let value = event.target.value;
+    //    NoChild[name] = value;
+    //    this.setState({ NoChild });
+
+    //    console.log("NoChild", this.state.NoChild)
+    //    //this.state.ChildDTO = [];
+    //    for (var i = 0; i <= event.target.value; i++) {
+
+    //        let ChildObjectNew = Object.assign({}, this.state.childObj);
+    //        this.state.childDTO.push(ChildObjectNew);
+    //        this.setState({});
+    //    } this.AddChildGrid();
+    //}
+    SetValueChild = (type, event) => {
+        debugger
+
+        let ChildDTO = this.state.ChildDTO;
+        let name = event.target.name;
+        let value = event.target.value;
+        ChildDTO[0][name] = value;
+        this.setState({ ChildDTO });
+         this.change(event, name, type);
+        let sendArray = [];
+          console.log("ChildDTO", this.state.ChildDTO)
+        this.state.ChildDTO = [];
+        for (var i = 1; i <= event.target.value; i++) {
+            this.state.ChildDTO = this.state.ChildDTO.concat({
+                "NoOfchild": "",
+                "childName": "",
+                "childDob": "",
+                "childAge": "",
+                "Relationship": "",
+
+            });
+
+            //sendArray.push({
+            //    'NAME': this.state.ChildDTO[i].NAME,
+            //    'DOB': this.state.ChildDTO[i].DOB,
+            //    'Age': this.state.ChildDTO[i].Age,
+            //    'Relationship': this.state.ChildDTO[i].Relationship,
+            //});
+
+        } this.AddChildGrid();
+    }  
+
+    //SetValueChild = (type, event) => {
+    //    debugger
+
+    //    let ChildDTO = this.state.ChildDTO;
+    //    let name = event.target.name;
+    //    let value = event.target.value;
+    //    ChildDTO[0][name] = value;
+    //    this.setState({ ChildDTO });
+      
+    //    this.change(event, name, type);
+    //    let sendArray = [];
+        
+    //    console.log("ChildDTO", this.state.ChildDTO)
+    //    this.state.ChildDTO = [];
+    //    for (var i = 0; i <= event.target.value; i++) {
+    //        this.state.ChildDTO = this.state.ChildDTO.concat({
+    //            "NoOfchild": "",
+    //            "childName": "",
+    //            "childDob": "",
+    //            "childAge": "",
+    //            "Relationship": "",
+
+    //        });
+           
+    //    } 
+    //}  
 
 
     SetValue = (event) => {
@@ -693,6 +951,65 @@ class NeedAnalysisCompleted extends React.Component {
             });
     }
 
+/************PERSONAL INFORMATION  ************** */
+    AddChildGrid = () => {
+
+        for (var i = 0; i <= this.state.datename.length - 1; i++) {
+
+            this.state.ChildDateDTO[this.state.datename[i]] = this.state.datetime[i];
+        }
+        console.log("Child", this.state.ChildDTO[0], this.state.ChildDTO)
+        this.setState({
+            newChildData: this.state.ChildDTO.map((m, index) => {
+                return {
+                    NAME: <CustomInput labelText="" id="NAME" name="childName" value={m.childName} onChange={(e) => this.onHandleChange(e, index)} formControlProps={{ fullWidth: true }} />,
+                    DOB: <CustomDatetime labelText="" id="DOB" name="childDob" value={m.childDob} onChange={(e) => this.onDateChange("date", "childDob", e)} formControlProps={{ fullWidth: true }} />,
+                    Age: <CustomInput labelText="" id="Age" name="childAge" value={m.childAge} formControlProps={{ fullWidth: true }} />, 
+                    Relationship: <Dropdown labelText="" id="Relationship" name="Relationship" value={m.Relationship} lstObject={this.state.Relationship} onChange={(e) => this.onHandleChange(e, index)} // onChange={(e) => this.onHandleChange1("string", e)}
+                        formControlProps={{ fullWidth: true }} />
+                        
+                      
+                      
+                        
+                };
+            })
+        })
+        console.log("ChildNew", this.state.newChildData)
+    }
+
+//    AddChildGrid() {
+     
+           
+//        for (var i = 0; i <= this.state.datename.length - 1; i++) {
+
+//            this.state.ChildDateDTO[this.state.datename[i]] = this.state.datetime[i];
+//        }
+//        debugger;
+//        console.log("Child", this.state.ChildDTO[0], this.state.ChildDTO)
+//        this.setState({
+//             newChildData: this.state.ChildDTO.map((prop, key) => {
+//               //  this.state.ChildDTO = this.state.ChildDTO.concat({
+//                 return {
+//                   //  No: key,
+//                   //  NAME: prop.NAME,
+                    
+//                 NAME: <CustomInput labelText="" id="NAME" name="childName" value={this.state.ChildDTO[key].childName} onChange={(e) => this.onHandleChange("string", e)} formControlProps={{ fullWidth: true }} />,
+//                 DOB: <CustomDatetime labelText="" id="DOB" name="childDob" value={this.state.ChildDTO[key].childDob} onChange={(e) => this.onDateChange("date", "childDob", e)} formControlProps={{ fullWidth: true }} />,
+//                 Age: <CustomInput labelText="" id="Age" name="childAge" value={this.state.ChildDTO[key].childAge} formControlProps={{ fullWidth: true }} />,
+//                     Relationship: <Dropdown labelText="" id="Relationship" name="Relationship" lstObject={this.state.Relationship} filterName="Relationship" value={this.state.ChildDTO[key].Relationship} onChange={(e) => this.onHandleChange("string", e)} formControlProps={{ fullWidth: true }} />,
+                      
+//                     };
+
+//                 console.log("Childkey", this.state.ChildDTO[key].childName)
+//                })
+//        });
+//        console.log("ChildNew", this.state.newChildData)
+//}
+
+       
+  
+
+/************PERSONAL INFORMATION  ************** */
 
     handleClose = () => {
 
@@ -748,7 +1065,10 @@ class NeedAnalysisCompleted extends React.Component {
                                 masterList={this.state.masterList} openCal={this.state.openCal} showCalc={this.state.showCalc}
                                 showFNA={this.state.showFNA} caledit={this.caledit} handleClose={this.handleClose} FNAedit={this.FNAedit}
 
-                                LeadDTO={this.props.LeadDTO} firstNameState={this.state.firstNameState} ageState={this.state.ageState} dateOfBirthState={this.state.dateOfBirthState}
+                                LeadDTO={this.props.LeadDTO} ChildDTO={this.state.ChildDTO} Relationship={this.state.Relationship}
+                                newChildData={this.state.newChildData}// newChildData={this.state.newChildData}
+                                SetValueChild={this.SetValueChild} AddChildGrid={this.AddChildGrid}
+                                firstNameState={this.state.firstNameState} ageState={this.state.ageState} dateOfBirthState={this.state.dateOfBirthState}
                             />
 
                             </Animated>

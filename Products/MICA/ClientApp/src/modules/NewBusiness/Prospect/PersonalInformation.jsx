@@ -32,17 +32,20 @@ import Datetime from "react-datetime";
 import { max } from "moment";
 import CommonModify from 'modules/NewBusiness/Lead/CommonModify.jsx';
 import ReactTable from 'components/MuiTable/MuiTable.jsx';
+import Wizard from "components/Wizard/Wizard.jsx";
+import ProductSelection from 'modules/NewBusiness/Prospect/ProductSelection.jsx';
+
 
 
 
 const ProsptInformation = (props) => {
 
     let classes = props.classes;
-    console.log("PersnInfo", props, props.componentData);
+    console.log("PersnInfo", props, props.componentData, props.newChildData);
 
     return (
         <div>
-
+           
             <GridContainer>
                
 
@@ -96,13 +99,12 @@ const ProsptInformation = (props) => {
                 <GridItem xs={12} sm={12} md={3}>
                     <CustomInput
                         required={true}
-                      //  success={props.componentData.ageState === "success"}
-                      //  error={props.componentData.ageState === "error"}
+                 
                         labelText="Number Of Children"
                         id="NoOfChildren"
-                        name="NoOfChildren"
-                       // value={props.componentData.LeadDTO[0].NoOfChildren}
-                        // onChange={(e) => props.SetValue("string", e)}
+                        name="NoOfchild"
+                        value={props.componentData.ChildDTO.NoOfchild}
+                        onChange={(e) => props.componentData.SetValueChild("string", e)}
                         formControlProps={{
                             fullWidth: true
                         }}
@@ -118,13 +120,23 @@ const ProsptInformation = (props) => {
                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
 
                         <ReactTable
-                          //  data={this.state.newParamData}
+                            data={props.componentData.newChildData}
                             filterable
                             columns={[
+                                //{
+                                //    Header: "No  ",
+                                //    accessor: "No",
+                                //    minWidth: 30,
+                                //    style: { textAlign: "center" },
+                                //    headerClassName: 'react-table-center',
+                                //    resizable: false,
+
+                                //},
                                 
                                 {
                                     Header: "NAME  ",
-                                //    accessor: "MasterList",
+                                    accessor: "NAME",
+                                    //accessor: "childName",
                                     minWidth: 30,
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -132,7 +144,8 @@ const ProsptInformation = (props) => {
 
                                 }, {
                                     Header: "DOB",
-                                  //  accessor: "input",
+                                    accessor: "DOB",
+                                    //accessor: "childDob",
                                     minWidth: 30,
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -141,7 +154,8 @@ const ProsptInformation = (props) => {
                                 },
                                 {
                                     Header: "AGE AT NEXT BIRTHDAY ",
-                                   // accessor: "dataType",
+                                    accessor: "Age",
+                                   // accessor: "childAge",
                                     minWidth: 30,
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -150,7 +164,7 @@ const ProsptInformation = (props) => {
                                 },
                                 {
                                     Header: "RELATIONSHIP",
-                                  //  accessor: "allocParamName",
+                                    accessor: "Relationship",
                                     minWidth: 30,
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -160,7 +174,7 @@ const ProsptInformation = (props) => {
                             ]}
                             defaultPageSize={5}
                             showPaginationTop={false}
-                           // pageSize={([this.state.newParamData.length + 1] < 5) ? [this.state.newParamData.length + 1] : 5}
+                            pageSize={([props.componentData.newChildData.length + 1] < 5) ? [props.componentData.newChildData.length + 1] : 5}
                             showPaginationBottom
                             className="-striped -highlight"
                         />
