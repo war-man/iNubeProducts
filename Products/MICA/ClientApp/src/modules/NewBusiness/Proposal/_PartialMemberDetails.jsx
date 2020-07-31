@@ -239,8 +239,8 @@ const PartialMemberDetails = (props) => {
                                 labelText="Date Of Birth"
                                 id='dob'
                                 name='dob'
-                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.dateOfBirth : props.tblPolicyMemberDetails.dob}
-                                onChange={(evt) => props.DateChange('dob', evt)}
+                                value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition.dob : props.tblPolicyMemberDetails.dob}
+                                onChange={props.singleValueSelectedProposer === "1" ? (e) => props.onProposerDateChange('datetime', 'PolicyOwnerDetailsdataOnNoCondition', 'dob', e) : ""}
                                 formControlProps={{ fullWidth: true }} />
                         </GridItem>
 

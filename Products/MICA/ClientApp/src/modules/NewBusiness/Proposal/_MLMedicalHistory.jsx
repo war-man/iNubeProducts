@@ -717,7 +717,7 @@ const MLMedicalHistory = (props) => {
                 {props.show4MHQ4 &&
                     <GridItem>
 
-                        <p>4. {(props.MedHistQuesDTO[11] !== undefined) ? props.MedHistQuesDTO[11].questionText : ""}</p>
+                        <p>4.4.1 {(props.MedHistQuesDTO[11] !== undefined) ? props.MedHistQuesDTO[11].questionText : ""}</p>
 
                         <GridItem xs={12}>
                             <FormControlLabel
@@ -1243,7 +1243,7 @@ const MLMedicalHistory = (props) => {
                                             accessor: "dateLastTaken",
                                             style: { textAlign: "center" },
                                             headerClassName: 'react-table-center',
-                                            minWidth: 100,
+                                            minWidth: 150,
                                             resizable: false,
                                         },
                                         {

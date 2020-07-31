@@ -18,6 +18,7 @@ import NewBusinessConfig from 'modules/NewBusiness/NewBusinessConfig.js';
 import Delete from "@material-ui/icons/Delete";
 import Button from "components/CustomButtons/Button.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
+import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 
 
 
@@ -780,7 +781,7 @@ class Questionnaries extends React.Component {
                     nameOfMedication: <CustomInput value={m.nameOfMedication} onChange={(e) => this.handleLMSetValues(e, index)} name="nameOfMedication" formControlProps={{ fullWidth: true }} />,
                     dose: <CustomInput value={m.dose} onChange={(e) => this.handleLMSetValues(e, index)} name="dose" formControlProps={{ fullWidth: true }} />,
                     frequency: <CustomInput value={m.frequency} onChange={(e) => this.handleLMSetValues(e, index)} name="frequency" formControlProps={{ fullWidth: true }} />,
-                    dateLastTaken: <CustomInput value={m.dateLastTaken} onChange={(e) => this.handleLMSetValues(e, index)} name="dateLastTaken" formControlProps={{ fullWidth: true }} />,
+                    dateLastTaken: <CustomDatetime value={m.dateLastTaken} onChange={(e) => this.handleLMDateChange('dateLastTaken',e, index)} name="dateLastTaken" formControlProps={{ fullWidth: true }} />,
                     actions: <Button justIcon round simple color="danger" className="remove" disabled={(this.state.nonedit === true) ? true : false} onClick={(e) => this.deleteLMdata(e, index)} ><Delete /> </Button >
                 };
             })
@@ -798,6 +799,40 @@ class Questionnaries extends React.Component {
         this.handleLMDataTable();
     }
 
+    handleLMDateChange = (name, evt, index) => {
+        debugger
+        var today = evt.toDate();
+
+        var day = today.getDate();
+        var month = today.getMonth() + 1;
+
+        if (month < 10) {
+            month = '0' + month;
+
+        }
+        if (day < 10) {
+            day = '0' + day;
+        }
+
+        //var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+        var date = day + '/' + month + '/' + today.getFullYear();
+
+        let lastMedTaken = this.props.lmedicinetable;
+        lastMedTaken[index][name] = date;
+
+        this.setState({ lastMedTaken });
+
+        console.log("lastMedTaken", lastMedTaken);
+
+        this.handleLMDataTable();
+    }
+    datechange = (date) => {
+        const _date = date.split('/');
+        const dateObj = { month: _date[1], year: _date[2], day: _date[0] };
+
+        return dateObj.year + '-' + dateObj.month + '-' + dateObj.day;
+    }
     handleLMAddButton = () => {
         let LMedicineObjectNew = Object.assign({}, this.props.lmedicineDto);
         this.props.lmedicinetable.push(LMedicineObjectNew);
@@ -820,7 +855,7 @@ class Questionnaries extends React.Component {
                 return {
                     nameOfTreatment: <CustomInput value={m.nameOfTreatment} onChange={(e) => this.handleTreatSetValues(e, index)} name="nameOfTreatment" formControlProps={{ fullWidth: true }} />,
                     location: <CustomInput value={m.location} onChange={(e) => this.handleTreatSetValues(e, index)} name="location" formControlProps={{ fullWidth: true }} />,
-                    date: <CustomInput value={m.date} onChange={(e) => this.handleTreatSetValues(e, index)} name="date" formControlProps={{ fullWidth: true }} />,
+                    date: <CustomDatetime value={m.date} onChange={(e) => this.handleTreatDateChange('date', e, index)} name="date" formControlProps={{ fullWidth: true }} />,
                     result: <CustomInput value={m.result} onChange={(e) => this.handleTreatSetValues(e, index)} name="result" formControlProps={{ fullWidth: true }} />,
                     actions: <Button justIcon round simple color="danger" className="remove" disabled={(this.state.nonedit === true) ? true : false} onClick={(e) => this.deleteLMdata(e, index)} ><Delete /> </Button >
                 };
@@ -839,6 +874,35 @@ class Questionnaries extends React.Component {
         this.handleTreatDataTable();
     }
 
+    handleTreatDateChange = (name, evt, index) => {
+        debugger
+        var today = evt.toDate();
+
+        var day = today.getDate();
+        var month = today.getMonth() + 1;
+
+        if (month < 10) {
+            month = '0' + month;
+
+        }
+        if (day < 10) {
+            day = '0' + day;
+        }
+
+        //var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+        var date = day + '/' + month + '/' + today.getFullYear();
+
+        let TreatmentDate = this.props.Treatmenttable;
+        TreatmentDate[index][name] = date;
+
+        this.setState({ TreatmentDate });
+
+        console.log("TreatmentDate", TreatmentDate);
+
+        this.handleTreatDataTable();
+    }
+   
     handleTreatAddButton = () => {
         let TreatObjectNew = Object.assign({}, this.props.TreatmentDto);
         this.props.Treatmenttable.push(TreatObjectNew);
@@ -861,7 +925,7 @@ class Questionnaries extends React.Component {
                 return {
                     nameOfDoctor: <CustomInput value={m.nameOfDoctor} onChange={(e) => this.handleTreatSetValues(e, index)} name="nameOfDoctor" formControlProps={{ fullWidth: true }} />,
                     address: <CustomInput value={m.address} onChange={(e) => this.handleTreatSetValues(e, index)} name="address" formControlProps={{ fullWidth: true }} />,
-                    dateOfLastConsult: <CustomInput value={m.dateOfLastConsult} onChange={(e) => this.handleTreatSetValues(e, index)} name="dateOfLastConsult" formControlProps={{ fullWidth: true }} />,
+                    dateOfLastConsult: <CustomDatetime value={m.dateOfLastConsult} onChange={(e) => this.handleDHCDateChange('dateOfLastConsult', e, index)} name="dateOfLastConsult" formControlProps={{ fullWidth: true }} />,
                     actions: <Button justIcon round simple color="danger" className="remove" disabled={(this.state.nonedit === true) ? true : false} onClick={(e) => this.deleteLMdata(e, index)} ><Delete /> </Button >
                 };
             })
@@ -876,6 +940,35 @@ class Questionnaries extends React.Component {
         this.setState({ DHCTabledto });
 
         console.log("DHC table testing:", this.props.DHCtable);
+        this.handleDHCDataTable();
+    }
+
+    handleDHCDateChange = (name, evt, index) => {
+        debugger
+        var today = evt.toDate();
+
+        var day = today.getDate();
+        var month = today.getMonth() + 1;
+
+        if (month < 10) {
+            month = '0' + month;
+
+        }
+        if (day < 10) {
+            day = '0' + day;
+        }
+
+        //var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+        var date = day + '/' + month + '/' + today.getFullYear();
+
+        let dhcDate = this.props.DHCtable;
+        dhcDate[index][name] = date;
+
+        this.setState({ dhcDate });
+
+        console.log("dhcDate", dhcDate);
+
         this.handleDHCDataTable();
     }
 

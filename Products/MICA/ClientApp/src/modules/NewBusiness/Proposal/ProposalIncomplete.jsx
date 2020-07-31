@@ -16,7 +16,7 @@ import Icon from "@material-ui/core/Icon";
 //import ReactTable from "react-table";
 import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import user from "assets/img/user.png";
-
+import swal from 'sweetalert';
 import ModifyProposal from "./ModifyProposal.jsx";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -104,58 +104,58 @@ class ProposalIncomplete extends React.Component {
             proposalFormFlag: true,
             selectOccPNM: "0",
             selectOccPOM: "0",
-           
+
             PolicyOwnerDetailsdataOnYesConditioin: [],//we dont have to send this data to next page becouse in editable fucntion i sa filtering it and storing it into its Dto object 
             //so we have to send niche vala data to next page
             //Agar Yes condition par date bind nahi hot rha hai toh data jo yes condition par aarha hia toh uske paramaeter name check karo name and all
 
             PolicyOwnerDetailsdataOnYesConditioinDto: [],
             //   FilterPolicyOwnerDetailsdata: [],
-            PolicyOwnerDetailsdataOnNoCondition: 
+            PolicyOwnerDetailsdataOnNoCondition:
             {
-                   "relationShipWithProposer": 0,
-                    "salutation": "",
-                    "nameWithInitial": "",
-                    "givenName": "",
-                    "surname": "",
-                    "emiratesId": "",
-                    "dateOfBirth": "",
-                    "age": "",
-                    "genderID": "",
-                    "maritialStatus": "",
-                    "occupation": "",
-                    "annualIncome": "",
-                    "passportNumber": "",
-                    "nameOfEmployee": "",
-                    "nationality": "",
-                    "countryOfResidence": "",
-                    "ageProof": "",
-                    "occupationRequireHarzasousWork": 0,
-                    "specifyOccupationWork": "",
-                    "countryOfOccupation": "",
+                "relationShipWithProposer": 0,
+                "salutation": "",
+                "nameWithInitial": "",
+                "givenName": "",
+                "surname": "",
+                "emiratesId": "",
+                "dob": "",
+                "age": "",
+                "genderID": "",
+                "maritialStatus": "",
+                "occupation": "",
+                "annualIncome": "",
+                "passportNumber": "",
+                "nameOfEmployee": "",
+                "nationality": "",
+                "countryOfResidence": "",
+                "ageProof": "",
+                "occupationRequireHarzasousWork": 0,
+                "specifyOccupationWork": "",
+                "countryOfOccupation": "",
                 "citizenShip": false,
                 "citizenship1": "",
                 "citizenship2": "",
-                    "mobileNo": "",
-                    "home": "",
-                    "officeNo": "",
-                    "email": "",
-                    "address1": "",
-                    "address2": "",
-                    "address3": "",
+                "mobileNo": "",
+                "home": "",
+                "officeNo": "",
+                "email": "",
+                "address1": "",
+                "address2": "",
+                "address3": "",
                 "postalCode": "",
-                    "city": "",
-                    "district": "",
+                "city": "",
+                "district": "",
                 "province": "",
-                    "isPermanentAddrSameasCommAddr": false,
-                    "pAddress1": "",
-                    "pAddress2": "",
-                    "pAddress3": "",
-                    "pPostalCode": "",
-                    "pDistrict": "",
-                    "pProvince": ""
-                   
-                },
+                "isPermanentAddrSameasCommAddr": false,
+                "pAddress1": "",
+                "pAddress2": "",
+                "pAddress3": "",
+                "pPostalCode": "",
+                "pDistrict": "",
+                "pProvince": ""
+
+            },
 
 
             //  Master Data for all the dropdowns
@@ -172,8 +172,8 @@ class ProposalIncomplete extends React.Component {
                 "Height": "",
                 "HeightFeets": "",
                 "Weight": "",
-               // "SteadyWeight": "",
-               // "HeightUnit": "",
+                // "SteadyWeight": "",
+                // "HeightUnit": "",
                 "WeightUnit": "",
                 "IsSmoker": false,
                 "SmokeType": "",
@@ -328,7 +328,7 @@ class ProposalIncomplete extends React.Component {
                 "preferredLanguage": "",
                 "premiumMethodOfComm": ""
             },
-           
+
             proposerSigDetailsDTO: {
                 //"proposerSignaturedoc": "",
                 "proposerDate": "",
@@ -343,7 +343,7 @@ class ProposalIncomplete extends React.Component {
             },
 
             wealthSigDetailsDTO: {
-               // "wealthSignaturedoc": "",
+                // "wealthSignaturedoc": "",
                 "otherCircumstances": "",
                 "IsPolicy": "",
                 "comments": "",
@@ -362,7 +362,7 @@ class ProposalIncomplete extends React.Component {
                 "tblPolicyMemberDetails": [],
                 "familyBackgroundDetails": [],
             },
-            
+
             tblPolicyMemberDetails: {
 
                 "salutation": "",
@@ -404,12 +404,12 @@ class ProposalIncomplete extends React.Component {
                 "isSameasProposerAddress": true,
                 "citizenship1": "",
                 "citizenship2": "",
-              //"residentialNationality": "string",
-             // "residentialNationalityStatus": "string",
+                //"residentialNationality": "string",
+                // "residentialNationalityStatus": "string",
                 "occupationHazardousWork": 0,
                 "passportNumber": "",
-             // "countryOccupation": "string",
-             // "specifyResidental": "string",
+                // "countryOccupation": "string",
+                // "specifyResidental": "string",
                 "specifyHazardousWork": "",
                 "citizenShip": false,
                 "gender": "",
@@ -435,14 +435,14 @@ class ProposalIncomplete extends React.Component {
             },
 
             "SaveModifiedProposalDetails": {
-                "quoteNo": "",  
+                "quoteNo": "",
                 "policyNo": "",
-                "policyMemberOwnerDetails": [],  // this.state.tblPolicyMemberDetails
-                "policyNewMemberDetails": [],   //this.state.PolicyOwnerDetailsdataOnNoCondition
+                "policyMemberOwnerDetails": [],   // this.state.tblPolicyMemberDetails -- existing proposer details changes will be capture in this json.
+                "policyNewMemberDetails": [],     //this.state.PolicyOwnerDetailsdataOnNoCondition  --- if the proposer is not same as life to be assured then that proposer details will be captured in this json.
                 "QuestioneriesDetails": [],
-                "DocumentationUpdating": [], //this.state.premiumPayingDto,this.state.preferredCommunication
-                "ProposerSignatureDetails": [], //this.state.proposerSigDetailsDTO
-                "WealthSignatureDetails": []   //this.state.wealthSigDetailsDTO
+                "DocumentationUpdating": [],        //this.state.premiumPayingDto,this.state.preferredCommunication
+                "ProposerSignatureDetails": [],    //this.state.proposerSigDetailsDTO
+                "WealthSignatureDetails": []      //this.state.wealthSigDetailsDTO
             }
 
         }
@@ -456,21 +456,6 @@ class ProposalIncomplete extends React.Component {
 
     SubmitProposal = () => {
         debugger;
-        
-        // this.state.fields.IsActive = 1;
-        // this.state.fields.CreatedDate = date();
-        // ${ NewBusinessConfig.ProposalConfigUrl }
-
-        //storing the child data into parent decaleard array
-        // let tblPolicyMemberDetail = this.state.tblPolicyMemberDetails;
-        // debugger;
-        //if (this.state.tblPolicyMemberDetails.dob != undefined) {
-        //    tblPolicyMemberDetail.dob = this.newdatechange(this.state.tblPolicyMemberDetails.dob);
-        //}
-        // tblPolicyMemberDetail.dob = this.newdatechange(this.state.tblPolicyMemberDetails.dob);
-        // tblPolicyMemberDetail.doj = this.newdatechange(this.state.tblPolicyMemberDetails.doj);
-        // this.setState({ tblPolicyMemberDetail})
-        //this.state.SaveProposalDto.tblPolicyMemberDetails = this.state.tblPolicyMemberDetails;
 
         this.state.medicalHistoryDTO.Question4of9of1 = this.state.cmedicinetable;
         this.state.medicalHistoryDTO.Question4of10of1 = this.state.lmedicinetable;
@@ -480,9 +465,10 @@ class ProposalIncomplete extends React.Component {
         console.log("medicalhistorydtodata", this.state.medicalHistoryDTO);
 
         this.state.SaveModifiedProposalDetails.quoteNo = this.state.filterData.quoteNo;
-       // this.state.SaveModifiedProposalDetails.policyNo = this.state.filterData.quoteNo;
+        // this.state.SaveModifiedProposalDetails.policyNo = this.state.filterData.quoteNo;
 
         this.state.SaveModifiedProposalDetails.policyMemberOwnerDetails.push(this.state.tblPolicyMemberDetails);
+        this.state.SaveModifiedProposalDetails.policyNewMemberDetails.push(this.state.PolicyOwnerDetailsdataOnNoCondition);
         this.state.SaveModifiedProposalDetails.QuestioneriesDetails.push(this.state.LifeStyleQA);
         this.state.SaveModifiedProposalDetails.QuestioneriesDetails.push(this.state.familytable);
         this.state.SaveModifiedProposalDetails.QuestioneriesDetails.push(this.state.insurancetable);
@@ -530,7 +516,7 @@ class ProposalIncomplete extends React.Component {
     }
     //setting the master values  
     MasterSetValue = (evt) => {
-        // debugger;
+        
         let masterSetValue = this.state.tblPolicyMemberDetails;
         masterSetValue[evt.target.name] = evt.target.value;
         this.setState({ masterSetValue });
@@ -538,24 +524,7 @@ class ProposalIncomplete extends React.Component {
 
     }
 
-
-    //DateChange = (name, event) => {
-    //    console.log(event);
-    //    var today = event.toDate();
-    //    var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
-    //    let userdDTO = this.state.tblPolicyMemberDetails;
-    //    userdDTO[0][name] = date;
-    //    this.setState({ userdDTO });
-    //};
-    //newdatechange = (date) => {
-    //    const _date = date.split('/');
-    //    const dateObj = { month: _date[1], year: _date[2], day: _date[0] };
-
-    //    return dateObj.year + '-' + dateObj.month + '-' + dateObj.day;
-    //}
-
     DateChange = (name, event) => {
-        //debugger
         const fields = this.state.tblPolicyMemberDetails;
         console.log('event', event);
         var today = event.toDate();
@@ -564,9 +533,62 @@ class ProposalIncomplete extends React.Component {
         this.setState({ fields })
     };
 
+    onProposerDateChange = (formate, type, name, evt) => {
+        var today = evt.toDate();
+
+        //var day = today.getDate();
+        //var month = today.getMonth() + 1;
+
+        //if (month < 10) {
+        //    month = '0' + month;
+
+        //}
+        //if (day < 10) {
+        //    day = '0' + day;
+        //}
+
+        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+        let newProposerDTO = this.state.PolicyOwnerDetailsdataOnNoCondition;
+        newProposerDTO[name] = date;
+
+        this.setState({ newProposerDTO });
+
+        console.log("newProposerDTO", newProposerDTO);
+
+        if (name == "dob") {
+            this.handleDobvalidation();
+        } else {
+
+        }
+
+    }
+
+    handleDobvalidation() {
+        //this.setState({ validdob: false });
+        
+        var today = new Date();
+        var birthDate = new Date(this.state.PolicyOwnerDetailsdataOnNoCondition.dob);
+        var calculatedage = today.getFullYear() - birthDate.getFullYear();
+        var m = today.getMonth() - birthDate.getMonth();
+        console.log("age value", calculatedage);
+        if (calculatedage < 18) {
+            swal("", "Date of Birth value entered should be more than 18 years", "error");
+            let date = this.state.PolicyOwnerDetailsdataOnNoCondition;
+            date.dob = new Date(this.state.PolicyOwnerDetailsdataOnNoCondition.dob).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+            this.setState({ date });
+        }
+        else {
+            let dob = this.state.PolicyOwnerDetailsdataOnNoCondition;
+            dob.dob = new Date(this.state.PolicyOwnerDetailsdataOnNoCondition.dob).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+            this.setState({ dob });
+            //this.setState({ validdob: true });
+        }
+        console.log("date: ", this.state.PolicyOwnerDetailsdataOnNoCondition.dob)
+    }
 
     componentDidMount() {
-        
+
         //this is for grid data which is comming into the gridtable when we click on incompleted proposal 
         fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/ProposalPoll/GetProposalIncompleteData` + ``, {
             method: 'get',
@@ -605,10 +627,7 @@ class ProposalIncomplete extends React.Component {
                 //this.leadTable(data);
                 this.setState({ MasterDataDto: data });
             });
-
-
-
-
+        
         console.log("MasterDataDto", this.state.MasterDataDto)
 
 
@@ -644,7 +663,7 @@ class ProposalIncomplete extends React.Component {
         this.setState({ premiumPayingDto });
 
         console.log("premiumPayingDto", this.state.premiumPayingDto);
-        
+
     }
 
     CommunicationSetValues = (evt) => {
@@ -720,7 +739,7 @@ class ProposalIncomplete extends React.Component {
 
         obj.smokecount = MasterDataDto2.filter(a => a.mID == LifeStyleQA.SmokeQuantity)[0].mValue === undefined
             ? [] : MasterDataDto2.filter(a => a.mID == LifeStyleQA.SmokeQuantity)[0].mValue;
-       
+
         obj.smoketype = MasterDataDto1.filter(a => a.mID == LifeStyleQA.SmokeType)[0].mValue === undefined
             ? [] : MasterDataDto1.filter(a => a.mID == LifeStyleQA.SmokeType)[0].mValue;
 
@@ -743,7 +762,7 @@ class ProposalIncomplete extends React.Component {
         const MasterDataDto3 = this.state.MasterDataDto[145].mdata;
         const MasterDataDto4 = this.state.MasterDataDto[142].mdata;
 
-        console.log("MasterDataDto1", MasterDataDto3, MasterDataDto4, MasterDataDto3.filter(a => a.mID == LifeStyleQA.AlcoholTypes) );
+        console.log("MasterDataDto1", MasterDataDto3, MasterDataDto4, MasterDataDto3.filter(a => a.mID == LifeStyleQA.AlcoholTypes));
 
         obj.alcoholType = MasterDataDto3.filter(a => a.mID == LifeStyleQA.AlcholType)[0].mValue === undefined
             ? [] : MasterDataDto3.filter(a => a.mID == LifeStyleQA.AlcholType)[0].mValue;
@@ -790,7 +809,7 @@ class ProposalIncomplete extends React.Component {
     }
 
 
-    
+
 
     leadTable = (data) => {
         console.log("incompletedata", data);
@@ -834,7 +853,7 @@ class ProposalIncomplete extends React.Component {
     handlePolicyOwnerData = (id) => {
         //debugger;
         //fetch("https://localhost:44351/api/Proposal/PolicyOwnerDetails/GePolicyOwnerDetails?PolicyID="+id , {
-        fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/PolicyOwnerDetails/GePolicyOwnerDetails?PolicyID=`+ id + ``, {
+        fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/PolicyOwnerDetails/GePolicyOwnerDetails?PolicyID=` + id + ``, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -854,7 +873,7 @@ class ProposalIncomplete extends React.Component {
                 console.log("PolicyOwnerDetailsDto:jdhfuwehoe", this.state.tblPolicyMemberDetails);
 
             });
-        
+
     }
 
     //////////////// Handling policy owner's permanent address checkbox (Is Permanent address same as communication address....?)//////////////////////////////
@@ -863,7 +882,7 @@ class ProposalIncomplete extends React.Component {
         debugger;
 
         let state = this.state;
-        
+
         if (event.target.checked == true) {
             state.singleValueCheckboxSelected = true;
             this.setState({});
@@ -990,11 +1009,11 @@ class ProposalIncomplete extends React.Component {
         this.state.singleValue = event.target.value == "1" ? false : true;
         this.state.singleValueSelected = event.target.value;
         this.state.singleValueSelectedProposer = event.target.value;
-        this.state.selectOccPOM = event.target.value; 
+        this.state.selectOccPOM = event.target.value;
         this.setState({ value });
         console.log("singleValueSelected", this.state.singleValueSelected);
 
-       
+
     }
 
     ///////// Occupation Hazardous work set up for policy owner details//////
@@ -1016,13 +1035,13 @@ class ProposalIncomplete extends React.Component {
             this.setState({});
         }
     }
-    
+
     ///////// Occupation Hazardous work set up for policy new member details//////
 
     handleNewPolicyRadio = (event) => {
 
         this.state.selectOccPNM = event.target.value;    // "selectOccPNM" -> means OccupationHazardousWork selection for new proposer when user selects No
-        this.setState({}); 
+        this.setState({});
 
         if (this.state.selectOccPNM === "1") {
             this.state.PolicyOwnerDetailsdataOnNoCondition.occupationRequireHarzasousWork = "1"; // "1" -> means Is OccupationHazardousWork require = No
@@ -1052,11 +1071,11 @@ class ProposalIncomplete extends React.Component {
         this.setState({
             familydatatable: this.state.familytable.map((m, index) => {
                 return {
-                    relationship : <MasterDropdown value={m.relationship} lstObject={this.state.MasterDataDto} filterName='FamilyBackGroundRelationship' name='relationship' onChange={(e) => this.handleFamilySetValues(e, index)} formControlProps={{ fullWidth: true }} />,
-                    presentage : <CustomInput value={m.presentage} onChange={(e) => this.handleFamilySetValues(e, index)} name="presentage" formControlProps={{ fullWidth: true }} />,
-                    stateofhealth : <MasterDropdown value={m.stateofhealth} lstObject={this.state.MasterDataDto} filterName='StateOfHealth' onChange={(e) => this.handleFamilySetValues(e, index)} name="stateofhealth" formControlProps={{ fullWidth: true }} />,
-                    ageatdeath : <CustomInput value={m.ageatdeath} onChange={(e) => this.handleFamilySetValues(e, index)} name="stateofhealth" formControlProps={{ fullWidth: true }} />,
-                    cause : <MasterDropdown value={m.cause} lstObject={this.state.MasterDataDto} filterName='CauseOfDeath' onChange={(e) => this.handleFamilySetValues(e, index)} name="cause" formControlProps={{ fullWidth: true }} />,
+                    relationship: <MasterDropdown value={m.relationship} lstObject={this.state.MasterDataDto} filterName='FamilyBackGroundRelationship' name='relationship' onChange={(e) => this.handleFamilySetValues(e, index)} formControlProps={{ fullWidth: true }} />,
+                    presentage: <CustomInput value={m.presentage} onChange={(e) => this.handleFamilySetValues(e, index)} name="presentage" formControlProps={{ fullWidth: true }} />,
+                    stateofhealth: <MasterDropdown value={m.stateofhealth} lstObject={this.state.MasterDataDto} filterName='StateOfHealth' onChange={(e) => this.handleFamilySetValues(e, index)} name="stateofhealth" formControlProps={{ fullWidth: true }} />,
+                    ageatdeath: <CustomInput value={m.ageatdeath} onChange={(e) => this.handleFamilySetValues(e, index)} name="stateofhealth" formControlProps={{ fullWidth: true }} />,
+                    cause: <MasterDropdown value={m.cause} lstObject={this.state.MasterDataDto} filterName='CauseOfDeath' onChange={(e) => this.handleFamilySetValues(e, index)} name="cause" formControlProps={{ fullWidth: true }} />,
                     actions: <Button justIcon round simple color="danger" className="remove" disabled={(this.state.nonedit === true) ? true : false} onClick={(e) => this.deleteFamilydata(e, index)} ><Delete /> </Button >
 
                 };
@@ -1070,7 +1089,7 @@ class ProposalIncomplete extends React.Component {
         let value = event.target.value;
         familytabledto[index][name] = value;
         this.setState({ familytabledto });
-        
+
         console.log("dssythfkgui", this.state.familytable);
         this.handleFamilydatatable();
     }
@@ -1216,12 +1235,12 @@ class ProposalIncomplete extends React.Component {
                                                         */}
                         {this.state.open &&
                             <ModifyProposal handlePolicyOwnerRadio={this.handlePolicyOwnerRadio} selectOccPOM={this.state.selectOccPOM} handlePermanentAdd={this.handlePermanentAdd} NPMpermanentAddSelected={this.state.NPMpermanentAddSelected} handleCitizenshipCheckBox={this.handleCitizenshipCheckBox} NPMcitizenshipSelected={this.state.NPMcitizenshipSelected} selectOccPNM={this.state.selectOccPNM} handleNewPolicyRadio={this.handleNewPolicyRadio} SaveModifiedProposalDetails={this.state.SaveModifiedProposalDetails} MHDetailsSetValue={this.MHDetailsSetValue} medicalHistoryDTO={this.state.medicalHistoryDTO} wealthSigDetailsDTO={this.state.wealthSigDetailsDTO} proposerSigDetailsDTO={this.state.proposerSigDetailsDTO} proposalFormFlag={this.state.proposalFormFlag} premiumPayingDto={this.state.premiumPayingDto} PremiumPaymentSetValue={this.PremiumPaymentSetValue} preferredCommunication={this.state.preferredCommunication} CommunicationSetValues={this.CommunicationSetValues} cmedicinetable={this.state.cmedicinetable} cmedicineDto={this.state.cmedicineDto} lmedicinetable={this.state.lmedicinetable} lmedicineDto={this.state.lmedicineDto} Treatmenttable={this.state.Treatmenttable} TreatmentDto={this.state.TreatmentDto}
-                            DHCtable={this.state.DHCtable} DHCtDto={this.state.DHCtDto} claimedDto={this.state.claimedDto} claimedtable={this.state.claimedtable} insurancetable={this.state.insurancetable} insuranceDto={this.state.insuranceDto} handleAddButton={this.handleAddButton} familydatatable={this.state.familydatatable} familyBackground={this.state.familyBackground} FamilyDetailSetValue={this.FamilyDetailSetValue} familyBackgroundDto={this.state.familyBackgroundDto} AlcoholQuestionAddButton={this.AlcoholQuestionAddButton} alcoholdata={this.state.alcoholdata}
-                            TobaccoQuestionAddButton={this.TobaccoQuestionAddButton} tobaccodata={this.state.tobaccodata} handlePolicyOwnerData={this.handlePolicyOwnerData} DateChange={this.DateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails}
-                            SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer}
-                            singleValueSelected={this.state.singleValueSelected} handleRadioChange={this.handleRadioChange} handleRadioOnChange={this.handleRadioOnChange} leadTable={this.leadTable} SetValue={this.SetValue} MasterDataDto={this.state.MasterDataDto} filterData={this.state.filterData} PolicyOwnerDetailsDto={this.state.PolicyOwnerDetailsDto} PolicyOwnerDetailsSetValue={this.PolicyOwnerDetailsSetValue}
-                            PolicyOwnerDetailsdataOnYesConditioinDto={this.state.PolicyOwnerDetailsdataOnYesConditioinDto} PolicyOwnerDetailsdataOnNoCondition={this.state.PolicyOwnerDetailsdataOnNoCondition} handleClose={this.handleClose} SetPermanentAddCheckBox={this.SetPermanentAddCheckBox} singleValueCheckboxSelected={this.state.singleValueCheckboxSelected} citizenshipCheckboxSelected={this.state.citizenshipCheckboxSelected}
-                            SetCitizenshipCheckBox={this.SetCitizenshipCheckBox} />
+                                DHCtable={this.state.DHCtable} DHCtDto={this.state.DHCtDto} claimedDto={this.state.claimedDto} claimedtable={this.state.claimedtable} insurancetable={this.state.insurancetable} insuranceDto={this.state.insuranceDto} handleAddButton={this.handleAddButton} familydatatable={this.state.familydatatable} familyBackground={this.state.familyBackground} FamilyDetailSetValue={this.FamilyDetailSetValue} familyBackgroundDto={this.state.familyBackgroundDto} AlcoholQuestionAddButton={this.AlcoholQuestionAddButton} alcoholdata={this.state.alcoholdata}
+                                TobaccoQuestionAddButton={this.TobaccoQuestionAddButton} tobaccodata={this.state.tobaccodata} handlePolicyOwnerData={this.handlePolicyOwnerData} onProposerDateChange={this.onProposerDateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails}
+                                SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer}
+                                singleValueSelected={this.state.singleValueSelected} handleRadioChange={this.handleRadioChange} handleRadioOnChange={this.handleRadioOnChange} leadTable={this.leadTable} SetValue={this.SetValue} MasterDataDto={this.state.MasterDataDto} filterData={this.state.filterData} PolicyOwnerDetailsDto={this.state.PolicyOwnerDetailsDto} PolicyOwnerDetailsSetValue={this.PolicyOwnerDetailsSetValue}
+                                PolicyOwnerDetailsdataOnYesConditioinDto={this.state.PolicyOwnerDetailsdataOnYesConditioinDto} PolicyOwnerDetailsdataOnNoCondition={this.state.PolicyOwnerDetailsdataOnNoCondition} handleClose={this.handleClose} SetPermanentAddCheckBox={this.SetPermanentAddCheckBox} singleValueCheckboxSelected={this.state.singleValueCheckboxSelected} citizenshipCheckboxSelected={this.state.citizenshipCheckboxSelected}
+                                SetCitizenshipCheckBox={this.SetCitizenshipCheckBox} />
                         }
                         {/*</div>
                     </Modal>*/}
